@@ -1,0 +1,24 @@
+version: "3"
+services:
+  open-aps-db:
+    build:
+      context: ./open-aps-db
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: int_test_admin
+      POSTGRES_PASSWORD: just_a_testing_password
+      POSTGRES_DB: open_aps
+      POSTGRES_REGISTER_PASSWORD: just_reg_testing_password
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U int_test_admin -d open_aps",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: -p 5432
