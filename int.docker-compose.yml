@@ -21,4 +21,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - test-network
     command: -p 5432
+
+networks:
+  test-network:
+    driver: bridge
