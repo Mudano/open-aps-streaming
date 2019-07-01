@@ -1,28 +1,5 @@
 version: "3.5"
 services:
-  open-aps-db:
-    build:
-      context: ./open-aps-db
-      dockerfile: Dockerfile
-    restart: always
-    environment:
-      POSTGRES_USER: ${OPEN_APS_POSTGRES_ADMIN_USER}
-      POSTGRES_PASSWORD: ${OPEN_APS_POSTGRES_ADMIN_PASSWORD}
-      POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
-      POSTGRES_REGISTER_USER: ${OPEN_APS_POSTGRES_REGISTER_USER}
-      POSTGRES_REGISTER_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${OPEN_APS_POSTGRES_ADMIN_USER} -d {OPEN_APS_POSTGRES_DB}",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - test-network
-    command: -p ${OPEN_APS_POSTGRES_PORT}
   open-aps-int:
     build:
       context: ./integration-tests
@@ -35,13 +12,5 @@ services:
       POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
       POSTGRES_REGISTER_USER: ${OPEN_APS_POSTGRES_REGISTER_USER}
       POSTGRES_REGISTER_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
-    networks:
-      - test-network
-    depends_on:
-      - open-aps-db
     command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- pytest
 
-networks:
-  test-network:
-    name: open-aps-test-network
-    driver: bridge
