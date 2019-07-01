@@ -27,6 +27,6 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 8000:8000
-    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- python manage.py runserver 0.0.0.0:8000
+      - ${OPEN_APS_REGISTRATION_PORT}:${OPEN_APS_REGISTRATION_PORT}
+    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- python manage.py runserver 0.0.0.0:${OPEN_APS_REGISTRATION_PORT}
 
