@@ -27,27 +27,22 @@ class DatabaseConfig:
             f"dbname='{self.db_name}' user='{self.user}' password='{self.password}'"
 
     @staticmethod
-    def __get_test_server_config_from_env():
+    def from_test_env(user_env_var, pass_env_var):
         """
-        fetches the test db server's host, port, and database name from the environment
-        :return: (host, port, database_name)
+        fetches the test db server's host, port, and database name from fixed environment
+        variables, and fetches a given username and password from given env var strings.
+        Constructs and returns an instance of DatabaseConfig from these.
+        :return: DatabaseConfig
         """
         test_host = os.environ['POSTGRES_HOST']
         test_port = os.environ['POSTGRES_PORT']
         test_db_name = os.environ['POSTGRES_DB']
-        return test_host, test_port, test_db_name
-
-    @staticmethod
-    def from_admin_test_environment():
-        """
-        Uses preset environment variables to define the admin database account.
-        :return: DatabaseConfig class for the test admin user.
-        """
-        test_host, test_port, test_db_name = DatabaseConfig.__get_test_server_config_from_env()
-        admin_user = os.environ['POSTGRES_ADMIN_USER']
-        admin_password = os.environ['POSTGRES_ADMIN_PASSWORD']
-        return DatabaseConfig(test_host, test_port, test_db_name, admin_user, admin_password)
+        user = os.environ[user_env_var]
+        password = os.environ[pass_env_var]
+        return DatabaseConfig(test_host, test_port, test_db_name, user, password)
 
 
 # below are preset users constructed from environment variables and ready to be used in tests
-test_db_admin_config = DatabaseConfig.from_admin_test_environment()
+test_db_admin_config = DatabaseConfig.from_test_env('POSTGRES_ADMIN_USER', 'POSTGRES_ADMIN_PASSWORD')
+
+test_db_register_config = DatabaseConfig.from_test_env('POSTGRES_REGISTER_USER', 'POSTGRES_REGISTER_PASSWORD')

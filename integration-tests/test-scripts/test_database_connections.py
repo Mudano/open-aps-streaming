@@ -2,7 +2,7 @@
 contains basic connection tests for all users of the application database.
 """
 import psycopg2
-from utils.database_config import test_db_admin_config
+from utils.database_config import test_db_admin_config, test_db_register_config
 
 
 def database_connection_test_builder(db_config):
@@ -26,4 +26,6 @@ def test_admin_database_connection():
     database_connection_test_builder(test_db_admin_config)()
 
 
-
+# uses the database register web-page account to run a basic connectivity test
+def test_register_database_connection():
+    database_connection_test_builder(test_db_register_config)()
