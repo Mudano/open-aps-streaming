@@ -32,7 +32,8 @@ services:
       POSTGRES_USER: ${OPEN_APS_POSTGRES_ADMIN_USER}
       POSTGRES_PASSWORD: ${OPEN_APS_POSTGRES_ADMIN_PASSWORD}
       POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
+      APPLICATION_PORT: ${OPEN_APS_REGISTRATION_PORT}
     ports:
       - ${OPEN_APS_REGISTRATION_PORT}:${OPEN_APS_REGISTRATION_PORT}
-    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- python manage.py runserver 0.0.0.0:${OPEN_APS_REGISTRATION_PORT}
+    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
 
