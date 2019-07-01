@@ -22,6 +22,15 @@ services:
     networks:
       - test-network
     command: -p 5432
+  open-aps-int:
+    build:
+      context: ./integration-tests
+      dockerfile: Dockerfile
+    networks:
+      - test-network
+    depends_on:
+      - open-aps-db
+    command: ./wait-for-it.sh open-aps-db:5432 -- pytest
 
 networks:
   test-network:
