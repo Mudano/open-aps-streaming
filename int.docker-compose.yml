@@ -5,8 +5,6 @@ services:
       context: ./open-aps-db
       dockerfile: Dockerfile
     restart: always
-    ports:
-      - 5432:5432
     environment:
       POSTGRES_USER: int_test_admin
       POSTGRES_PASSWORD: just_a_testing_password
