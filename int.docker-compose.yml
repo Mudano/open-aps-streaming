@@ -6,31 +6,38 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      POSTGRES_USER: int_test_admin
-      POSTGRES_PASSWORD: just_a_testing_password
-      POSTGRES_DB: open_aps
-      POSTGRES_REGISTER_PASSWORD: just_reg_testing_password
+      POSTGRES_USER: ${OPEN_APS_POSTGRES_ADMIN_USER}
+      POSTGRES_PASSWORD: ${OPEN_APS_POSTGRES_ADMIN_PASSWORD}
+      POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
+      POSTGRES_REGISTER_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U int_test_admin -d open_aps",
+          "pg_isready -U ${OPEN_APS_POSTGRES_ADMIN_USER} -d {OPEN_APS_POSTGRES_DB}",
         ]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
       - test-network
-    command: -p 5432
+    command: -p ${OPEN_APS_POSTGRES_PORT}
   open-aps-int:
     build:
       context: ./integration-tests
       dockerfile: Dockerfile
+    environment:
+      POSTGRES_HOST: 'open-aps-db'
+      POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
+      POSTGRES_ADMIN_USER: ${OPEN_APS_POSTGRES_ADMIN_USER}
+      POSTGRES_ADMIN_PASSWORD: ${OPEN_APS_POSTGRES_ADMIN_PASSWORD}
+      POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
+      POSTGRES_REGISTER_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
     networks:
       - test-network
     depends_on:
       - open-aps-db
-    command: ./wait-for-it.sh open-aps-db:5432 -- pytest
+    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- pytest
 
 networks:
   test-network:
