@@ -1,4 +1,4 @@
-version: "3"
+version: "3.5"
 services:
   open-aps-db:
     build:
@@ -27,4 +27,5 @@ services:
 
 networks:
   test-network:
+    name: open-aps-test-network
     driver: bridge
