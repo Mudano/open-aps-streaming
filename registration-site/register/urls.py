@@ -20,4 +20,5 @@ from .views import index
 urlpatterns = [
     path('polls/', index, name='index'),
     path('admin/', admin.site.urls),
+    path('openhumans/', include('openhumans.urls')),
 ]

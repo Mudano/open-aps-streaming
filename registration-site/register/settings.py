@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'openhumans'
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,12 @@ POSTGRES_PORT = os.environ['POSTGRES_PORT']
 POSTGRES_DB_NAME = os.environ['POSTGRES_DB']
 POSTGRES_USER = os.environ['POSTGRES_USER']
 POSTGRES_PASS = os.environ['POSTGRES_PASSWORD']
+
+APPLICATION_HOST = os.getenv('APPLICATION_HOST', 'http://localhost:5000')
+APPLICATION_PORT = os.getenv('APPLICATION_PORT', '8000')
+OPENHUMANS_APP_BASE_URL = f'{APPLICATION_HOST}:{APPLICATION_PORT}'
+OPENHUMANS_CLIENT_ID = os.getenv('OPENHUMANS_CLIENT_ID', 'your_client_id')
+OPENHUMANS_CLIENT_SECRET = os.getenv('OPENHUMANS_CLIENT_SECRET', 'your_client_secret')
 
 
 DATABASES = {
