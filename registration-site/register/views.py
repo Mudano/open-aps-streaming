@@ -7,7 +7,7 @@ import requests
 # Set up logging.
 logger = logging.getLogger(__name__)
 
-from .settings import OPENHUMANS_APP_BASE_URL
+# from .settings import OPENHUMANS_APP_BASE_URL
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -17,7 +17,7 @@ def oh_get_member_data(token):
     Exchange OAuth2 token for member data.
     """
     req = requests.get(
-        '{}/api/direct-sharing/project/exchange-member/'.format(OPENHUMANS_APP_BASE_URL),
+        '{}/api/direct-sharing/project/exchange-member/'.format(settings.OPENHUMANS_OH_BASE_URL),
         params={'access_token': token})
     if req.status_code == 200:
         return req.json()
@@ -34,7 +34,7 @@ def home(request):
         request.user.is_authenticated))
 
     context = {'client_id': settings.OPENHUMANS_CLIENT_ID,
-               'oh_proj_page': 'temp activity page'}
+               'oh_proj_page': settings.OPENHUMANS_PROJECT_ADDRESS}
 
     if request.user.is_authenticated:
         context.update({
