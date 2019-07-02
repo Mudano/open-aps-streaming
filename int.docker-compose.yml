@@ -12,5 +12,5 @@ services:
       POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
       POSTGRES_REGISTER_USER: ${OPEN_APS_POSTGRES_REGISTER_USER}
       POSTGRES_REGISTER_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
-    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- pytest
+    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./wait-for-it.sh open-aps-registration-site:${OPEN_APS_REGISTRATION_PORT} -- pytest
 
