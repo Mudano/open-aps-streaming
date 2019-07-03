@@ -1,7 +1,6 @@
 """
 Django settings for register project.
 """
-
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -21,7 +20,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -29,7 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'register.register.apps.RegisterConfig'
+    'register.register.apps.RegisterConfig',
+    'openhumans'
 ]
 
 MIDDLEWARE = [
@@ -63,10 +62,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'register.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-
 # get postgres configuration from the environment
 POSTGRES_HOST = os.environ['POSTGRES_HOST']
 POSTGRES_PORT = os.environ['POSTGRES_PORT']
@@ -83,7 +78,9 @@ OPENHUMANS_PROJECT_ADDRESS = os.getenv('OPEN_HUMANS_PROJECT_ADDRESS')
 OPENHUMANS_CLIENT_ID = os.getenv('OPEN_HUMANS_CLIENT_ID')
 OPENHUMANS_CLIENT_SECRET = os.getenv('OPEN_HUMANS_CLIENT_SECRET')
 
+LOGIN_REDIRECT_URL = '/'
 
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -97,7 +94,6 @@ DATABASES = {
         'PORT': POSTGRES_PORT,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -116,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 
 LOGGING = {
     'version': 1,
@@ -137,7 +134,6 @@ LOGGING = {
     },
 }
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -151,13 +147,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 # STATIC_ROOT = os.path.join(BASE_DIR, 'register', 'static')
 
-STATICFILES_DIRS = (
-       os.path.join(BASE_DIR, 'register', 'static'),
-)
-
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'register', 'static'),)
 STATIC_URL = '/static/'
