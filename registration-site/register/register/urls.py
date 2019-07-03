@@ -15,15 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from .register.views import index, home, complete
+from .views import index, home, complete, logout_view, transfer
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
-    # path('polls/', index, name='index'),
-    path(r'', include('register.register.urls')),
-    # path('admin/', admin.site.urls),
-    # path(r'complete/?', complete, name='complete'),
+    path('polls/', index, name='index'),
+    path(r'', home, name='home'),
+    path(r'complete', complete, name='complete'),
+    path(r'logout', logout_view, name='logout'),
+    path(r'transfer', transfer, name='transfer'),
     # path('openhumans/', include('openhumans.urls')),
 ]
 

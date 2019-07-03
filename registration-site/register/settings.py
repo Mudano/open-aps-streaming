@@ -6,7 +6,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+BASE_DIR = os.path.join(BASE_DIR, 'register')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'openhumans'
+    'register.register.apps.RegisterConfig'
 ]
 
 MIDDLEWARE = [
@@ -74,8 +74,8 @@ POSTGRES_DB_NAME = os.environ['POSTGRES_DB']
 POSTGRES_USER = os.environ['POSTGRES_USER']
 POSTGRES_PASS = os.environ['POSTGRES_PASSWORD']
 
-APPLICATION_HOST = os.getenv('APPLICATION_HOST', 'http://localhost')
-APPLICATION_PORT = os.getenv('APPLICATION_PORT', '8000')
+APPLICATION_HOST = os.getenv('APPLICATION_HOST')
+APPLICATION_PORT = os.getenv('APPLICATION_PORT')
 OPENHUMANS_APP_BASE_URL = f'{APPLICATION_HOST}:{APPLICATION_PORT}'
 
 OPENHUMANS_OH_BASE_URL = 'https://www.openhumans.org'
@@ -117,6 +117,26 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'register': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+        }
+    },
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -134,5 +154,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
+# STATIC_ROOT = os.path.join(BASE_DIR, 'register', 'static')
+
+STATICFILES_DIRS = (
+       os.path.join(BASE_DIR, 'register', 'static'),
+)
 
 STATIC_URL = '/static/'

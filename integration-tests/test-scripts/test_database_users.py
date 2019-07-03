@@ -57,3 +57,24 @@ def test_register_user_cannot_create_public():
         blocked = True
 
     assert blocked
+
+
+def test_register_user_can_create_register():
+    """
+    Attempts to create a table in the register schema as the register user, test passes if this is
+    a success, else the test fails.
+    :return: None | AssertError
+    """
+    try:
+        conn = psycopg2.connect(test_db_register_config.get_connection_string())
+        cur = conn.cursor()
+        cur.execute("create table register.testing(test integer)")
+        created = True
+
+        cur.close()
+        conn.close()
+    except Exception as e:
+        created = False
+        print("registration user was not permitted to create a new table in the register schema")
+
+    assert created
