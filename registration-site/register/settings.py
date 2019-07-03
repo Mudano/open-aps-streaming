@@ -5,7 +5,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_DIR = os.path.join(BASE_DIR, 'register')
+#BASE_DIR = os.path.join(BASE_DIR, 'register')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'register.register.apps.RegisterConfig',
+    'register.apps.RegisterConfig',
     'openhumans'
 ]
 
@@ -149,7 +149,5 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-# STATIC_ROOT = os.path.join(BASE_DIR, 'register', 'static')
-
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'register', 'static'),)
 STATIC_URL = '/static/'

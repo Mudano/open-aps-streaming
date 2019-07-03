@@ -15,9 +15,12 @@ Including another URLconf
 """
 from django.urls import include, path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from .views import home, logout_view, transfer
 
 urlpatterns = [
-    path(r'', include('register.register.urls')),
+    path(r'', home, name='home'),
+    path(r'logout', logout_view, name='logout'),
+    path(r'transfer', transfer, name='transfer'),
     path('openhumans/', include('openhumans.urls')),
 ]
 
