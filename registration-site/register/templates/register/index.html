@@ -2,7 +2,7 @@
 
 {% block main_container %}
 
-<h1>Nightscout &rarr; Open Humans</h1>
+<h1>Regular Nightscout to Open Humans Transfers</h1>
 
 {% if request.user.is_authenticated %}
 
@@ -41,10 +41,11 @@
 <h2>Technical details</h2>
 <p>
   This app does not receive access to any identifying information from
-  your Open Humans account, and does not store any data locally. The app
-  deposits data into your Open Humans account associated with the
-  <a href="{{ oh_proj_page }}">"Nightscout Data Transfer"</a> activity,
-  which is managed by James Wedding and other Nightscout Foundation staff.
+  your Open Humans account. The only information that is received and
+  stored is an anonymous Open Humans member ID, and the authentication
+  details required for the application to regularly push files to your
+  Open Humans account. Data is deposited using these details and the
+  apps <a href="{{ oh_proj_page }}">associated transfer activity</a>.
 </p>
 <p>
   Raw data is JSON format, retrieved from your Nightscout server. You'll
@@ -53,6 +54,6 @@
 </p>
 <p>
   Source code for this app:
-  <a href="https://github.com/NightscoutFoundation/dataxfer">https://github.com/NightscoutFoundation/dataxfer</a>
+  <a href="https://github.com/Mudano/open-aps-streaming">https://github.com/Mudano/open-aps-streaming</a>
 </p>
 {% endblock main_container %}

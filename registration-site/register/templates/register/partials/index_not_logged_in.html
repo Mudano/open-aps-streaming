@@ -1,17 +1,17 @@
 <p class="lead">
-  Use this small open source app to perform a one-time copy of raw
-  Nightscout data into your
-  <a href="https://www.openhumans.org/">Open Humans</a> account.
-  This enables you to share your data with studies and citizen science
-  projects.
+  Register with this app to have your Nightscout data regularly
+  copied into your <a href="https://www.openhumans.org/">Open Humans</a>
+  account. This enables you to share your data with studies and
+  citizen science projects.
 </p>
 <p class="lead">
   Learn more by visiting:<br>
   <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
 </p>
 <p>
-  This is a one-off transfer. If you want to update your data, you'll
-  have to do it again. Updates will overwrite all current data.
+  This is an automated transfer. Once you are registered no further action
+  is required, your Nightscout data will be regularly extracted
+  and deposited into your OpenHumans account.
 </p>
 <h2>How it works</h2>
 <ol>
@@ -22,25 +22,17 @@
   <li><b>Authorize (or re-authorize) this app.</b><br>
     This connects the app to your Open Humans account.</li>
   <li><b>Give us your Nightscout URL.</b><br>
-    You can also specify a time range.</li>
+    We will then store this in your OpenHumans account for safe keeping.</li>
   <li><b>That's it!</b><br>
-    We'll get your data and put it in your Open Humans account.
-    You'll be able to access &amp; manage your data here:
+    On regular intervals we'll fetch your new data and put it in your Open Humans
+    account. You'll be able to access &amp; manage your data here:
     <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
   </li>
 </ol>
-{% if client_id %}
+
 <a
   class="btn btn-primary btn-lg"
   href="https://www.openhumans.org/direct-sharing/projects/oauth2/authorize/?client_id={{ client_id }}&response_type=code"
-  {% else %}
-  class="btn btn-default disabled"
-  {% endif %}
   >
-  Start Nightscout Data Transfer
+  Register for Nightscout Data Transfers
 </a>
-{% if not client_id %}
-<p class="text-muted"><i>
-  This button is disabled because client_id hasn't been configured.
-</i></p>
-{% endif %}

@@ -1,12 +1,11 @@
-{% if oh_data and oh_data.data %}
 <p>
-</p>
-{% endif %}
-<p>
-  Use this form to initiate a copy of Nightscout data into Open Humans.
+  Use this form to initiate automated copies of Nightscout data into Open Humans.
   <b>This app will NOT retain any record of your Nightscout URL.</b>
-  This keeps your server secure. It also means that you'll need to manually
-  request data transfer each time you want to update data.
+  Rather the application stores your Nightscout URL in your private Open
+  Humans account. This helps keep your server secure and means that you
+  can at any point manually delete your Nightscout URL from Open Humans
+  if you wish to. Any changes made to this stored URL will also stop any
+  future pulls of data from your Nightscout application.
 </p>
 
 <div class="panel panel-default">
@@ -16,16 +15,6 @@
   <div class="panel panel-body">
     <form method="post" action="{% url 'transfer' %}">
       {% csrf_token %}
-      <div class="form-group">
-        <label for="afterDate">Starting from this date...</label>
-        <input type="text" class="form-control" id="afterDate" name=afterDate placeholder="YYYY-MM-DD">
-        <span id="helpBlock" class="help-block">Get all data from on or after this date. (If blank, get from earliest date possible.)</span>
-      </div>
-      <div class="form-group">
-        <label for="beforeDate">...up to this date.</label>
-        <input type="text" class="form-control" id="beforeDate" name=beforeDate placeholder="YYYY-MM-DD">
-        <span id="helpBlock" class="help-block">Get all data from on or before this date. (If blank, get data up to present.)</span>
-      </div>
       <div class="form-group">
         <label for="nightscoutURL">Your Nightscout URL</label>
         <input type="text" class="form-control" id="nightscoutURL" name=nightscoutURL>

@@ -5,48 +5,45 @@
   </form>
 </h2>
 
-{% if request.user.openhumansmember.last_xfer_datetime %}
-  {% with request.user.openhumansmember.last_xfer_status as status %}
-  <div class="panel
-      {% if 'Failed' in status or 'Aborted' in status %}panel-danger
-      {% elif status == 'Complete' %}panel-success
-      {% else %}panel-warning{% endif %}">
-    <div class="panel-heading">
-      Status of latest data transfer
-    </div>
-    <div class="panel-body">
-      <p>
-        <b>Initiated:</b> {{ request.user.openhumansmember.last_xfer_datetime }} UTC<br>
-        <b>Status:</b> {{ request.user.openhumansmember.last_xfer_status }}
-      </p>
-      {% if request.user.openhumansmember.last_xfer_status == 'Queued' or request.user.openhumansmember.last_xfer_status == 'Initiated' %}
-      <p>
-        Please give the data transfer a couple minutes to complete. You can
-        reload this page to check for updates.
-      </p>
-      {% endif %}
-    </div>
-  </div>
-  {% endwith %}
-{% else %}
+
 <p class="lead">
-  This app is now connected to Open Humans!{% if not oh_data.data %} Use the
-  form below to start a data transfer.{% endif %}
+  This app is now connected to Open Humans! Use the form below to
+  connect to your Nightscout app.
+</p>
+
+
+{% if ns_url_file_count == 1 %}
+<hr>
+<p>
+  It looks like you already have a Nightscout URL recorded in your OpenHumans account. See
+  the information on this below. If you've changed your Nightscout address, or if the
+  information below is incorrect, then simply provide your new URL in the form
+  below and this information will be updated.
 </p>
 {% endif %}
 
-{% if oh_data.data %}
+
+{% if ns_url_file_count > 1 %}
 <hr>
-<h3>Current Open Humans data</h3>
+<p>
+  It looks like you already have multiple Nightscout URs recorded in your OpenHumans account.
+  See the information on this below. This will prevent the regular upload of data from running
+  as the application is only intended to load data from a single Nightscout instance per
+  OpenHumans user. If you re-enter your URL in the form below the listed files will be deleted
+  and replaced by your given URL, this should restart the automated data pulls.
+</p>
+{% endif %}
+
+
+{% if ns_url_file_count > 0 %}
+<h3>Current Nightscout URL</h3>
 <table class="table">
   <tr>
     <th>Filename</th>
     <th></th>
-    <th>Created</th>
-    <th>Start date</th>
-    <th>End date</th>
+    <th>Created at</th>
   </tr>
-  {% for filedata in oh_data.data %}
+  {% for filedata in ns_url_files %}
   <tr>
     <td>{{ filedata.basename }}</td>
     <td>
@@ -55,24 +52,12 @@
     <td>
       {{ filedata.created }}
     </td>
-    <td>
-      {{ filedata.metadata.start_date }}
-    </td>
-    <td>
-      {{ filedata.metadata.end_date }}
-    </td>
   </tr>
   {% endfor %}
 </table>
 {% endif %}
 
 <hr>
-{% if oh_data.data %}
-<h3>New Data Transfer</h3>
-{% elif request.user.openhumansmember.last_xfer_datetime %}
-<h3>Initiate new data transfer</h3>
-{% else %}
 <h3>Initiate data transfer</h3>
-{% endif %}
 
 {% include 'register/partials/request_xfer_form.html' %}
