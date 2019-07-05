@@ -1,6 +1,6 @@
 FROM python:3.6
 
-WORKDIR /registration-site
+WORKDIR /nightscout-ingester
 ADD wait-for-it.sh .
 
 ADD requirements.txt .
