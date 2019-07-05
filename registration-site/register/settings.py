@@ -15,7 +15,7 @@ SECRET_KEY = 'r-j0z2&x-$m)y-rn$)vf0n3ib&188z(2d4k1*t5dyc&$clcw=5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.ngrok.io', 'localhost']
 
 
 # Application definition
@@ -68,9 +68,8 @@ POSTGRES_DB_NAME = os.environ['POSTGRES_DB']
 POSTGRES_USER = os.environ['POSTGRES_USER']
 POSTGRES_PASS = os.environ['POSTGRES_PASSWORD']
 
-APPLICATION_HOST = os.getenv('APPLICATION_HOST')
-APPLICATION_PORT = os.getenv('APPLICATION_PORT')
-OPENHUMANS_APP_BASE_URL = f'{APPLICATION_HOST}:{APPLICATION_PORT}'
+OPENHUMANS_APP_BASE_URL = os.getenv('APP_BASE_URL')
+APPLICATION_PORT = os.getenv('APP_PORT')
 
 OPENHUMANS_OH_BASE_URL = 'https://www.openhumans.org'
 OPENHUMANS_PROJECT_ADDRESS = os.getenv('OPEN_HUMANS_PROJECT_ADDRESS')

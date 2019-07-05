@@ -1,10 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.conf import settings
+from django.contrib.auth.models import User
 import logging
+import json
 from django.contrib import messages
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 import io
 
 # Set up logging.
@@ -64,6 +68,26 @@ def logout_view(request):
     """
     logout(request)
     return redirect('home')
+
+
+@require_http_methods(['POST'])
+@csrf_exempt
+def deauth_view(request):
+    """
+    The /deauth endpoint. Hit with a POST request when a user de-authorises
+    the OpenHumans project from accessing their data. The body of this request
+    is of the form { 'project_member_id': '12345678', 'erasure_requested': True }
+    """
+    json_str = json.loads(request.body.decode('utf-8'))
+    deauth_data = json.loads(json_str)
+    member_code = deauth_data['project_member_id']
+    erasure_requested = deauth_data['erasure_requested']
+
+    if erasure_requested:
+        logger.debug(f'Request received to delete member {member_code}')
+        delete_user(member_code)
+
+    return HttpResponse(status=200)
 
 
 def build_ns_url_metadata(oh_project_address):
@@ -159,3 +183,23 @@ def handle_oh_upload_attempt(request, upload_successful):
         messages.success(request, 'Successfully updated Nightscout URL information on Open Humans')
     else:
         messages.error(request, 'An error occurred uploading the file to Open Humans.')
+
+
+def delete_user(member_code):
+    """
+    Given an Open Humans member code will attempt to delete that user from all locations in the
+    registration portion of the application database.
+
+    :param member_code: The Open Humans code of the member to be deleted
+    :return: None
+    """
+    try:
+        u = User.objects.get(username=f'{member_code}_openhumans')
+        u.delete()
+        logger.info(f'Successfully deleted member {member_code} from the registration database')
+
+    except User.DoesNotExist:
+        logger.error(f'Unable to delete member {member_code} as requested, member does not exist')
+
+    except Exception as e:
+        logger.error(f'error encountered attempting to delete member {member_code}: {e}')

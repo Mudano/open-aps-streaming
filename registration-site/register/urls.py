@@ -15,13 +15,14 @@ Including another URLconf
 """
 from django.urls import include, path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from .views import home, logout_view, transfer
+from .views import home, logout_view, transfer, deauth_view
 
 urlpatterns = [
     path(r'', home, name='home'),
     path(r'logout', logout_view, name='logout'),
     path(r'transfer', transfer, name='transfer'),
     path('openhumans/', include('openhumans.urls')),
+    path('deauth', deauth_view, name='deauth'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
