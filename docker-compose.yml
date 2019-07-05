@@ -1,9 +1,6 @@
 version: "3.5"
 services:
   open-aps-db:
-    build:
-      context: ./open-aps-db
-      dockerfile: Dockerfile
     restart: always
     environment:
       POSTGRES_USER: ${OPEN_APS_POSTGRES_ADMIN_USER}
@@ -22,9 +19,6 @@ services:
       retries: 5
     command: -p ${OPEN_APS_POSTGRES_PORT}
   open-aps-registration-site:
-    build:
-      context: ./registration-site
-      dockerfile: Dockerfile
     restart: always
     environment:
       POSTGRES_HOST: 'open-aps-db'

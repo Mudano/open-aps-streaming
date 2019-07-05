@@ -1,0 +1,11 @@
+version: "3.5"
+services:
+  open-aps-db:
+    build:
+      context: ./open-aps-db
+      dockerfile: Dockerfile
+  open-aps-registration-site:
+    build:
+      context: ./registration-site
+      dockerfile: Dockerfile
+

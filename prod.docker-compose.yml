@@ -1,0 +1,13 @@
+version: "3.5"
+services:
+  open-aps-db:
+    image: open-aps-db:latest
+    volumes:
+      - open-aps-postgres-data:/var/lib/postgresql/data
+  open-aps-registration-site:
+    image: open-aps-registration-site:latest
+
+
+volumes:
+  open-aps-postgres-data:
+

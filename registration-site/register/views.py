@@ -36,18 +36,22 @@ def transfer(request):
     ns_url = request.POST['nightscoutURL']
     logger.debug(f"Pushing NS URL '{ns_url}' to OH Member {oh_member.oh_id}")
 
-    try:
-        ns_url_file_metadata = build_ns_url_metadata(settings.OPENHUMANS_PROJECT_ADDRESS)
-        ns_url_filename = f'{oh_member.oh_id}_open_aps_nightscout_url.txt'
+    if ns_url:
+        try:
+            ns_url_file_metadata = build_ns_url_metadata(settings.OPENHUMANS_PROJECT_ADDRESS)
+            ns_url_filename = f'{oh_member.oh_id}_open_aps_nightscout_url.txt'
 
-        if ns_url_filename in get_oh_member_file_names(oh_member):
-            logger.debug('Found an existing Nightscout URL file(s) for user. Deleting these before upload.')
-            oh_member.delete_single_file(file_basename=ns_url_filename)  # this deletes all files with the name
+            if ns_url_filename in get_oh_member_file_names(oh_member):
+                logger.debug('Found an existing Nightscout URL file(s) for user. Deleting these before upload.')
+                oh_member.delete_single_file(file_basename=ns_url_filename)  # this deletes all files with the name
 
-        upload_successful = upload_string_file_to_oh(oh_member, ns_url, ns_url_filename, ns_url_file_metadata)
-        handle_oh_upload_attempt(request, upload_successful)
-    except:
-        messages.error(request, 'Failed to update Nightscout URL information on Open Humans')
+            upload_successful = upload_string_file_to_oh(oh_member, ns_url, ns_url_filename, ns_url_file_metadata)
+            handle_oh_upload_attempt(request, upload_successful)
+        except Exception as e:
+            logger.error(e)
+            messages.error(request, 'Failed to update Nightscout URL information on Open Humans')
+    else:
+        messages.warning(request, 'An empty Nightscout address cannot be submitted, please provide a valid URL.')
 
     return redirect('home')
 
