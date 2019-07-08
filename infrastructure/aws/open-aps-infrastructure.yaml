@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  MachineId:
+    Description: The Amazon EC2 image ID used on the solution server.
+    Type: AWS::EC2::Image::Id
+    Default: ami-01e6a0b85de033c99
+  SecurityKeyName:
+    Description: The name of the AWS key pair to be used to access the instance.
+    Type: AWS::EC2::KeyPair::KeyName
+  InstanceType:
+    Description: The instance type of the openaps server
+    Type: String
+    Default: t2.nano
+    AllowedValues:
+      - t2.nano
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+  VolumeSize:
+    Description: The size (GB) of the underlying volume for the openaps server.
+    Type: Number
+    Default: 50
+
+Resources:
+  OpenApsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security group for the OpenAPS Nightscout data solution Machine. Created inside the default VPC"
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: 22
+        IpProtocol: tcp
+        ToPort: 22
+      - CidrIp: 0.0.0.0/0
+        FromPort: 80
+        IpProtocol: tcp
+        ToPort: 80
+      - CidrIp: 0.0.0.0/0
+        FromPort: 443
+        IpProtocol: tcp
+        ToPort: 443
+      - CidrIp: 0.0.0.0/0
+        FromPort: 5432
+        IpProtocol: tcp
+        ToPort: 5432
+
+  OpenApsServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref MachineId
+      KeyName: !Ref SecurityKeyName
+      InstanceType: !Ref InstanceType
+      SecurityGroupIds: [!Ref OpenApsSecurityGroup]
+      BlockDeviceMappings:
+        - 
+          DeviceName: "/dev/sda1"
+          Ebs:
+            VolumeSize: !Ref VolumeSize
+      Tags:
+        - 
+          Key: Name
+          Value: open-aps-nightscout-data-server
+        -
+          Key: Owner
+          Value: openaps.app@gmail.com
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            sudo apt-get update -y
+            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+            sudo apt-get update -y
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+            sudo groupadd docker
+            sudo usermod -aG docker ubuntu
+
+Outputs:
+  OpenApsServerPublicIp:
+    Description: The public IP of the provisioned openaps server.
+    Value: !GetAtt OpenApsServer.PublicIp
