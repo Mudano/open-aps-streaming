@@ -46,6 +46,26 @@ def test_register_schema_exists():
     assert len(public_schema) == 1
 
 
+def test_ns_ingest_schema_exists():
+    """
+    Tests that the nightscout ingest schema exists in the application database.
+    :return: None | AssertError
+    """
+    try:
+        conn = psycopg2.connect(test_db_admin_config.get_connection_string())
+        cur = conn.cursor()
+        cur.execute("SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'ns_ingest'")
+        public_schema = cur.fetchall()
+
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"Database connection failed for {test_db_admin_config.user}: " + str(e))
+        public_schema = []
+
+    assert len(public_schema) == 1
+
+
 def test_public_schema_empty():
     """
     The public schema is not used by any component of the application. This test ensures that

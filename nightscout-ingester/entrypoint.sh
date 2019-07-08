@@ -1,3 +1,3 @@
-#!/usr/bin/env bash
-python -c 'print("Hello World!")'
+#!/bin/sh
+python -u ingester.py
 

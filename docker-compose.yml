@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
       POSTGRES_REGISTER_USER: ${OPEN_APS_POSTGRES_REGISTER_USER}
       POSTGRES_REGISTER_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
+      POSTGRES_NIGHTSCOUT_USER: ${OPEN_APS_POSTGRES_NIGHTSCOUT_USER}
+      POSTGRES_NIGHTSCOUT_PASSWORD: ${OPEN_APS_NIGHTSCOUT_PASSWORD}
     healthcheck:
       test:
         [
@@ -34,4 +36,12 @@ services:
     ports:
       - ${OPEN_APS_REGISTRATION_PORT}:${OPEN_APS_REGISTRATION_PORT}
     command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
-
+  open-aps-nightscout-ingester:
+    restart: always
+    environment:
+      POSTGRES_HOST: 'open-aps-db'
+      POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
+      POSTGRES_USER: ${OPEN_APS_POSTGRES_NIGHTSCOUT_USER}
+      POSTGRES_PASSWORD: ${OPEN_APS_NIGHTSCOUT_PASSWORD}
+      POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
+    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./wait-for-it.sh open-aps-registration-site:${OPEN_APS_REGISTRATION_PORT} -- ./entrypoint.sh

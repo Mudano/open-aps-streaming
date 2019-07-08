@@ -6,7 +6,8 @@ services:
       - open-aps-postgres-data:/var/lib/postgresql/data
   open-aps-registration-site:
     image: open-aps-registration-site:latest
-
+  open-aps-nightscout-ingester:
+    image: open-aps-nightscout-ingester:latest
 
 volumes:
   open-aps-postgres-data:

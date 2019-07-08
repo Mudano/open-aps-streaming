@@ -46,3 +46,5 @@ class DatabaseConfig:
 test_db_admin_config = DatabaseConfig.from_test_env('POSTGRES_ADMIN_USER', 'POSTGRES_ADMIN_PASSWORD')
 
 test_db_register_config = DatabaseConfig.from_test_env('POSTGRES_REGISTER_USER', 'POSTGRES_REGISTER_PASSWORD')
+
+test_db_ns_config = DatabaseConfig.from_test_env('POSTGRES_NIGHTSCOUT_USER', 'POSTGRES_NIGHTSCOUT_PASSWORD')
