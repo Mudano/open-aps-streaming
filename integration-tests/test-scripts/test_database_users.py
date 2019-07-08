@@ -147,3 +147,4 @@ def test_ns_ingest_user_can_select_openhumansmember():
         print("ns_ingest user was not permitted to select from openhumans_openhumansmember")
 
     assert user_response != 'custom failure'
+

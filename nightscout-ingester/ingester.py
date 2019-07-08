@@ -1,24 +1,15 @@
 from ingester.scheduler import app_scheduler
+from ingester.jobs import nightscout_ingest_job
 from datetime import datetime
-import os
-
-
-def test():
-    time = datetime.now()
-    print(f'schedule test running at {time}')
-
 
 if __name__ == '__main__':
-    print(f'{datetime.now()} - Scheduled Nightscout ingester is starting up.')
-
-    app_scheduler.add_job(test, 'interval', seconds=5, id='1', replace_existing=True)
-    exit_key = 'Break' if os.name == 'nt' else 'C'
-    print(f'Press Ctrl+{exit_key} to exit')
+    app_scheduler.add_job(nightscout_ingest_job, 'interval', seconds=10, id='1', replace_existing=True)
 
     try:
+        print(f'{datetime.now()} - Beginning the scheduled Nightscout ingest job.')
         app_scheduler.start()
     except (KeyboardInterrupt, SystemExit) as e:
-        print(f'and exception was encountered whilst running the scheduler: {e}')
+        print(f'an exception was encountered whilst running the scheduler: {e}')
         pass
 else:
     print('why am I not main?')
