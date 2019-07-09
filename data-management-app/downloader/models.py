@@ -1,6 +1,6 @@
 
 from flask_login import UserMixin
-from apps.downloader import db
+from downloader import db
 
 
 class User(db.Model, UserMixin):

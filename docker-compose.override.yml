@@ -12,4 +12,7 @@ services:
     build:
       context: ./nightscout-ingester
       dockerfile: Dockerfile
-
+  open-aps-downloader:
+    build:
+      context: ./data-management-app
+      dockerfile: Dockerfile

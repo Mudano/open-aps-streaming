@@ -1,15 +1,15 @@
 
-from apps.downloader.functions import create_new_user, reset_user_password, NotFoundError, create_download_file
+from downloader.functions import create_new_user, reset_user_password, NotFoundError, create_download_file
 from flask_login import current_user, login_user, login_required, logout_user
-from apps.downloader import app, db, bcrypt, logger, DOWNLOAD_DAYS_CUTOFF
+from downloader import app, db, bcrypt, logger, DOWNLOAD_DAYS_CUTOFF
 from flask import session, redirect, url_for, request
 from flask import render_template, send_file
-from auth.helpers import get_metabase_url
-from apps.downloader.models import User
+from downloader.models import User
 import traceback
 import random
 import string
-
+import jwt
+import os
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -141,8 +141,17 @@ def analytics():
         notification = session['notification'] if 'notification' in session else None
         session['notification'] = None
 
-        iframe_url = get_metabase_url()
-        return render_template('analytics.html', iframe_url=iframe_url, notification=notification)
+        payload = {
+            "resource": {"dashboard": 6},
+            "params": {
+            }
+        }
+        token = jwt.encode(payload, os.environ['METABASE_SECRET_KEY'], "HS256")
+
+        iframeUrl = os.environ['METABASE_URL'] + "/embed/dashboard/" + token.decode(
+            "utf8") + "#theme=night&bordered=false&titled=false"
+
+        return render_template('analytics.html', iframe_url=iframeUrl, notification=notification)
 
     except Exception:
         logger.error(f'ANALYTICS - {str(traceback.format_exc())}')
