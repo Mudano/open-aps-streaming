@@ -1,6 +1,7 @@
 
 from downloader import APP_PUBLIC_URL, APP_DIRECTORY_PATH, app, db, logger
 from downloader.models import User
+from flask_login import current_user
 from downloader import mail
 from flask_mail import Message
 import pandas as pd
@@ -58,6 +59,9 @@ def create_new_user(email, temp_code):
         verified=False,
         verification_code=temp_code,
         admin=False,
+        login_count=0,
+        num_downloads=0,
+        total_download_size_mb=0,
         created_ts=datetime.datetime.now()
     )
     db.session.add(new_user)

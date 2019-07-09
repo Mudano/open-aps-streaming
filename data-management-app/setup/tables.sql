@@ -6,6 +6,10 @@ CREATE TABLE openaps.app_users (
 	verified BOOL,
 	verification_code TEXT,
 	admin BOOL DEFAULT FALSE,
+	last_signin TIMESTAMP,
+	login_count INTEGER,
+	num_downloads INTEGER,
+	total_download_size_mb NUMERIC,
 	created_ts TIMESTAMP
 );
 GRANT SELECT ON openaps.app_users TO admin_viewer;
