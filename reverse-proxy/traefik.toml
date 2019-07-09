@@ -1,0 +1,23 @@
+defaultEntryPoints = ["http", "https"]
+
+[entryPoints]
+  [entryPoints.dashboard]
+    address = ":8080"
+    [entryPoints.dashboard.auth]
+      [entryPoints.dashboard.auth.basic]
+        users = ["admin:$apr1$ruca84Hq$mbjdMZBAG.KWn7vfN/SNK/"]
+  [entryPoints.http]
+    address = ":80"
+      [entryPoints.http.redirect]
+        entryPoint = "https"
+  [entryPoints.https]
+    address = ":443"
+      [entryPoints.https.tls]
+[api]
+entrypoint="dashboard"
+
+[docker]
+domain = "your_domain"
+watch = true
+network = "open-aps"
+

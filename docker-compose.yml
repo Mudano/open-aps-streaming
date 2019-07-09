@@ -66,3 +66,11 @@ services:
     ports:
       - 9999:9999
     command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
+#  reverse-proxy:
+#    image: nginx:latest
+#    volumes:
+#      - ./reverse-proxy/nginx.conf/:/etc/nginx/nginx.conf/
+#    ports:
+#      - 81:80
+#      - 444:443
+

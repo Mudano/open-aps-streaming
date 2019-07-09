@@ -10,7 +10,25 @@ services:
     image: open-aps-registration-site:latest
   open-aps-nightscout-ingester:
     image: open-aps-nightscout-ingester:latest
+  reverse-proxy:
+    image: traefik:1.7.2-alpine
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $PWD/reverse-proxy/traefik.toml:/traefik.toml
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - open_aps_prod
+    labels:
+      - traefik.frontend.rule=Host:monitor.your_domain
+      - traefik.port=8080
+
 
 volumes:
   open-aps-postgres-data:
+
+networks:
+  open_aps:
+    name: open_aps_prod
 
