@@ -1,6 +1,5 @@
 
 from utils.slack_publisher import SlackPublisher
-from auth.helpers import get_slack_key
 import datetime
 import logging
 import sys
@@ -11,7 +10,7 @@ class Logger(object):
 
     def __init__(self, error_channel='openaps-errors', path=None, name='logger', level=logging.DEBUG, file_name_format='%Y-%m-%d-%H-%M-%S', delimiter='~'):
 
-        self.slacker = SlackPublisher(api_key=get_slack_key())
+        self.slacker = SlackPublisher(api_key=os.environ['DOWNLOADER_SLACK_KEY'])
         self.error_channel = error_channel
 
         self.logger = logging.getLogger(name)

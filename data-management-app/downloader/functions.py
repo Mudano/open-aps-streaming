@@ -1,7 +1,7 @@
 
-from apps.downloader import APP_PUBLIC_URL, APP_DIRECTORY_PATH, app, db, logger
-from apps.downloader.models import User
-from apps.downloader import mail
+from downloader import APP_PUBLIC_URL, APP_DIRECTORY_PATH, app, db, logger
+from downloader.models import User
+from downloader import mail
 from flask_mail import Message
 import pandas as pd
 import datetime
