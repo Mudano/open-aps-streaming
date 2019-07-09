@@ -10,6 +10,8 @@ services:
     image: open-aps-registration-site:latest
   open-aps-nightscout-ingester:
     image: open-aps-nightscout-ingester:latest
+  open-aps-downloader:
+    image: open-aps-downloader:latest
   reverse-proxy:
     image: traefik:1.7.2-alpine
     volumes:
