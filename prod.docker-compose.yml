@@ -3,7 +3,7 @@ services:
   open-aps-db:
     image: open-aps-db:latest
     ports:
-      - 5423:5432
+      - 5432:5432
     volumes:
       - open-aps-postgres-data:/var/lib/postgresql/data
   open-aps-registration-site:
