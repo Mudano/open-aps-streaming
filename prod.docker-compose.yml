@@ -6,11 +6,52 @@ services:
       - 5432:5432
     volumes:
       - open-aps-postgres-data:/var/lib/postgresql/data
+    networks:
+      - open_aps
   open-aps-registration-site:
     image: open-aps-registration-site:latest
+    networks:
+      - open_aps
+    labels:
+      - traefik.backend=registration
+      - traefik.frontend.rule=Host:register.localhost
+      - traefik.docker.network=open_aps
+      - traefik.port=${OPEN_APS_REGISTRATION_PORT}
+      - traefik.enable=true
   open-aps-nightscout-ingester:
     image: open-aps-nightscout-ingester:latest
+    networks:
+      - open_aps
+  open-aps-downloader:
+    image: open-aps-downloader:latest
+    networks:
+      - open_aps
+    labels:
+      - traefik.backend=download
+      - traefik.frontend.rule=Host:data.localhost
+      - traefik.docker.network=open_aps
+      - traefik.port=9999
+      - traefik.enable=true
+  reverse-proxy:
+    image: traefik:1.7.2-alpine
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $PWD/reverse-proxy/traefik.toml:/traefik.toml
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - open_aps
+    labels:
+      - traefik.frontend.rule=Host:monitor.localhost
+      - traefik.port=8080
+      - traefik.enable=true
 
 volumes:
   open-aps-postgres-data:
+
+networks:
+  open_aps:
+    driver: bridge
+    name: open_aps_prod
 
