@@ -1,5 +1,5 @@
 #!/bin/sh
-docker-compose down
+docker-compose -f docker-compose.yml -f prod.docker-compose.yml down
 
 volume=$(docker volume inspect --format '{{json .Mountpoint}}' open-aps-streaming_open-aps-postgres-data)
 

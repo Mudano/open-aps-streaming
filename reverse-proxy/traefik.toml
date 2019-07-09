@@ -17,7 +17,7 @@ defaultEntryPoints = ["http", "https"]
 entrypoint="dashboard"
 
 [docker]
-domain = "your_domain"
+domain = "localhost"
 watch = true
 network = "open-aps"
-
+exposedByDefault = false
