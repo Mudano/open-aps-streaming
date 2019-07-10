@@ -1,6 +1,5 @@
 
 from downloader.functions import create_new_user, reset_user_password, NotFoundError, AlreadyExistsError, create_download_file, update_application, create_registration_record
-from downloader.helpers import get_metabase_url
 from flask_login import current_user, login_user, login_required, logout_user
 from downloader import app, db, bcrypt, logger, DOWNLOAD_DAYS_CUTOFF
 from flask import session, redirect, url_for, request
