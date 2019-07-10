@@ -16,8 +16,16 @@ defaultEntryPoints = ["http", "https"]
 [api]
 entrypoint="dashboard"
 
+[acme]
+email = "openaps.app@gmail.com"
+storage = "acme.json"
+entryPoint = "https"
+onHostRule = true
+  [acme.httpChallenge]
+  entryPoint = "http"
+
 [docker]
-domain = "localhost"
+domain = "openaps.org"
 watch = true
 network = "open-aps"
 exposedByDefault = false

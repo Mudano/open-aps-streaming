@@ -14,7 +14,7 @@ services:
       - open_aps
     labels:
       - traefik.backend=registration
-      - traefik.frontend.rule=Host:register.localhost
+      - traefik.frontend.rule=Host:register.openaps.org
       - traefik.docker.network=open_aps
       - traefik.port=${OPEN_APS_REGISTRATION_PORT}
       - traefik.enable=true
@@ -28,7 +28,7 @@ services:
       - open_aps
     labels:
       - traefik.backend=download
-      - traefik.frontend.rule=Host:data.localhost
+      - traefik.frontend.rule=Host:data.openaps.org
       - traefik.docker.network=open_aps
       - traefik.port=9999
       - traefik.enable=true
@@ -37,13 +37,14 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - $PWD/reverse-proxy/traefik.toml:/traefik.toml
+      - $PWD/reverse-proxy/acme.json:/acme.json
     ports:
       - 80:80
       - 443:443
     networks:
       - open_aps
     labels:
-      - traefik.frontend.rule=Host:monitor.localhost
+      - traefik.frontend.rule=Host:monitor.openaps.org
       - traefik.port=8080
       - traefik.enable=true
 
