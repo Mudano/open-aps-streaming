@@ -4,6 +4,7 @@ from ohapi.api import oauth2_token_exchange
 import requests
 from .oh_file_info import OhFileInfo
 from datetime import datetime, timedelta
+import os
 
 class OhUser:
     """
@@ -107,7 +108,7 @@ class OhUser:
         """
         Looks in the user's OpenHumans account and checks if it has a last updated at file with the expected name.
         If a matching file is found it is fetched, and it's contents returned as a string by this function. If no
-        matching files (or more than one) are found the date approximately 5 years ago is returned.
+        matching files (or more than one) are found the date approximately 5 days ago is returned.
 
         :return: String | None
         """
@@ -120,8 +121,8 @@ class OhUser:
                   f'this is not supported and data will not be fetched.')
             return None
         elif len(last_updated_files) < 1:
-            print(f'No Nightscout files found for user {self.member_code}, will fetch for last five years.')
-            return str(datetime.utcnow() - timedelta(days=5*365))
+            print(f'No last recorded files found for user {self.member_code}, will fetch for last five days.')
+            return int(datetime.timestamp(datetime.now() - timedelta(days=5))) * 1000
         else:
             return last_updated_files[0].get_text_contents()
 
@@ -149,6 +150,32 @@ class OhUser:
             for f in file_info_array]
 
         return file_info_objects
+
+    def fetch_and_write_entries_file(self):
+        """
+        Looks in the user's OpenHumans account and checks if it has an entries data file with the expected name.
+        If a matching file is found it is fetched, and it's contents written to a local temp file. If no
+        matching files (or more than one) are found  then None is returned.
+
+        :return: the file name as stored on the local files system | None
+        """
+        all_file_info = self.fetch_all_file_info()
+        entries_file_end = f'{self.member_code}_entries.json'
+        ns_entries_files = [f for f in all_file_info if f.basename.endswith(entries_file_end)]
+
+        if len(ns_entries_files) > 1:
+            print(f'Found multiple Nightscout entries files for user {self.member_code}, '
+                  f'this is not supported and data will not be fetched.')
+            return None
+        elif len(ns_entries_files) < 1:
+            print(f'No Nightscout files found for user {self.member_code}, an initial temp file will be created.')
+            five_days_ago = int(datetime.timestamp(datetime.now() - timedelta(days=5))) * 1000
+            new_file_name = f'{five_days_ago}_{entries_file_end}'
+            open(new_file_name, 'a').close()
+            return os.path.abspath(new_file_name)
+        else:
+            file_location = ns_entries_files[0].download_file()
+            return os.path.abspath(file_location)
 
     @staticmethod
     def __calculate_expiry_datetime(expires_in_seconds):

@@ -1,5 +1,5 @@
 import requests
-
+import shutil
 
 class OhFileInfo:
     """
@@ -33,3 +33,11 @@ class OhFileInfo:
         else:
             print(f'Request for contents of {self.download_url} from OpenHumans failed.')
             return None
+
+    def download_file(self):
+        local_filename = self.basename
+        with requests.get(self.download_url, stream=True) as r:
+            with open(local_filename, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+
+        return local_filename
