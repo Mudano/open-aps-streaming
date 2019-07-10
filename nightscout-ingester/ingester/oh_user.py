@@ -103,6 +103,28 @@ class OhUser:
         else:
             return ns_url_files[0].get_text_contents()
 
+    def fetch_last_recorded_at(self):
+        """
+        Looks in the user's OpenHumans account and checks if it has a last updated at file with the expected name.
+        If a matching file is found it is fetched, and it's contents returned as a string by this function. If no
+        matching files (or more than one) are found the date approximately 5 years ago is returned.
+
+        :return: String | None
+        """
+        all_file_info = self.fetch_all_file_info()
+        last_updated_files = [f for f in all_file_info
+                              if f.basename == f'{self.member_code}_last_nightscout_ingest.txt']
+
+        if len(last_updated_files) > 1:
+            print(f'Found multiple last ingest files for user {self.member_code}, '
+                  f'this is not supported and data will not be fetched.')
+            return None
+        elif len(last_updated_files) < 1:
+            print(f'No Nightscout files found for user {self.member_code}, will fetch for last five years.')
+            return str(datetime.utcnow() - timedelta(days=5*365))
+        else:
+            return last_updated_files[0].get_text_contents()
+
     def fetch_all_file_info(self):
         """
         Fetches the file info for all files stored in OpenHumans by this member.

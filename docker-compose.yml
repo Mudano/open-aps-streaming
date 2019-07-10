@@ -47,6 +47,7 @@ services:
       OPEN_HUMANS_CLIENT_ID: ${OPEN_HUMANS_CLIENT_ID}
       OPEN_HUMANS_PROJECT_ADDRESS: ${OPEN_HUMANS_PROJECT_ADDRESS}
       OPEN_HUMANS_CLIENT_SECRET: ${OPEN_HUMANS_CLIENT_SECRET}
+      INGEST_INTERVAL_HOURS: ${OPEN_APS_INGEST_INTERVAL_HOURS}
     command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./wait-for-it.sh open-aps-registration-site:${OPEN_APS_REGISTRATION_PORT} -- ./entrypoint.sh
   open-aps-downloader:
     restart: always

@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 import requests
 
+
 class NightscoutSite:
     """
     Represents a given Nightscout Site
@@ -38,4 +39,5 @@ class NightscoutSite:
         if test_url.status_code != 200:
             return None
         return url
+
 
