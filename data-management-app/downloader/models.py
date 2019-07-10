@@ -17,6 +17,8 @@ class User(db.Model, UserMixin):
     login_count = db.Column(db.Integer)
     num_downloads = db.Column(db.Integer)
     total_download_size_mb = db.Column(db.Float)
+    deactivated = db.Column(db.Boolean)
+    deactivated_date = db.Column(db.Date)
     created_ts = db.Column(db.Date)
 
     def __repr__(self):
@@ -33,9 +35,7 @@ class RegApplication(db.Model):
     phone_number = db.Column(db.String)
     irb_approval = db.Column(db.String)
     sponsor_organisation = db.Column(db.String)
-    oh_project_created = db.Column(db.Boolean)
     request_description = db.Column(db.String)
-    agreement_obtained = db.Column(db.Boolean)
     application_processed = db.Column(db.Boolean)
     application_granted = db.Column(db.Boolean)
     processed_date = db.Column(db.Date)

@@ -1,11 +1,12 @@
 
 from downloader import APP_PUBLIC_URL, APP_DIRECTORY_PATH, app, db, logger, ADMIN_EMAIL
 from downloader.models import User, RegApplication
-from flask_login import current_user
 from downloader import mail
 from flask_mail import Message
 import pandas as pd
 import datetime
+import random
+import string
 import os
 
 
@@ -28,8 +29,9 @@ def send_message(subject, email, content):
     logger.debug(f'SEND MESSAGE - Mail message sent to user {email}.')
 
 
-def reset_user_password(email, temp_code):
+def reset_user_password(email):
 
+    temp_code = generate_code()
     user = User.query.filter_by(email=email).first()
 
     if not user:
@@ -55,7 +57,9 @@ def reset_user_password(email, temp_code):
     )
 
 
-def create_new_user(email, temp_code):
+def create_new_user(email):
+
+    temp_code = generate_code()
 
     new_user = User(
         email=email,
@@ -133,7 +137,6 @@ def create_registration_record(request):
     user = User.query.filter_by(email=request.form['register-email'])
 
     if user:
-
         raise AlreadyExistsError
 
     new_application = RegApplication(
@@ -184,6 +187,25 @@ def create_registration_record(request):
     )
 
 
+def update_application(request):
+
+    record = RegApplication.query.filter_by(email=request.form['application-email']).first()
+
+    record.application_processed = True
+    record.application_granted = False if request.form['application-action'] == 'reject' else True
+    record.processed_date = datetime.datetime.now()
+    db.session.commit()
+
+    if not record.application_granted:
+
+        send_message(subject='OpenAPS Access Refused',
+                     email=request.form['application-email'],
+                     content=f"""Your application for access to the OpenAPS data portal was rejected for the following reason:
+                                 <br><br>
+                                 '{request.form['reject-reason']}'""")
+
+
+
 
 def remove_temporary_files():
 
@@ -196,3 +218,8 @@ def remove_temporary_files():
 
         if modified_time < cutoff:
             os.remove(directory + filename)
+
+
+def generate_code():
+
+    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(9))

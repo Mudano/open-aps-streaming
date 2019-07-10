@@ -1,5 +1,6 @@
 
-from downloader.functions import create_new_user, reset_user_password, NotFoundError, AlreadyExistsError, create_download_file, create_registration_record
+from downloader.functions import create_new_user, reset_user_password, NotFoundError, AlreadyExistsError, create_download_file, update_application, create_registration_record
+from downloader.helpers import get_metabase_url
 from flask_login import current_user, login_user, login_required, logout_user
 from downloader import app, db, bcrypt, logger, DOWNLOAD_DAYS_CUTOFF
 from flask import session, redirect, url_for, request
@@ -7,8 +8,6 @@ from flask import render_template, send_file
 from downloader.models import User, RegApplication
 from datetime import datetime
 import traceback
-import random
-import string
 import jwt
 import os
 
@@ -33,21 +32,26 @@ def login():
 
                     if user:
                         if user.verified:
-                            if bcrypt.check_password_hash(user.hashed_pw, pw):
+                            if not user.deactivated:
+                                if bcrypt.check_password_hash(user.hashed_pw, pw):
 
-                                login_user(user)
+                                    login_user(user)
 
-                                user.login_count = user.login_count + 1
-                                user.last_signin = datetime.now()
-                                db.session.commit()
+                                    user.login_count = user.login_count + 1
+                                    user.last_signin = datetime.now()
+                                    db.session.commit()
 
-                                logger.debug(f'LOGIN - login completed successfully for email {email}.')
+                                    logger.debug(f'LOGIN - login completed successfully for email {email}.')
 
-                                return redirect(url_for(('main')))
+                                    return redirect(url_for(('main')))
 
+                                else:
+                                    logger.debug(f'LOGIN - login failed for user {email}, incorrect password.')
+                                    session['notification'] = {'status': 'error', 'content': 'Sorry, that password was incorrect.'}
+                                    return redirect(url_for('login'))
                             else:
-                                logger.debug(f'LOGIN - login failed for user {email}, incorrect password.')
-                                session['notification'] = {'status': 'error', 'content': 'Sorry, that password was incorrect.'}
+                                logger.debug(f'LOGIN - login failed for email {email}, user deactivated.')
+                                session['notification'] = {'status': 'error', 'content': 'Sorry, your user account has been deactivated.'}
                                 return redirect(url_for('login'))
                         else:
                             logger.debug(f'LOGIN - login failed for email {email}, user not verified.')
@@ -63,10 +67,8 @@ def login():
 
                     logger.debug(f"LOGIN - User with email {request.form['password-reset']} is resetting their password.")
 
-                    temp_code = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(9))
-
                     try:
-                        reset_user_password(request.form['password-reset'], temp_code)
+                        reset_user_password(request.form['password-reset'])
 
                     except NotFoundError:
 
@@ -157,8 +159,7 @@ def analytics():
         }
         token = jwt.encode(payload, os.environ['METABASE_SECRET_KEY'], "HS256")
 
-        iframeUrl = os.environ['METABASE_URL'] + "/embed/dashboard/" + token.decode(
-            "utf8") + "#theme=night&bordered=false&titled=false"
+        iframeUrl = os.environ['METABASE_URL'] + "/embed/dashboard/" + token.decode("utf8") + "#theme=night&bordered=false&titled=false"
 
         return render_template('app/analytics.html', iframe_url=iframeUrl, notification=notification)
 
@@ -182,31 +183,41 @@ def admin():
             session['notification'] = None
 
             users = User.query.all()
-            applications = RegApplication.query.all()
+            applications = RegApplication.query.filter(RegApplication.application_processed != True).all()
 
             if request.method == 'POST':
 
                 if 'add-user' in request.form:
 
-                    temp_code = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(9))
-
-                    create_new_user(request.form['add-user'], temp_code)
+                    create_new_user(request.form['add-user'])
 
                     session['notification'] = {'status': 'success', 'content': 'User added successfully, a verification link has been sent to their email.'}
                     return redirect(url_for('admin'))
 
+                elif 'deactivate-user' in request.form:
 
-                elif 'remove-user' in request.form:
-
-                    user = User.query.filter_by(id=request.form.get('remove-user')).first()
-                    logger.debug(f'ADMIN - Removing user with email {user.email}')
-                    User.query.filter_by(id=request.form.get('remove-user')).delete()
+                    user = User.query.filter_by(id=request.form.get('deactivate-user')).first()
+                    user.deactivated = True
+                    user.deactivated_date = datetime.now()
 
                     db.session.commit()
 
                     session['notification'] = {'status': 'success', 'content': 'User deleted successfully.'}
                     return redirect(url_for('admin'))
 
+                elif 'application-email' in request.form:
+
+                    if request.form['application-action'] == 'approve':
+
+                        create_new_user(request.form['application-email'])
+                        update_application(request)
+
+                    elif request.form['application-action'] == 'reject':
+
+                        update_application(request)
+
+                    session['notification'] = {'status': 'success', 'content': 'Action processed successfully, the user has been notified.'}
+                    return redirect(url_for('admin'))
 
             return render_template('app/admin.html', users=users, applications=applications, notification=notification)
 

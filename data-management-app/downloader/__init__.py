@@ -43,7 +43,7 @@ try:
     login_manager.login_message_category = 'info'
     logger.debug('INIT - Flask Login initialised.')
 
-    APP_PUBLIC_URL = 'https://127.0.0.1:9999'
+    APP_PUBLIC_URL = 'https://data.openaps.org'
     APP_DIRECTORY_PATH = '/downloader'
     DOWNLOAD_DAYS_CUTOFF = 180
     ADMIN_EMAIL = 'laurie.bamber@mudano.com'

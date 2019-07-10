@@ -10,6 +10,8 @@ CREATE TABLE openaps.app_users (
 	login_count INTEGER,
 	num_downloads INTEGER,
 	total_download_size_mb NUMERIC,
+	deactivated BOOLEAN,
+	deactivated_date TIMESTAMP,
 	created_ts TIMESTAMP
 );
 GRANT SELECT ON openaps.app_users TO admin_viewer;
@@ -27,7 +29,6 @@ CREATE TABLE openaps.researcher_applications (
 	sponsor_organisation VARCHAR,
 	oh_project_created BOOLEAN,
 	request_description TEXT,
-	agreement_obtained BOOL,
 	application_processed BOOL,
 	application_granted BOOL,
 	processed_date TIMESTAMP,
