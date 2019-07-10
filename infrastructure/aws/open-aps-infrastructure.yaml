@@ -21,6 +21,9 @@ Parameters:
     Description: The size (GB) of the underlying volume for the openaps server.
     Type: Number
     Default: 50
+  ElasticIpAllocationId:
+    Description: The allocation ID of the elastic IP to assign to the ec2 instance.
+    Type: String
 
 Resources:
   OpenApsSecurityGroup:
@@ -82,8 +85,14 @@ Resources:
             git clone https://github.com/Mudano/open-aps-streaming.git
             cd open-aps-streaming/
             ./image-builds.sh
+  AssociateExistingIp:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !Ref ElasticIpAllocationId
+      InstanceId: !Ref OpenApsServer
 
 Outputs:
-  OpenApsServerPublicIp:
-    Description: The public IP of the provisioned openaps server.
-    Value: !GetAtt OpenApsServer.PublicIp
+  OpenApsElasticIp:
+    Description: The elastic IP address assigned to the openaps server.
+    Value: !Ref AssociateExistingIp
+
