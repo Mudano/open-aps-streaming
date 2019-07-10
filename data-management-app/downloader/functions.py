@@ -1,6 +1,6 @@
 
-from downloader import APP_PUBLIC_URL, APP_DIRECTORY_PATH, app, db, logger
-from downloader.models import User
+from downloader import APP_PUBLIC_URL, APP_DIRECTORY_PATH, app, db, logger, ADMIN_EMAIL
+from downloader.models import User, RegApplication
 from flask_login import current_user
 from downloader import mail
 from flask_mail import Message
@@ -10,6 +10,9 @@ import os
 
 
 class NotFoundError(Exception):
+    pass
+
+class AlreadyExistsError(Exception):
     pass
 
 
@@ -123,6 +126,63 @@ def create_download_file(request):
         raise NotFoundError
 
     return outfile
+
+
+def create_registration_record(request):
+
+    user = User.query.filter_by(email=request.form['register-email'])
+
+    if user:
+
+        raise AlreadyExistsError
+
+    new_application = RegApplication(
+        researcher_name=request.form['register-name'],
+        email=request.form['register-email'],
+        phone_number=request.form['register-phone'],
+        irb_approval=request.form['register-irb'],
+        sponsor_organisation=request.form['register-sponsor'],
+        oh_project_created=bool(request.form['register-oh']),
+        request_description=request.form['register-textarea'],
+        agreement_obtained=True,
+        inserted_ts=datetime.datetime.now()
+    )
+
+    db.session.add(new_application)
+    db.session.commit()
+
+    send_message(
+        subject='New User Application',
+        email=ADMIN_EMAIL,
+        content=f"""Hey there,<!--
+           --><br><!--
+           -->a new user has requested access to the OpenAPS data portal:<!--
+           --><br><br><!--
+           --><b>Name</b><!--
+           --><br>{new_application.researcher_name}<!--
+           --><br><br><!--
+           --><b>Email</b><!--
+           --><br>{new_application.email}<!--
+           --><br><br><!--
+           --><b>Phone</b><!--
+           --><br>{new_application.phone_number}<!--
+           --><br><br><!--
+           --><b>IRB Approval</b><!--
+           --><br>{new_application.irb_approval}<!--
+           --><br><br><!--
+           --><b>Sponsor</b><!--
+           --><br>{new_application.sponsor_organisation}<!--
+           --><br><br><!--
+           --><b>OH Project</b><!--
+           --><br>{new_application.oh_project_created}<!--
+           --><br><br><!--
+           --><b>Application Description</b><!--
+           --><br>{new_application.request_description}<!--
+           --><br><br><br><!--
+           --><b>Proceed to the following URL to accept/decline this application:</b><br><!--
+           --><a href="{APP_PUBLIC_URL + '/admin'}">{APP_PUBLIC_URL + '/admin#applications'}</a>"""
+    )
+
 
 
 def remove_temporary_files():

@@ -1,0 +1,81 @@
+
+<link href="{{ url_for('static', filename='css/' + 'table.css') }}" rel="stylesheet">
+
+<style>
+
+    .users-overlay {
+        position:absolute;
+        top: 11%;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 70%;
+        padding-bottom: 2px;
+        width: 75%;
+        max-width: 1400px;
+        background-color: rgba(15, 17, 22, 1.0);
+        padding: 0.5%;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0.5em rgba(0, 170, 170, 0.2), 0 0 0.5em rgba(0, 170, 170, 0.2);
+        text-align: center;
+        display: none;
+        }
+
+    table th, table td {text-align: center; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;}
+
+    .email-col, .email-head {width: 30%;}
+
+    .downloads-col, .down-size-col, .login-cnt-col,
+    .downloads-head, .down-size-head, .login-cnt-head {
+        width: 16.3%;
+        }
+
+    .last-login-col, .last-login-head {width: 20%;}
+
+    h4 {margin-bottom: 15px; margin-top: 20px;}
+
+    .close-button {
+        position: absolute;
+        top: 2%; right: 2%;
+        cursor: pointer;
+        color: rgba(250,250,250,0.8);
+        font-size: 13px;
+        }
+    .close-button:hover {
+        text-decoration: underline;
+        color: rgb(0, 93, 242);
+        }
+
+</style>
+
+<div class="users-overlay unselectable">
+      <h4>User Metrics</h4>
+      <div class="close-button">Close</div>
+      <div class="tbl-header">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <thead>
+            <tr>
+              <th class="email-head">User</th>
+              <th class="downloads-head">Downloads</th>
+              <th class="down-size-head">Downloaded</th>
+              <th class="login-cnt-head">Logins</th>
+              <th class="last-login-head">Last Login</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="tbl-content">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tbody>
+            {% for user in users %}
+                <tr>
+                  <td class="email-col">{{ user.email }}</td>
+                  <td class="downloads_col">{{ user.num_downloads }}</td>
+                  <td class="down-size-col">{{ "%.2f"|format(user.total_download_size_mb) }}MB</td>
+                  <td class="login-cnt-col">{{ user.login_count }}</td>
+                  <td class="last-login-col">{{ user.last_signin.strftime('%Y-%m-%d') if user.last_signin else None }}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+</div>

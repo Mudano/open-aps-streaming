@@ -1,0 +1,100 @@
+<link href="{{ url_for('static', filename='css/' + 'table.css') }}" rel="stylesheet">
+
+<style>
+
+    .applications-overlay {
+        position:absolute;
+        top: 11%;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 70%;
+        padding-bottom: 2px;
+        width: 75%;
+        max-width: 1400px;
+        background-color: rgba(15, 17, 22, 1.0);
+        padding: 0.5%;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0.5em rgba(0, 170, 170, 0.2), 0 0 0.5em rgba(0, 170, 170, 0.2);
+        text-align: center;
+        display: none;
+        }
+
+    table th, table td {text-align: center; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;}
+
+    tr {cursor: pointer;}
+
+    .email-col, .email-head {width: 30%;}
+
+    .irb-col, .sponsor-col, .oh-project-col,
+    .irb-head, .sponsor-head, .oh-project-head {
+        width: 16.3%;
+        }
+    .description-col {width: 0%;}
+
+    .phone-col, .phone-head {width: 20%;}
+
+    h4 {margin-bottom: 15px; margin-top: 20px;}
+
+    .close-button {
+        position: absolute;
+        top: 2%; right: 2%;
+        cursor: pointer;
+        color: rgba(250,250,250,0.8);
+        font-size: 13px;
+        }
+    .close-button:hover {
+        text-decoration: underline;
+        color: rgb(0, 93, 242);
+        }
+
+    .application-form {}
+
+</style>
+
+<div class="applications-overlay unselectable">
+      <h4>Pending Applications</h4>
+      <div class="close-button">Close</div>
+      <div class="tbl-header">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <thead>
+            <tr>
+              <th class="email-head">User</th>
+              <th class="irb-head">IRB Approval</th>
+              <th class="sponsor-head">Sponsor</th>
+              <th class="oh-project-head">OH Project</th>
+              <th class="phone-head">Phone</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="tbl-content">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tbody>
+            {% for app in applications %}
+                <tr>
+                  <td class="email-col">{{ app.email }}</td>
+                  <td class="irb-col">{{ app.irb_approval|title }}</td>
+                  <td class="sponsor-col">{{ app.sponsor_organisation }}</td>
+                  <td class="oh-project-col">{{ app.oh_project_created }}</td>
+                  <td class="phone-col">{{ app.phone_number }}</td>
+                  <td class="description-col">{{ app.request_description }}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <form class="application-form">
+
+     </form>
+</div>
+
+<script>
+
+    $('tr').on('click', function () {
+
+        $('.applications-overlay tr').not(':first').hide();
+        $(this).show();
+
+    });
+
+</script>

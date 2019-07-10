@@ -1,10 +1,10 @@
 
-from downloader.functions import create_new_user, reset_user_password, NotFoundError, create_download_file
+from downloader.functions import create_new_user, reset_user_password, NotFoundError, AlreadyExistsError, create_download_file, create_registration_record
 from flask_login import current_user, login_user, login_required, logout_user
 from downloader import app, db, bcrypt, logger, DOWNLOAD_DAYS_CUTOFF
 from flask import session, redirect, url_for, request
 from flask import render_template, send_file
-from downloader.models import User
+from downloader.models import User, RegApplication
 from datetime import datetime
 import traceback
 import random
@@ -81,7 +81,7 @@ def login():
         else:
             return redirect(url_for('main'))
 
-        return render_template('login.html', title='Login', notification=notification)
+        return render_template('user/login.html', title='Login', notification=notification)
 
 
     except Exception:
@@ -100,7 +100,7 @@ def main():
         notification = session['notification'] if 'notification' in session else None
         session['notification'] = None
 
-        return render_template('main.html', notification=notification)
+        return render_template('user/main.html', notification=notification)
 
     except Exception:
         logger.error(f'MAIN - Error occurred: {str(traceback.format_exc())}')
@@ -132,7 +132,7 @@ def downloader():
 
             return send_file(file_location, as_attachment=True)
 
-        return render_template('downloader.html', notification=notification, days_cutoff=DOWNLOAD_DAYS_CUTOFF)
+        return render_template('app/downloader.html', notification=notification, days_cutoff=DOWNLOAD_DAYS_CUTOFF)
 
     except Exception:
         logger.error(f'DOWNLOADER - {str(traceback.format_exc())}')
@@ -160,7 +160,7 @@ def analytics():
         iframeUrl = os.environ['METABASE_URL'] + "/embed/dashboard/" + token.decode(
             "utf8") + "#theme=night&bordered=false&titled=false"
 
-        return render_template('analytics.html', iframe_url=iframeUrl, notification=notification)
+        return render_template('app/analytics.html', iframe_url=iframeUrl, notification=notification)
 
     except Exception:
         logger.error(f'ANALYTICS - {str(traceback.format_exc())}')
@@ -182,6 +182,7 @@ def admin():
             session['notification'] = None
 
             users = User.query.all()
+            applications = RegApplication.query.all()
 
             if request.method == 'POST':
 
@@ -207,7 +208,7 @@ def admin():
                     return redirect(url_for('admin'))
 
 
-            return render_template('admin.html', users=users, notification=notification)
+            return render_template('app/admin.html', users=users, applications=applications, notification=notification)
 
         else:
             session['notification'] = {'status': 'error', 'content': 'You do not have the necessary permissions to view this page.'}
@@ -263,7 +264,7 @@ def verify():
                 session['notification'] = {'status': 'error', 'content': 'No account was found with that email.'}
                 return redirect(url_for('verify'))
 
-        return render_template('verify.html', notification=notification)
+        return render_template('user/verify.html', notification=notification)
 
 
     except Exception:
@@ -271,6 +272,46 @@ def verify():
         session['notification'] = {'status': 'error', 'content': 'Sorry an error occurred. Please try again later.'}
         return redirect(url_for('login'))
 
+
+
+@app.route('/registration', methods=['GET', 'POST'])
+def register_guide():
+
+    if request.method == 'POST':
+
+        if request.form.get('terms-checkbox') == 'on':
+
+            session['register'] = True
+            return redirect(url_for('register'))
+
+        else:
+            session['notification'] = {'status': 'error', 'content': 'You did not tick the agree to terms checkbox.'}
+            return redirect(url_for('register'))
+
+    return render_template('user/guidelines.html')
+
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+
+    if 'register' in session and session['register']:
+
+        if request.method == 'POST':
+
+            try:
+                create_registration_record(request)
+            except AlreadyExistsError:
+                session['notification'] = {'status': 'error', 'content': 'An application related to your account has already been submitted.'}
+                return redirect(url_for('login'))
+
+            session['notification'] = {'status': 'success', 'content': 'Your application has been submitted. Please wait for approval from an OpenAPS admin, which you will be notified of via your provided email.'}
+            return redirect(url_for('login'))
+
+    else:
+        return redirect(url_for('register_guide'))
+
+    return render_template('user/register.html')
 
 
 @app.route("/logout")

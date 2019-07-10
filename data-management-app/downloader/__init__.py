@@ -43,10 +43,10 @@ try:
     login_manager.login_message_category = 'info'
     logger.debug('INIT - Flask Login initialised.')
 
-    SLACK_NOTIFICATION_CHANNEL = 'laurie_app_testing'
     APP_PUBLIC_URL = 'https://127.0.0.1:9999'
-    APP_DIRECTORY_PATH = 'C:/Users/Laurie Bamber/Work/openaps/openaps/src/apps/downloader'
+    APP_DIRECTORY_PATH = '/downloader'
     DOWNLOAD_DAYS_CUTOFF = 180
+    ADMIN_EMAIL = 'laurie.bamber@mudano.com'
 
     from downloader.models import User
 

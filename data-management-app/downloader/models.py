@@ -21,3 +21,22 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"Users('{self.email}')"
+
+
+class RegApplication(db.Model):
+    __tablename__ = "researcher_applications"
+    __table_args__ = ({"schema": "openaps"})
+
+    seq_id = db.Column(db.Integer, primary_key=True)
+    researcher_name = db.Column(db.String)
+    email = db.Column(db.String)
+    phone_number = db.Column(db.String)
+    irb_approval = db.Column(db.String)
+    sponsor_organisation = db.Column(db.String)
+    oh_project_created = db.Column(db.Boolean)
+    request_description = db.Column(db.String)
+    agreement_obtained = db.Column(db.Boolean)
+    application_processed = db.Column(db.Boolean)
+    application_granted = db.Column(db.Boolean)
+    processed_date = db.Column(db.Date)
+    inserted_ts = db.Column(db.Date)
