@@ -1,0 +1,154 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+
+
+<style>
+
+    .form-container {
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70%;
+        max-width: 900px;
+        height: auto;
+        padding: 5%;
+        background-color: #0a1116;
+        border-left:1px solid rgba(102, 102, 102, 0.2);
+        border-right: 1px solid rgba(102, 102, 102, 0.2);
+        text-align: justify;
+        }
+    .form-breaker {display: block; height: 4vh;}
+    .bottom-padding {width: 100%; height: 80px;}
+
+    .guidelines-text {
+        color: #d6d6d6;
+        }
+
+    ol * {
+        color: #d6d6d6;
+        }
+    ol li {padding-bottom: 15px;}
+    ol li ul {padding-top: 10px; text-align: left;}
+
+    .proceed-button {width: 50%; margin: 0 auto; display: none;}
+
+    .guideline-hr {
+        width: 70%;
+        height: 1px;
+        margin: 0 auto;
+        box-shadow: inset 0 0 1em rgba(0, 170, 170, 0.5), 0 0 1em rgba(0, 170, 170, 0.5);
+        background-color: #fff;
+        margin-top: 5%;
+        margin-bottom: 5%;
+        }
+    .title-hr {width: 90%}
+    .subtitle-hr {width: 40%;}
+
+    h5 {margin-bottom: 3%; text-align: left;}
+
+    .checkbox-container {display: table; margin: 0px auto; color: #fff;}
+
+
+</style>
+
+
+<div class="form-container unselectable">
+
+    <h4>Research Guidelines for working with the OpenAPS Data Commons in Open Humans</h4>
+
+    <div class="guideline-hr"></div>
+
+
+    <h5>About the OpenAPS Data Commons on Open Humans</h5>
+    <div class="guidelines-text">Members of the OpenAPS community have frequently expressed the desire to donate their DIY closed loop data for scientific research; or to perform research themselves. The OpenAPS Data Commons was created to enable a simple way to share data sets from the community, both with traditional researchers who will create traditional research studies, and with groups or individuals from the community who want to review data as part of their own research projects. The OpenAPS Data Commons uses the Open Humans platform to enable people to easily upload and share their data.</div>
+
+
+    <div class="guideline-hr subtitle-hr"></div>
+
+
+    <h5>Who is running the OpenAPS Data Commons?</h5>
+    <div class="guidelines-text">Dana Lewis has volunteered to serve as the administrator of the data commons for the OpenAPS community, following the general principles of the community to make data and knowledge easily accessible and shared from and with the community. She can be reached at dana@OpenAPS.org for any questions, concerns, or input about the data commons. She will work with a volunteer group from the community when needed to determine which projects or activities access data from the OpenAPS Data Commons.</div>
+
+
+    <div class="guideline-hr subtitle-hr"></div>
+
+
+    <h5>Who is allowed to access data from the OpenAPS Data Commons?</h5>
+    <div class="guidelines-text">As a default, data shared with the OpenAPS Data Commons is aggregated and kept private. The community administrator(s) will decide as requests emerge which projects are allowed to ultimately access data from the OpenAPS Data Commons.<br><br>
+                                 The community has agreed upon these criteria to determine what constitutes a research project, study, or activity that they would like to have access to data from the OpenAPS Data Commons.<br><br>
+                                 (Note for community members: this document will allow anyone to comment - so if you have future input to the community’s research criteria for the OpenAPS Data Commons in the future, you can comment directly on this document or contact dana@openAPS.org to discuss.)</div>
+
+
+    <div class="guideline-hr subtitle-hr"></div>
+
+
+    <h5>Research Criteria Requirements:</h5>
+
+    <ol>
+        <li>Sharing insights, data, and/or analysis back with the OpenAPS Community in a reasonable time frame.
+            <ul>
+                <li><i>This is a requirement of special importance if any research findings have direct and immediate impacts on participants’ lives. I.e. if you find a bug in code, or otherwise find something that would significantly impact someone, members of the community should be informed immediately.</i></li>
+            </ul>
+        </li>
+        <li>Information, data, insights, and/or analysis based on, or related to, data from the OpenAPS Data Commons must be published in a relatively open manner.
+            <ul>
+                <li><i>This may mean partnering with members of the OpenAPS community to publish relevant details to the OpenAPS.org blog so it is freely accessible to the community. We have previously worked with traditional publications to adapt copyright agreements to make clear when information is already in the public domain, even if the traditional publication is the main venue for sharing this data with the academic or medical communities. If a journal is firewalled, this also means making images and/or PDFs available to members of the community if the content is not able to be published freely without a paywall otherwise.</i></li>
+            </ul>
+        </li>
+        <li>Acknowledge that you are utilizing data from the OpenAPS Data Commons.
+            <ul>
+                <li><i>The OpenAPS Data Commons and your methods for accessing and utilizing the data should be clearly acknowledged in any publication, poster, presentation, webpage, etc. about your work.</i></li>
+            </ul>
+        </li>
+        <li>You may make no attempts to re-identify any Data Commons member, based on the anonymized data sets, and will not publish directly the member-ID (the eight digit identifier) - instead, you may use a coded numbering system.</li>
+    </ol>
+
+    <div class="guideline-hr subtitle-hr"></div>
+
+    <h5>Research Criteria - Recommendations (Optional)</h5>
+    <div class="guidelines-text">While not required, members of the OpenAPS believe in patient-centered, -driven, and -designed research and we recommend directly involving patient community members in the design, implementation, and all other steps of research. With this in mind, volunteer members of the community are willing to serve as Co-PI, advisors, and/or co-authors for publications about data related to the OpenAPS Community.</div>
+
+    <br><br>
+
+
+    <form method="POST">
+
+        <div class="checkbox-container">
+            <input type="checkbox" name="terms-checkbox">
+            <span>&nbsp;&nbsp;I agree to the terms specified above</span>
+        </div>
+
+        <br><br>
+
+        <div class="fuller-button proceed-button">Proceed</div>
+
+    </form>
+
+    <div class="bottom-padding"></div>
+
+</div>
+
+<script>
+
+    $('.checkbox-container input').on('change', function () {
+
+        $('.proceed-button').fadeToggle();
+
+    });
+
+</script>
+<script>
+
+    $('.proceed-button').on('click', function () {
+
+        $(this).closest('form').submit();
+
+    });
+
+</script>
+
+
+{% endblock content %}

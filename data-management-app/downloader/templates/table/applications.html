@@ -1,0 +1,189 @@
+
+<link href="{{ url_for('static', filename='css/' + 'table.css') }}" rel="stylesheet">
+
+<style>
+
+    .applications-overlay {
+        position:absolute;
+        top: 11%;
+        left: 50%;
+        transform: translateX(-50%);
+        height: auto;
+        max-height: 70%;
+        padding-bottom: 2px;
+        width: 75%;
+        max-width: 1400px;
+        background-color: rgba(15, 17, 22, 1.0);
+        padding: 0.5%;
+        padding-bottom: 50px;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0.5em rgba(0, 170, 170, 0.2), 0 0 0.5em rgba(0, 170, 170, 0.2);
+        text-align: center;
+        display: none;
+        }
+
+    .applications-overlay tbody tr {cursor: pointer;}
+
+    .email-col, .email-head {width: 30%;}
+
+    .irb-col, .sponsor-col, .phone-col,
+    .irb-head, .sponsor-head, .phone-head {
+        width: 16.3%;
+        }
+    .description-col {width: 0%;}
+
+     .name-col, .name-head {width: 20%;}
+
+    h4 {margin-bottom: 15px; margin-top: 20px;}
+
+    .close-button {
+        position: absolute;
+        top: 2%; right: 2%;
+        cursor: pointer;
+        color: rgba(250,250,250,0.8);
+        font-size: 13px;
+        }
+    .close-button:hover {
+        text-decoration: underline;
+        color: rgb(0, 93, 242);
+        }
+
+    .application-form {
+        width: 70%;
+        margin: 0 auto;
+        padding-top: 20px;
+        text-align: justify;
+        color: #d6d6d6;
+        display: none;
+        }
+
+    .approve-button, .reject-button {
+        float: left;
+        width: 35%;
+        }
+    .button-separator {
+        float: left;
+        width: 30%;
+        height: 1px;
+        }
+
+</style>
+
+<div class="applications-overlay unselectable">
+      <h4>Pending Applications</h4>
+      <div class="close-button">Close</div>
+      <div class="tbl-header">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <thead>
+            <tr>
+              <th class="name-head">Name</th>
+              <th class="email-head">User</th>
+              <th class="sponsor-head">Sponsor</th>
+              <th class="irb-head">IRB Approval</th>
+              <th class="phone-head">Phone</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="tbl-content">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tbody>
+            {% for app in applications %}
+                <tr>
+                  <td class="name-col">{{ app.researcher_name }}</td>
+                  <td class="email-col">{{ app.email }}</td>
+                  <td class="sponsor-col">{{ app.sponsor_organisation }}</td>
+                  <td class="irb-col">{{ app.irb_approval|title }}</td>
+                  <td class="phone-col">{{ app.phone_number }}</td>
+                  <td class="description-col">{{ app.request_description }}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <form class="application-form" method="POST">
+
+          <input type="hidden" name="application-email" class="application-email">
+          <input type="hidden" name="application-action" class="application-action">
+
+          <div class="description-text"></div>
+
+          <div style="width: 80%; margin: 0 auto; padding-top: 4%;">
+              <div class="fuller-button approve-button" id="approve">APPROVE</div>
+              <div class="button-separator"></div>
+              <div class="fuller-button reject-button" id="reject">REJECT</div>
+          </div>
+
+     </form>
+</div>
+
+<script>
+
+    $('.approve-button, .reject-button').on('click', function () {
+
+        $('.application-action').val($(this).attr('id'));
+        var approvalForm = $(this).closest('form');
+
+        if ( $('.application-action').val() === 'approve' ) {
+
+            approvalForm.submit();
+
+        } else if ( $('.application-action').val() === 'reject' ) {
+
+            Swal.fire({
+              title: 'Reject Application',
+              input: 'textarea',
+              inputPlaceholder: 'Why are you rejecting this application?',
+              inputValidator: (value) => {
+                return !value && 'A rejection reason must be specified.'
+              }
+            }).then( function ( result ) {
+
+                if ( result.value && result.value != '' ) {
+
+                    var input = document.createElement('input');
+                    input.setAttribute('type', 'text');
+                    input.setAttribute('name', 'reject-reason');
+                    input.setAttribute('value', result.value);
+
+                    approvalForm.append(input);
+                    approvalForm.submit();
+
+                };
+
+            });
+
+        };
+
+    });
+
+</script>
+<script>
+
+    $('.applications-overlay tbody tr').on('click', function () {
+
+        if ( !$('.application-form:visible').length ) {
+
+            var email = $(this).find('.email-col').html();
+            $('.application-email').val(email);
+
+            $('.applications-overlay tr').not(':first').hide();
+            $(this).show();
+
+            $('.description-text').text($(this).find('.description-col').html());
+            $('.application-form').fadeIn();
+
+        } else {
+
+            $('.application-form').fadeOut();
+            $('.description-text').text('');
+            $('.applications-overlay tr').show();
+
+            $('.application-email').val('');
+            $('.application-action').val('');
+
+        };
+
+    });
+
+</script>

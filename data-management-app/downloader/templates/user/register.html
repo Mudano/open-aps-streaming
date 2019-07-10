@@ -1,0 +1,178 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+
+
+<style>
+
+    .form-container {
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 65%;
+        max-width: 900px;
+        height: auto;
+        padding: 5%;
+        background-color: #0a1116;
+        border-left:1px solid rgba(102, 102, 102, 0.2);
+        border-right: 1px solid rgba(102, 102, 102, 0.2);
+        }
+    .form-breaker {display: block; height: 4vh;}
+    .bottom-padding {width: 100%; height: 80px;}
+
+    .register-title-container {width: 30%;}
+    .register-title {
+        color: #fff !important;
+        font-family: 'Nunito', sans-serif;
+        }
+    .register-title-hr {
+        box-shadow: inset 0 0 1em rgba(0, 170, 170, 0.5), 0 0 1em rgba(0, 170, 170, 0.5);
+        height: 1px;
+        background-color: #fff;
+        }
+
+    .register-text-field, .register-textarea, .irb-select, .oh-select {
+        width: 50%;
+        font-size: 14px;
+        padding-left: 2.5%;
+        background-color: rgba(15, 17, 22, 0.8);
+        color: #d6d6d6;
+        }
+
+    .register-text-field, .register-textarea, .select2-container, .select2-selection--single, .select2-container--default {
+        height: 40px !important;
+        border: 1px solid rgba(250,250,250,0.2);
+        border-radius: 3px;
+        }
+    .register-text-field, .register-textarea, .select2-container {box-shadow: inset 0 0 1em rgba(0, 170, 170, 0.2), 0 0 1em rgba(0, 170, 170, 0.2);}
+    .register-text-field:hover, .register-textarea:hover, .select2-container:hover {box-shadow: inset 0 0 1em rgba(0, 170, 170, 0.5), 0 0 1em rgba(0, 170, 170, 0.5);}
+
+
+    .select2-container--default .select2-selection--single {background-color: transparent; border: none;}
+    .select2-results {background-color: rgba(15, 17, 22, 0.8); color: #d6d6d6;}
+    .select2-container--default .select2-selection--single .select2-selection__rendered {color: #d6d6d6 !important; line-height: 38px;}
+
+    .register-textarea {
+        height: 12vh !important;
+        width: 100%;
+        padding: 1.5%;
+        margin-top: 10px;
+        }
+
+</style>
+
+
+<form class="form-container" method="POST">
+
+    <div class="register-title-container">
+        <div class="register-title">REGISTER</div>
+        <div class="register-title-hr"></div>
+    </div>
+    <br><br>
+
+    <h5>Name</h5>
+    <input type="text" class="register-text-field" required name="register-name">
+
+    <div class="form-breaker"></div>
+
+    <h5>Email</h5>
+    <input type="text" class="register-text-field" required name="register-email">
+
+    <div class="form-breaker"></div>
+
+    <h5>Phone</h5>
+    <input type="text" class="register-text-field" required name="register-phone">
+
+    <div class="form-breaker"></div>
+
+    <h5>Sponsor Institution/Organisation</h5>
+    <input type="text" class="register-text-field" name="register-sponsor">
+
+    <div class="form-breaker"></div>
+
+    <h5>Is your research project a research "study"? (As defined by Open Humans, meaning it requires IRB approval)</h5>
+    <select class="irb-select" required name="register-irb">
+        <option selected disabled></option>
+    </select>
+
+    <div class="form-breaker"></div>
+
+    <h5>Have you created an Open Humans project?</h5>
+    <select class="oh-select" required name="register-oh">
+        <option selected disabled></option>
+    </select>
+
+    <div class="form-breaker"></div>
+
+    <h5>Please give a high level overview of your proposed project, and explain why you want access to the OpenAPS Data Commons data.</h5>
+
+    <textarea class="register-textarea" required name="register-textarea"></textarea>
+
+    <div class="form-breaker"></div>
+
+    <div class="fuller-button">APPLY</div>
+
+    <div class="bottom-padding"></div>
+
+</form>
+<script>
+
+    $('.fuller-button').on('click', function () {
+
+        var regForm = $(this).closest('form');
+
+        if( regForm[0].checkValidity() ) {
+
+            regForm.submit();
+
+        } else {
+
+            regForm[0].reportValidity();
+
+        };
+
+    });
+
+
+
+</script>
+<script>
+
+    $(document).ready(function() {
+        $('.irb-select').select2({
+            tags: false,
+            width: '50%',
+            minimumResultsForSearch: -1,
+            data: [
+                   { id: "yes", text: "Yes, it is a study and I will have IRB approval for the project."},
+                   { id: "no", text: "No, it does not require IRB approval"},
+                   { id: "unsure", text: "Not sure"}
+                  ]
+        });
+    });
+    $(document).ready(function() {
+        $('.oh-select').select2({
+            tags: false,
+            width: '50%',
+            minimumResultsForSearch: -1,
+            data: [
+                   { id: "True", text: "Yes"},
+                   { id: "False", text: "No"}
+                  ]
+        });
+    });
+
+</script>
+<script>
+
+    $(document).ready( function () {
+
+        $('.register-title').fitText(0.75);
+
+    });
+
+</script>
+
+{% endblock content %}
