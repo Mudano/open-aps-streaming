@@ -5,6 +5,7 @@ from downloader import app, db, bcrypt, logger, DOWNLOAD_DAYS_CUTOFF
 from flask import session, redirect, url_for, request
 from flask import render_template, send_file
 from downloader.models import User
+from datetime import datetime
 import traceback
 import random
 import string
@@ -35,6 +36,10 @@ def login():
                             if bcrypt.check_password_hash(user.hashed_pw, pw):
 
                                 login_user(user)
+
+                                user.login_count = user.login_count + 1
+                                user.last_signin = datetime.now()
+                                db.session.commit()
 
                                 logger.debug(f'LOGIN - login completed successfully for email {email}.')
 
@@ -120,6 +125,10 @@ def downloader():
             except NotFoundError:
                 session['notification'] = {'status': 'error', 'content': 'No records were found for the given entity between the dates specified..'}
                 return redirect(url_for('downloader'))
+
+            current_user.total_download_size_mb = current_user.total_download_size_mb + (os.path.getsize(file_location) / (1024 * 1024.0))
+            current_user.num_downloads = current_user.num_downloads + 1
+            db.session.commit()
 
             return send_file(file_location, as_attachment=True)
 
