@@ -16,3 +16,6 @@ services:
     build:
       context: ./data-management-app
       dockerfile: Dockerfile
+  metabase:
+    image: metabase/metabase:latest
+

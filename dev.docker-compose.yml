@@ -3,4 +3,7 @@ services:
   open-aps-db:
     ports:
       - 5432:5432
+  metabase:
+    ports:
+      - 3000:3000
 

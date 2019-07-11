@@ -65,4 +65,6 @@ services:
       METABASE_URL: ${OPEN_APS_DOWNLOADER_METABASE_URL}
       DOWNLOADER_SLACK_KEY: ${OPEN_APS_DOWNLOADER_SLACK_KEY}
     command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
+  metabase:
+    restart: always
 
