@@ -21,11 +21,11 @@ def nightscout_ingest_job():
     for user in users:
 
         # Refresh tokens against OH and pull the nightscout URL file from OH
-        user.refresh_oh_token(CLIENT_ID, CLIENT_SECRET)
+        token_refresh_outcome = user.refresh_oh_token(CLIENT_ID, CLIENT_SECRET)
         nightscout_url = user.fetch_ns_url()
 
         # any failure to fetch a nightscout url will result in no transfer
-        if nightscout_url:
+        if nightscout_url and token_refresh_outcome:
             nightscout_site = NightscoutSite(nightscout_url)
             ns_valid = nightscout_site.validate_url()
 

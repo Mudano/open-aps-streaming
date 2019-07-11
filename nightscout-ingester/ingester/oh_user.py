@@ -44,14 +44,20 @@ class OhUser:
 
         :param client_id: The OpenHumans project client ID.
         :param client_secret: The OpenHumans project secret.
-        :return: None
+        :return: boolean, true if success else fals
         """
-        new_tokens = oauth2_token_exchange(client_id, client_secret, None,
+        try:
+            new_tokens = oauth2_token_exchange(client_id, client_secret, None,
                                            'https://www.openhumans.org/', refresh_token=self.refresh_token)
 
-        self.update_local_tokens(new_tokens['access_token'], new_tokens['refresh_token'],
+            self.update_local_tokens(new_tokens['access_token'], new_tokens['refresh_token'],
                                  self.__calculate_expiry_datetime(new_tokens['expires_in']))
-        self.save_current_tokens()
+            self.save_current_tokens()
+            return True
+        except:
+            print(f"Attempt to refresh OH token for OH member {self.member_code} "
+                  f"was un-successful, no data will be fetched")
+            return False
 
     def save_current_tokens(self):
         """
