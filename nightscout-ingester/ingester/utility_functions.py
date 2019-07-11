@@ -132,24 +132,6 @@ def upload_local_file_to_oh(file_path, file_name, file_metadata, access_token, m
         return False
 
 
-def upload_string_file_to_oh(string_content, file_name, file_metadata, access_token, member_id):
-    """
-    Uploads a new file to the members Open Humans account, containing the string contents provided.
-    :param oh_member: An Open Humans member Django model.
-    :param string_content: The string to be written inside of the new uploaded file.
-    :param file_name: The name of the file to be uploaded.
-    :param file_metadata: The metadata of the file to be uploaded.
-    :return: boolean. True if successful, else False
-    """
-    try:
-        with io.StringIO(string_content) as s:
-            upload_stream(s, file_name, file_metadata, access_token)
-        return True
-    except:
-        print(f'Failed to upload {file_name} to OH for OH member {member_id}')
-        return False
-
-
 def build_ns_file_metadata(file_type):
     """
     Given the OH project URL returns the metadata for a Nightscout URL file.

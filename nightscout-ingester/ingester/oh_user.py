@@ -48,7 +48,7 @@ class OhUser:
         """
         try:
             new_tokens = oauth2_token_exchange(client_id, client_secret, None,
-                                           'https://www.openhumans.org/', refresh_token=self.refresh_token)
+                                               'https://www.openhumans.org/', refresh_token=self.refresh_token)
 
             self.update_local_tokens(new_tokens['access_token'], new_tokens['refresh_token'],
                                  self.__calculate_expiry_datetime(new_tokens['expires_in']))
@@ -111,28 +111,6 @@ class OhUser:
         else:
             return ns_url_files[0].get_text_contents()
 
-    def fetch_last_recorded_at(self):
-        """
-        Looks in the user's OpenHumans account and checks if it has a last updated at file with the expected name.
-        If a matching file is found it is fetched, and it's contents returned as a string by this function. If no
-        matching files (or more than one) are found the date approximately 5 days ago is returned.
-
-        :return: String | None
-        """
-        all_file_info = self.fetch_all_file_info()
-        last_updated_files = [f for f in all_file_info
-                              if f.basename == f'{self.member_code}_last_nightscout_ingest.txt']
-
-        if len(last_updated_files) > 1:
-            print(f'Found multiple last ingest files for user {self.member_code}, '
-                  f'this is not supported and data will not be fetched.')
-            return None
-        elif len(last_updated_files) < 1:
-            print(f'No last recorded files found for user {self.member_code}, will fetch for last five days.')
-            return int(datetime.timestamp(datetime.now() - timedelta(days=5))) * 1000
-        else:
-            return last_updated_files[0].get_text_contents()
-
     def fetch_all_file_info(self):
         """
         Fetches the file info for all files stored in OpenHumans by this member.
@@ -144,10 +122,14 @@ class OhUser:
 
         file_info_response = requests.get(file_info_url)
 
-        if file_info_response.status_code == 200:
-            file_info_array = file_info_response.json()["data"]
-        else:
-            print(f'Request for file information from OpenHumans for user {self.member_code} failed.')
+        try:
+            if file_info_response.status_code == 200:
+                file_info_array = file_info_response.json()["data"]
+            else:
+                print(f'Request for file information from OpenHumans for user {self.member_code} failed.')
+                file_info_array = []
+        except:
+            print(f'Request for file information from OpenHumans for user {self.member_code} encountered an error.')
             file_info_array = []
 
         file_info_objects = [
