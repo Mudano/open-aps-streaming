@@ -1,5 +1,5 @@
 
-from downloader.functions import create_new_user, reset_user_password, NotFoundError, AlreadyExistsError, create_download_file, update_application, create_registration_record
+from downloader.functions import create_new_user, reset_user_password, NotFoundError, AlreadyExistsError, create_download_file, retrieve_iframes, update_application, create_registration_record
 from flask_login import current_user, login_user, login_required, logout_user
 from downloader import app, db, bcrypt, logger, DOWNLOAD_DAYS_CUTOFF
 from flask import session, redirect, url_for, request
@@ -7,7 +7,6 @@ from flask import render_template, send_file
 from downloader.models import User, RegApplication
 from datetime import datetime
 import traceback
-import jwt
 import os
 
 
@@ -151,16 +150,9 @@ def analytics():
         notification = session['notification'] if 'notification' in session else None
         session['notification'] = None
 
-        payload = {
-            "resource": {"dashboard": 6},
-            "params": {
-            }
-        }
-        token = jwt.encode(payload, os.environ['METABASE_SECRET_KEY'], "HS256")
+        iframe_mapper = retrieve_iframes()
 
-        iframeUrl = os.environ['METABASE_URL'] + "/embed/dashboard/" + token.decode("utf8") + "#theme=night&bordered=false&titled=false"
-
-        return render_template('app/analytics.html', iframe_url=iframeUrl, notification=notification)
+        return render_template('app/analytics.html', iframe_mapper=iframe_mapper, notification=notification)
 
     except Exception:
         logger.error(f'ANALYTICS - {str(traceback.format_exc())}')

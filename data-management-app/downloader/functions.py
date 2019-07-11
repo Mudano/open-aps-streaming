@@ -7,6 +7,7 @@ import pandas as pd
 import datetime
 import random
 import string
+import jwt
 import os
 
 
@@ -134,9 +135,10 @@ def create_download_file(request):
 
 def create_registration_record(request):
 
-    user = User.query.filter_by(email=request.form['register-email'])
+    user = User.query.filter_by(email=request.form['register-email']).first()
+    reg = RegApplication.query.filter_by(email=request.form['register-email']).first()
 
-    if user:
+    if user or reg:
         raise AlreadyExistsError
 
     new_application = RegApplication(
@@ -220,6 +222,26 @@ def remove_temporary_files():
             os.remove(directory + filename)
 
 
-def generate_code():
+def retrieve_iframes():
 
+    iframe_mapper = {
+        'entries': {'number': 6},
+        'treatments': {'number': 7},
+        'demographics': {'number': 8}
+    }
+
+    for dashboard, params in iframe_mapper.items():
+        payload = {
+            "resource": {"dashboard": params['number']},
+            "params": {
+            }
+        }
+        token = jwt.encode(payload, os.environ['METABASE_SECRET_KEY'], "HS256")
+        params['url'] = os.environ['METABASE_URL'] + "/embed/dashboard/" + token.decode(
+            "utf8") + "#theme=night&bordered=false&titled=false"
+
+    return iframe_mapper
+
+
+def generate_code():
     return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(9))
