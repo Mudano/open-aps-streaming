@@ -3,6 +3,7 @@ import requests
 from .utility_functions import process_ns_data
 from datetime import datetime
 
+
 class NightscoutSite:
     """
     Represents a given Nightscout Site
@@ -18,8 +19,10 @@ class NightscoutSite:
         url_test_result = self.__normalize_and_test_url()
         if url_test_result:
             self.url = url_test_result
+            return True
         else:
-            print(f"Error encountered when validating Nightscout URL {self.url}, class url not changed.")
+            print(f"Error encountered when validating Nightscout URL {self.url}, data won't be fetched.")
+            return False
 
     def __normalize_and_test_url(self):
         """
@@ -31,12 +34,12 @@ class NightscoutSite:
         if not working_url.startswith('http'):
             working_url = f'https://{working_url}'
         parsed = urlparse(working_url)
-        url = parsed.scheme + '://' + parsed.netloc
+        url = f'{parsed.scheme}://{parsed.netloc}'
         try:
-            test_url = requests.get(url)
+            test_url = requests.get(f'{url}/api/v1/profile.json')
         except requests.exceptions.SSLError:
-            url = 'http://' + parsed.netloc
-            test_url = requests.get(url)
+            url = f'http://{parsed.netloc}'
+            test_url = requests.get(f'{url}/api/v1/profile.json')
         except:
             return None
         if test_url.status_code != 200:
@@ -67,12 +70,13 @@ class NightscoutSite:
             new_data_response = requests.get(ns_data_url, params=ns_params)
 
             if new_data_response.status_code == 200:
-                new_processed_data = process_ns_data(new_data_response, nightscout_data_type.sensitive_keys)
+                new_data_json = new_data_response.json()
+                new_processed_data = process_ns_data(new_data_json, nightscout_data_type.sensitive_keys)
             else:
                 print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}')
                 new_processed_data = []
-        except Exception as e:
-            print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}: {e}')
+        except:
+            print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}')
             new_processed_data = []
         return new_processed_data
 

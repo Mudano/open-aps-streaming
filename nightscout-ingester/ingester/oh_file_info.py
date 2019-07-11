@@ -36,6 +36,11 @@ class OhFileInfo:
             return None
 
     def download_file(self):
+        """
+        Streams the Open Humans file to a local file matching the Open Humans file basename.
+
+        :return: string, the filename that was created locally.
+        """
         local_filename = self.basename
         with requests.get(self.download_url, stream=True) as r:
             with open(local_filename, 'wb') as f:

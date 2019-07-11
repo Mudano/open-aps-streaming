@@ -6,6 +6,7 @@ from .oh_file_info import OhFileInfo
 from datetime import datetime, timedelta
 import os
 
+
 class OhUser:
     """
     Represents a given Open Humans user as stored by this application.
@@ -152,6 +153,20 @@ class OhUser:
         return file_info_objects
 
     def fetch_and_write_data_file(self, file_type):
+        """
+        For a given Nightscout file type (e.g. entries), this function will pull all instances of this file on the
+        users OpenHumans account with the expected name. If multiple files are found for a given type this represents
+        an impossible application state and this users data update will not be carried out.
+
+        If no file of this format is found one will be created with the appropriate name (and with the first segment
+        of the file name, which represents the unix time of the last data update, set as 0).
+
+        Whether one file is fetched, or a new one is created locally, the function will return the absolute path
+        of this file.
+
+        :param file_type: String giving the Nightscout filetype to download and write to disk.
+        :return: The absolute path of the downloaded and written file | None
+        """
         all_file_info = self.fetch_all_file_info()
         data_file_end = f'{self.member_code}_{file_type}.json'
         ns_data_files = [f for f in all_file_info if f.basename.endswith(data_file_end)]
@@ -162,9 +177,8 @@ class OhUser:
             return None
         elif len(ns_data_files) < 1:
             print(f'No {file_type} files found for user {self.member_code}, an initial temp file will be created.')
-            #five_days_ago = int(datetime.timestamp(datetime.now() - timedelta(days=5))) * 1000
-            start_of_time = 0
-            new_file_name = f'{start_of_time}_{data_file_end}'
+            unix_time_start = 0
+            new_file_name = f'{unix_time_start}_{data_file_end}'
             open(new_file_name, 'a').close()
             return os.path.abspath(new_file_name)
         else:
@@ -173,6 +187,13 @@ class OhUser:
 
     @staticmethod
     def __calculate_expiry_datetime(expires_in_seconds):
+        """
+        Given the duration of a token in seconds this returns the time (from time of the function being ran) at
+        which that token will expire.
+
+        :param expires_in_seconds: The number of seconds in which the token will expire
+        :return: A datetime object giving the time at which the token will expire.
+        """
         return datetime.now() + timedelta(seconds=expires_in_seconds)
 
 
