@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 import requests
-from .file_utilities import process_ns_entries
+from .utility_functions import process_ns_data
+from datetime import datetime
 
 class NightscoutSite:
     """
@@ -42,89 +43,37 @@ class NightscoutSite:
             return None
         return url
 
-    def get_new_entries_since(self, start_datetime, end_datetime):
+    def get_new_data_since(self, nightscout_data_type, start_datetime, end_datetime):
         """
-        Get Nightscout entries data, ~60 days at a time.
-        Retrieve ~60 days at a time until either (a) the start point is reached
-        (after_date parameter) or (b) a run of 6 empty calls or (c) Jan 2010.
-        """
-        # end = arrow.get(before_date).ceil('second').timestamp * 1000
-        # start_date = arrow.get('2010-01-01').floor('second').timestamp * 1000
-        # if after_date:
-        #    start_date = arrow.get(after_date).floor('second').timestamp * 1000
 
-        ns_entries_url = self.url + '/api/v1/entries.json'
+        :param nightscout_data_type: The NightscoutDataTpe class for the data to be fetched from NS (e.g. entries)
+        :param start_datetime: Unix timestamp (ms). Data fetched will have a date greater than this.
+        :param end_datetime: Unix timestamp (ms). Data fetched will have a date lesser than or equal to this.
+        :return: String containing the processed data as json objects separated by linebreaks.
+        """
+        ns_data_url = f'{self.url}/api/v1/{nightscout_data_type.name}.json'
+
+        if nightscout_data_type.time_filter_name == 'created_at':
+            start_datetime = datetime.utcfromtimestamp(start_datetime / 1000).isoformat()
+            end_datetime = datetime.utcfromtimestamp(end_datetime / 1000).isoformat()
 
         ns_params = {
-            'count': 1000000,
-            'find[date][$gt]': start_datetime,
-            'find[date][$lte]': end_datetime
+            'count': 1000,
+            f'find[{nightscout_data_type.time_filter_name}][$gt]': start_datetime,
+            f'find[{nightscout_data_type.time_filter_name}][$lte]': end_datetime
         }
 
         try:
-            new_entries_response = requests.get(ns_entries_url, params=ns_params)
+            new_data_response = requests.get(ns_data_url, params=ns_params)
 
-            if new_entries_response.status_code == 200:
-                new_processed_entries = process_ns_entries(new_entries_response)
+            if new_data_response.status_code == 200:
+                new_processed_data = process_ns_data(new_data_response, nightscout_data_type.sensitive_keys)
             else:
-                print(f'An error was encountered downloading new entries data from ${self.url}')
-                new_processed_entries = []
-        except:
-            print(f'An error was encountered downloading new entries data from ${self.url}')
-            new_processed_entries = []
+                print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}')
+                new_processed_data = []
+        except Exception as e:
+            print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}: {e}')
+            new_processed_data = []
+        return new_processed_data
 
-        return new_processed_entries
-
-        # Start a JSON array.
-        # file_obj.write('[')
-        # initial_entry_done = False  # Entries after initial are preceded by commas.
-
-        # Get 8 million second chunks (~ 1/4th year) until none, or start reached.
-        # complete = False
-        # curr_end = end
-        # curr_start = curr_end - 5000000000
-        # empty_run = 0
-        # retries = 0
-        # while not complete:
-        #     if curr_start < start_date:
-        #         curr_start = start_date
-        #         complete = True
-        #         logger.debug('Final round (starting date reached)...')
-        #     log_update(oh_member, 'Querying entries from {} to {}...'.format(
-        #         arrow.get(curr_start / 1000).format(),
-        #         arrow.get(curr_end / 1000).format()))
-        #     ns_params = {'count': 1000000}
-        #     ns_params['find[date][$lte]'] = curr_end
-        #     ns_params['find[date][$gt]'] = curr_start
-        #     entries_req = requests.get(ns_entries_url, params=ns_params)
-        #     logger.debug('Request complete.')
-        #     assert entries_req.status_code == 200 or retries < MAX_RETRIES, \
-        #         'NS entries URL != 200 status'
-        #     if entries_req.status_code != 200:
-        #         retries += 1
-        #         logger.debug("RETRY {}: Status code is {}".format(
-        #             retries, entries_req.status_code))
-        #         continue
-        #     logger.debug('Status code 200.')
-        #     retries = 0
-        #     logger.debug('Retrieved {} entries...'.format(len(entries_req.json())))
-        #     if entries_req.json():
-        #         empty_run = 0
-        #         for entry in entries_req.json():
-        #             if initial_entry_done:
-        #                 file_obj.write(',')  # JSON array separator
-        #             else:
-        #                 initial_entry_done = True
-        #             json.dump(entry, file_obj)
-        #         logger.debug('Wrote {} entries to file...'.format(len(entries_req.json())))
-        #     else:
-        #         empty_run += 1
-        #         if empty_run > 6:
-        #             logger.debug('>10 empty calls: ceasing entries queries.')
-        #             break
-        #     curr_end = curr_start
-        #     curr_start = curr_end - 5000000000
-        #
-        # file_obj.write(']')  # End of JSON array.
-        # logger.debug('Done writing entries to file.')
 

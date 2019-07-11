@@ -151,30 +151,24 @@ class OhUser:
 
         return file_info_objects
 
-    def fetch_and_write_entries_file(self):
-        """
-        Looks in the user's OpenHumans account and checks if it has an entries data file with the expected name.
-        If a matching file is found it is fetched, and it's contents written to a local temp file. If no
-        matching files (or more than one) are found  then None is returned.
-
-        :return: the file name as stored on the local files system | None
-        """
+    def fetch_and_write_data_file(self, file_type):
         all_file_info = self.fetch_all_file_info()
-        entries_file_end = f'{self.member_code}_entries.json'
-        ns_entries_files = [f for f in all_file_info if f.basename.endswith(entries_file_end)]
+        data_file_end = f'{self.member_code}_{file_type}.json'
+        ns_data_files = [f for f in all_file_info if f.basename.endswith(data_file_end)]
 
-        if len(ns_entries_files) > 1:
-            print(f'Found multiple Nightscout entries files for user {self.member_code}, '
+        if len(ns_data_files) > 1:
+            print(f'Found multiple Nightscout {file_type} files for user {self.member_code}, '
                   f'this is not supported and data will not be fetched.')
             return None
-        elif len(ns_entries_files) < 1:
-            print(f'No Nightscout files found for user {self.member_code}, an initial temp file will be created.')
-            five_days_ago = int(datetime.timestamp(datetime.now() - timedelta(days=5))) * 1000
-            new_file_name = f'{five_days_ago}_{entries_file_end}'
+        elif len(ns_data_files) < 1:
+            print(f'No {file_type} files found for user {self.member_code}, an initial temp file will be created.')
+            #five_days_ago = int(datetime.timestamp(datetime.now() - timedelta(days=5))) * 1000
+            start_of_time = 0
+            new_file_name = f'{start_of_time}_{data_file_end}'
             open(new_file_name, 'a').close()
             return os.path.abspath(new_file_name)
         else:
-            file_location = ns_entries_files[0].download_file()
+            file_location = ns_data_files[0].download_file()
             return os.path.abspath(file_location)
 
     @staticmethod

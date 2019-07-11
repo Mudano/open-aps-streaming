@@ -1,6 +1,7 @@
 import requests
 import shutil
 
+
 class OhFileInfo:
     """
     Represents the file information that the OpenHumans API returns for a given user. Each instance
