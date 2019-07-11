@@ -47,6 +47,17 @@ services:
       - traefik.frontend.rule=Host:monitor.openaps.org
       - traefik.port=8080
       - traefik.enable=true
+  metabase:
+    image: metabase/metabase:latest
+    networks:
+      - open_aps
+    labels:
+      - traefik.backend=metabase
+      - traefik.frontend.rule=Host:datavis.openaps.org
+      - traefik.docker.network=open_aps
+      - traefik.port=3000
+      - traefik.enable=true
+
 
 volumes:
   open-aps-postgres-data:
