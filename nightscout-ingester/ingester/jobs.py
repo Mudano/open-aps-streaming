@@ -20,42 +20,49 @@ def nightscout_ingest_job():
     # for each user
     for user in users:
 
-        # Refresh tokens against OH and pull the nightscout URL file from OH
-        token_refresh_outcome = user.refresh_oh_token(CLIENT_ID, CLIENT_SECRET)
-        nightscout_url = user.fetch_ns_url()
+        # I hate having this big try-catch, but given time constraints and need for one users results not to stop
+        # another users import this is the quick solution. If you are reading this please do feel free to add more
+        # comprehensive low level exception handling so that this isn't required.
+        try:
+            # Refresh tokens against OH and pull the nightscout URL file from OH
+            token_refresh_outcome = user.refresh_oh_token(CLIENT_ID, CLIENT_SECRET)
+            nightscout_url = user.fetch_ns_url()
 
-        # any failure to fetch a nightscout url will result in no transfer
-        if nightscout_url and token_refresh_outcome:
-            nightscout_site = NightscoutSite(nightscout_url)
-            ns_valid = nightscout_site.validate_url()
+            # any failure to fetch a nightscout url will result in no transfer
+            if nightscout_url and token_refresh_outcome:
+                nightscout_site = NightscoutSite(nightscout_url)
+                ns_valid = nightscout_site.validate_url()
 
-            data_pulled_until = get_current_unix_timestamp_ms()
+                data_pulled_until = get_current_unix_timestamp_ms()
 
-            if ns_valid:
-                for data_type in supported_data_types:
+                if ns_valid:
+                    for data_type in supported_data_types:
 
-                    local_copy_of_data_file_name = user.fetch_and_write_data_file(data_type.name)
-                    data_file_name = get_basename(local_copy_of_data_file_name)
-                    data_last_loaded_at = get_previous_upload_timestamp(data_file_name)
+                        local_copy_of_data_file_name = user.fetch_and_write_data_file(data_type.name)
+                        data_file_name = get_basename(local_copy_of_data_file_name)
+                        data_last_loaded_at = get_previous_upload_timestamp(data_file_name)
 
-                    new_data = nightscout_site.get_new_data_since(data_type, data_last_loaded_at, data_pulled_until)
+                        new_data = nightscout_site.get_new_data_since(data_type, data_last_loaded_at, data_pulled_until)
 
-                    # if no new data is fetched for the given type then no further action is taken
-                    if new_data:
-                        print(f"new {data_type.name} found for user {user.member_code}")
-                        update_file_with_string(local_copy_of_data_file_name, new_data, data_type.file_update_method)
+                        # if no new data is fetched for the given type then no further action is taken
+                        if new_data:
+                            print(f"new {data_type.name} found for user {user.member_code}")
+                            update_file_with_string(local_copy_of_data_file_name, new_data, data_type.file_update_method)
 
-                        entries_metadata = build_ns_file_metadata(data_type.name)
-                        new_oh_file_name = build_new_oh_filename(data_pulled_until, user.member_code, data_type.name)
+                            entries_metadata = build_ns_file_metadata(data_type.name)
+                            new_oh_file_name = build_new_oh_filename(data_pulled_until, user.member_code, data_type.name)
 
-                        print(f'pushing new data file to {new_oh_file_name} for user {user.member_code}')
-                        upload_local_file_to_oh(local_copy_of_data_file_name, new_oh_file_name,
+                            print(f'pushing new data file to {new_oh_file_name} for user {user.member_code}')
+                            upload_local_file_to_oh(local_copy_of_data_file_name, new_oh_file_name,
                                                 entries_metadata, user.access_token, user.member_code)
 
-                        print(f'deleting previous OH file at: {data_file_name}')
-                        delete_oh_file(user.access_token, data_file_name)
+                            print(f'deleting previous OH file at: {data_file_name}')
+                            delete_oh_file(user.access_token, data_file_name)
 
-                    print(f'deleting local temp file at: {local_copy_of_data_file_name}')
-                    delete_local_file(local_copy_of_data_file_name)
+                        print(f'deleting local temp file at: {local_copy_of_data_file_name}')
+                        delete_local_file(local_copy_of_data_file_name)
+            print(f'Ingest job completed successfully for user {user.member_code}')
+        except Exception as e:
+            print(f'An exception was thrown carrying out ingest for user {user.member_code}: {e}')
 
     print(f'Ingest job completed at {datetime.now()}')
