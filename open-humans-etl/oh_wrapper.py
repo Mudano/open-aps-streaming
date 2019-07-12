@@ -13,18 +13,22 @@ class OHWrapper:
 
         self.OHProject = ohapi.OHProject(master_token)
 
-    def get_all_records(self, output_directory, max_file_size='126m'):
+    def get_all_records(self, output_directory, max_file_size='999m'):
 
         try:
-            rec = self.OHProject.download_all(
+            resp = self.OHProject.download_all(
                 target_dir=output_directory,
                 max_size=max_file_size
             )
-            return rec
+            return resp
 
         except Exception:
             print(traceback)
             sys.exit(1)
+
+    def get_member_list(self):
+
+        return self.OHProject.project_data
 
     @staticmethod
     def extract_directory_files(directory):
@@ -45,3 +49,4 @@ class OHWrapper:
                  open(filepath.replace('.gz', ''), 'wb') as outfile:
 
                     shutil.copyfileobj(extract_file, outfile, length=65536)
+            os.remove(filepath)

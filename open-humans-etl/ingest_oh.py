@@ -19,7 +19,7 @@ def get_user_filepaths(user_folder):
 
             if '.json' in file and file not in nightscout_files:
 
-                nightscout_files.append(f'{BASE_DIRECTORY}{user_folder}/{file}')
+                nightscout_files.append(f'{subdirs}/{file}')
 
     return nightscout_files
 
@@ -33,16 +33,16 @@ def get_user_records(file_paths):
             records = json.load(f)
 
         if 'entries' in file.lower():
-            [entries.append({**x, **{'user_id': user_folder}}) for x in records]
+            [entries.append({**x, **{'app_id': user_folder, 'oh_source_entity': 'OpenAPS'}}) for x in records]
 
         elif 'treatments' in file.lower():
-            [treatments.append({**x, **{'user_id': user_folder}}) for x in records]
+            [treatments.append({**x, **{'app_id': user_folder, 'oh_source_entity': 'OpenAPS'}}) for x in records]
 
-        elif 'profiles' in file.lower():
-            [profiles.append({**x, **{'user_id': user_folder}}) for x in records]
+        elif 'profile' in file.lower():
+            [profiles.append({**x, **{'app_id': user_folder, 'oh_source_entity': 'OpenAPS'}}) for x in records]
 
         elif 'device' in file.lower():
-            [device_status.append({**x, **{'user_id': user_folder}}) for x in records]
+            [device_status.append({**x, **{'app_id': user_folder, 'oh_source_entity': 'OpenAPS'}}) for x in records]
 
     status_metrics = [{**x['openaps'], **{'device_status_id': x['_id']}} for x in device_status if 'openaps' in x]
 
@@ -61,8 +61,6 @@ def ingest(mapper):
 
         for k, v in mapper.items():
 
-            print(k)
-
             temp_list = []
             try:
 
@@ -78,32 +76,35 @@ def ingest(mapper):
 
                 unduplicated = [dict(t) for t in {tuple(d.items()) for d in temp_list}]
 
-                try:
-                    ingester.add_target(target_data=unduplicated,
-                                        output_schema='openaps',
-                                        table_name=v['table'],
-                                        date_format='YYYY-MM-DD HH24:MI:SS'
-                                        )
-                except Exception:
-                    print(traceback.format_exc())
-                    break
+                # try:
+                #     ingester.add_target(target_data=unduplicated,
+                #                         output_schema='openaps',
+                #                         table_name=v['table'],
+                #                         date_format='YYYY-MM-DD HH24:MI:SS'
+                #                         )
+                # except Exception:
+                #     print(traceback.format_exc())
+                #     break
 
 
-if __name__ == '__main__':
+db = Database(get_connection())
+ingester = StreamIngester(get_connection())
+BASE_DIRECTORY = 'D:/Work/OpSci/openaps/src/ingest/openaps_data_2/'
 
-    db = Database(get_connection())
-    ingester = StreamIngester(get_connection())
-    BASE_DIRECTORY = ''
+user_folders = [x for x in next(os.walk(BASE_DIRECTORY))[1]]
 
-    user_folders = [x for x in next(os.walk(BASE_DIRECTORY))[1]]
+count = 1
+for user_folder in user_folders:
 
-    count = 1
-    for user_folder in user_folders:
+    print(f'{user_folder}: {count}/{len(user_folders)}')
+    count = count + 1
 
-        print(f'Processed: {count}/{len(user_folders)}')
+    paths = get_user_filepaths(user_folder)
+    mapper = get_user_records(paths)
 
-        paths = get_user_filepaths(user_folder)
-        mapper = get_user_records(paths)
+    try:
         ingest(mapper)
 
-        count = count + 1
+    except Exception as e:
+        print(f'{user_folder} ~ {str(e)}')
+        continue
