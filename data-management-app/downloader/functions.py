@@ -1,8 +1,8 @@
 
 from downloader import APP_PUBLIC_URL, APP_DIRECTORY_PATH, app, db, logger, ADMIN_EMAIL
 from downloader.models import User, RegApplication
-from downloader import mail
 from flask_mail import Message
+from downloader import mail
 import pandas as pd
 import datetime
 import random
@@ -15,6 +15,9 @@ class NotFoundError(Exception):
     pass
 
 class AlreadyExistsError(Exception):
+    pass
+
+class NotProcessedError(Exception):
     pass
 
 
@@ -62,18 +65,40 @@ def create_new_user(email):
 
     temp_code = generate_code()
 
-    new_user = User(
-        email=email,
-        verified=False,
-        verification_code=temp_code,
-        admin=False,
-        login_count=0,
-        num_downloads=0,
-        total_download_size_mb=0,
-        created_ts=datetime.datetime.now()
-    )
-    db.session.add(new_user)
-    db.session.commit()
+    user = User.query.filter_by(email=email).first()
+    reg = RegApplication.query.filter_by(email=email).first()
+
+    if user and (not user.deactivated and user.verified):
+
+        raise AlreadyExistsError
+
+    elif user:
+
+        user.verified = False
+        user.verification_code = temp_code
+        user.hashed_pw = None
+        user.deactivated = False
+        user.deactivated_date = None
+
+        db.session.commit()
+
+    elif reg and not reg.application_processed:
+
+        raise NotProcessedError
+
+    else:
+        new_user = User(
+            email=email,
+            verified=False,
+            verification_code=temp_code,
+            admin=False,
+            login_count=0,
+            num_downloads=0,
+            total_download_size_mb=0,
+            created_ts=datetime.datetime.now()
+        )
+        db.session.add(new_user)
+        db.session.commit()
 
     logger.debug(f'CREATE USER - About to send message to user {email}.')
 
@@ -110,8 +135,8 @@ def create_download_file(request):
             SELECT      * 
             FROM        openaps.%s base
             {'INNER JOIN openaps.device_status_metrics met ON base.id = met.device_status_id' if entity == 'device_status' else ""}
-            WHERE       %s::DATE > '%s'::DATE 
-            AND         %s::DATE < '%s'::DATE 
+            WHERE       %s::DATE >= '%s'::DATE 
+            AND         %s::DATE <= '%s'::DATE 
             ORDER BY %s
         """ % (entity, tmap[entity]['date_col'], start_date, tmap[entity]['date_col'], end_date, tmap[entity]['date_col'])).fetchall()
 
@@ -138,8 +163,15 @@ def create_registration_record(request):
     user = User.query.filter_by(email=request.form['register-email']).first()
     reg = RegApplication.query.filter_by(email=request.form['register-email']).first()
 
-    if user or reg:
+    if user and (user.deactivated or not user.verified):
+
+        User.query.filter_by(email=request.form['register-email']).delete()
+
+    elif user:
         raise AlreadyExistsError
+
+    if reg:
+        RegApplication.query.filter_by(email=request.form['register-email']).delete()
 
     new_application = RegApplication(
         researcher_name=request.form['register-name'],
@@ -147,9 +179,8 @@ def create_registration_record(request):
         phone_number=request.form['register-phone'],
         irb_approval=request.form['register-irb'],
         sponsor_organisation=request.form['register-sponsor'],
-        oh_project_created=bool(request.form['register-oh']),
         request_description=request.form['register-textarea'],
-        agreement_obtained=True,
+        application_processed=False,
         inserted_ts=datetime.datetime.now()
     )
 
@@ -177,9 +208,6 @@ def create_registration_record(request):
            --><br><br><!--
            --><b>Sponsor</b><!--
            --><br>{new_application.sponsor_organisation}<!--
-           --><br><br><!--
-           --><b>OH Project</b><!--
-           --><br>{new_application.oh_project_created}<!--
            --><br><br><!--
            --><b>Application Description</b><!--
            --><br>{new_application.request_description}<!--

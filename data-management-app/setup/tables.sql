@@ -27,7 +27,6 @@ CREATE TABLE openaps.researcher_applications (
 	phone_number VARCHAR,
 	irb_approval TEXT,
 	sponsor_organisation VARCHAR,
-	oh_project_created BOOLEAN,
 	request_description TEXT,
 	application_processed BOOL,
 	application_granted BOOL,
@@ -37,5 +36,5 @@ CREATE TABLE openaps.researcher_applications (
 );
 GRANT SELECT ON openaps.researcher_applications TO admin_viewer;
 GRANT USAGE, SELECT ON SEQUENCE openaps.researcher_applications_seq_id_seq TO ext_openaps_app;
-GRANT SELECT, INSERT, UPDATE ON openaps.researcher_applications TO ext_openaps_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON openaps.researcher_applications TO ext_openaps_app;
 

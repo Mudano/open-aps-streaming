@@ -107,82 +107,41 @@
 </div>
 
 
-<script>
 
-    function parseDate(str) {
-        var ymd = str.split('-');
-        return new Date(ymd[0], ymd[1]-1, ymd[2]);
-    }
-
-    function datediff(first, second) {
-        return Math.round((second-first)/(1000*60*60*24));
-    }
-
-    function dateRangeCheck () {
-
-        var start = parseDate($('.date-range').val().split(' to ')[0]);
-        var end = parseDate($('.date-range').val().split(' to ')[1]);
-
-        if ( datediff(start, end) >= {{ days_cutoff }}) {
-
-            var myDate = new Date(+start + {{ days_cutoff }} *86400000);
-            return myDate.getFullYear() + "-" + (myDate.getMonth()+1) + "-" + myDate.getDate();
-
-        };
-
-        return;
-    };
-
-</script>
 <script>
 
     $('.fuller-button').on('click', function () {
 
-        var rangeCheck = dateRangeCheck()
+        var downloadForm = $(this).parent('form');
 
-        if ( !rangeCheck ) {
+        if( downloadForm[0].checkValidity() ) {
 
-            var downloadForm = $(this).parent('form');
+            if ( $('.date-range').val() !== '' ) {
 
-            if( downloadForm[0].checkValidity() ) {
+                downloadForm.submit();
+                $('.fuller-button').prop('onclick', null).off('click');
+                $('.fuller-button').addClass('reset-warning');
 
-                if ( $('.date-range').val() !== '' ) {
+                $('.reset-warning').on('click', function () {
 
-                    downloadForm.submit();
-                    $('.fuller-button').prop('onclick', null).off('click');
-                    $('.fuller-button').addClass('reset-warning');
-
-                    $('.reset-warning').on('click', function () {
-
-                        Swal.fire({
-                            html: "Please refresh the page to commence another download.",
-                            type: "error"
-                        });
-
+                    Swal.fire({
+                        html: "Please refresh the page to commence another download.",
+                        type: "error"
                     });
 
-                } else {
-
-                    return;
-
-                };
+                });
 
             } else {
 
-                downloadForm[0].reportValidity();
-                $('.date-checker').attr('required',false);
+                return;
 
             };
 
         } else {
 
-            Swal.fire({
-                html: "According to your specified start date, the last allowed date within the 180 day cutoff would be <b>" + rangeCheck + "</b>",
-                type: "error"
-            });
-            $('.swal2-modal').css('border', '1px solid rgba(250,0,0,0.2)');
+            downloadForm[0].reportValidity();
 
-        }
+        };
 
     });
 

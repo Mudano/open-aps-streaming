@@ -18,7 +18,10 @@ try:
     app = Flask(__name__)
     logger.debug('INIT - Flask app initialised.')
     app.config['SECRET_KEY'] = os.environ['DOWNLOADER_SECRET_KEY']
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DOWNLOADER_POSTGRES_CON']
+
+    database_uri = f"postgresql://{os.environ['POSTGRES_USER']}:{os.environ['POSTGRES_PASSWORD']}@{os.environ['POSTGRES_HOST']}:{os.environ['POSTGRES_PORT']}/{os.environ['POSTGRES_DB']}"
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['SQLALCHEMY_POOL_SIZE'] = 20
     app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20
@@ -45,7 +48,6 @@ try:
 
     APP_PUBLIC_URL = 'https://data.openaps.org'
     APP_DIRECTORY_PATH = '/downloader'
-    DOWNLOAD_DAYS_CUTOFF = 180
     ADMIN_EMAIL = 'laurie.bamber@mudano.com'
 
     from downloader.models import User

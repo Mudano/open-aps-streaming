@@ -33,7 +33,7 @@
         background-color: #fff;
         }
 
-    .register-text-field, .register-textarea, .irb-select, .oh-select {
+    .register-text-field, .register-textarea, .irb-select {
         width: 50%;
         font-size: 14px;
         padding-left: 2.5%;
@@ -99,13 +99,6 @@
 
     <div class="form-breaker"></div>
 
-    <h5>Have you created an Open Humans project?</h5>
-    <select class="oh-select" required name="register-oh">
-        <option selected disabled></option>
-    </select>
-
-    <div class="form-breaker"></div>
-
     <h5>Please give a high level overview of your proposed project, and explain why you want access to the OpenAPS Data Commons data.</h5>
 
     <textarea class="register-textarea" required name="register-textarea"></textarea>
@@ -149,17 +142,6 @@
                    { id: "yes", text: "Yes, it is a study and I will have IRB approval for the project."},
                    { id: "no", text: "No, it does not require IRB approval"},
                    { id: "unsure", text: "Not sure"}
-                  ]
-        });
-    });
-    $(document).ready(function() {
-        $('.oh-select').select2({
-            tags: false,
-            width: '50%',
-            minimumResultsForSearch: -1,
-            data: [
-                   { id: "True", text: "Yes"},
-                   { id: "False", text: "No"}
                   ]
         });
     });

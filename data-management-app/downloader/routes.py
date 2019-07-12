@@ -1,7 +1,7 @@
 
-from downloader.functions import create_new_user, reset_user_password, NotFoundError, AlreadyExistsError, create_download_file, retrieve_iframes, update_application, create_registration_record
+from downloader.functions import create_new_user, reset_user_password, NotFoundError, NotProcessedError, AlreadyExistsError, create_download_file, retrieve_iframes, update_application, create_registration_record
 from flask_login import current_user, login_user, login_required, logout_user
-from downloader import app, db, bcrypt, logger, DOWNLOAD_DAYS_CUTOFF
+from downloader import app, db, bcrypt, logger
 from flask import session, redirect, url_for, request
 from flask import render_template, send_file
 from downloader.models import User, RegApplication
@@ -49,11 +49,11 @@ def login():
                                     return redirect(url_for('login'))
                             else:
                                 logger.debug(f'LOGIN - login failed for email {email}, user deactivated.')
-                                session['notification'] = {'status': 'error', 'content': 'Sorry, your user account has been deactivated.'}
+                                session['notification'] = {'status': 'error', 'content': 'Sorry, your user account has been deactivated, please register again to regain access.'}
                                 return redirect(url_for('login'))
                         else:
                             logger.debug(f'LOGIN - login failed for email {email}, user not verified.')
-                            session['notification'] = {'status': 'error', 'content': 'Sorry, your user account has not yet been verified.'}
+                            session['notification'] = {'status': 'error', 'content': 'Sorry, your user account has not yet been verified, please check your email for your verification link.'}
                             return redirect(url_for('login'))
                     else:
                         logger.debug(f'LOGIN - login failed for email {email}, no account found.')
@@ -132,7 +132,7 @@ def downloader():
 
             return send_file(file_location, as_attachment=True)
 
-        return render_template('app/downloader.html', notification=notification, days_cutoff=DOWNLOAD_DAYS_CUTOFF)
+        return render_template('app/downloader.html', notification=notification)
 
     except Exception:
         logger.error(f'DOWNLOADER - {str(traceback.format_exc())}')
@@ -180,7 +180,16 @@ def admin():
 
                 if 'add-user' in request.form:
 
-                    create_new_user(request.form['add-user'])
+                    try:
+                        create_new_user(request.form['add-user'])
+
+                    except AlreadyExistsError:
+                        session['notification'] = {'status': 'error', 'content': 'The user you are attempting to add already has an active account.'}
+                        return redirect(url_for('admin'))
+
+                    except NotProcessedError:
+                        session['notification'] = {'status': 'error', 'content': 'An outstanding application exists for this user in the application section.'}
+                        return redirect(url_for('admin'))
 
                     session['notification'] = {'status': 'success', 'content': 'User added successfully, a verification link has been sent to their email.'}
                     return redirect(url_for('admin'))
@@ -200,8 +209,8 @@ def admin():
 
                     if request.form['application-action'] == 'approve':
 
-                        create_new_user(request.form['application-email'])
                         update_application(request)
+                        create_new_user(request.form['application-email'])
 
                     elif request.form['application-action'] == 'reject':
 
@@ -279,16 +288,20 @@ def verify():
 @app.route('/registration', methods=['GET', 'POST'])
 def register_guide():
 
-    if request.method == 'POST':
+    if current_user.is_authenticated:
 
-        if request.form.get('terms-checkbox') == 'on':
+        if request.method == 'POST':
 
-            session['register'] = True
-            return redirect(url_for('register'))
+            if request.form.get('terms-checkbox') == 'on':
 
-        else:
-            session['notification'] = {'status': 'error', 'content': 'You did not tick the agree to terms checkbox.'}
-            return redirect(url_for('register'))
+                session['register'] = True
+                return redirect(url_for('register'))
+
+            else:
+                session['notification'] = {'status': 'error', 'content': 'You did not tick the agree to terms checkbox.'}
+                return redirect(url_for('register'))
+    else:
+        return redirect(url_for('main'))
 
     return render_template('user/guidelines.html')
 
@@ -297,21 +310,25 @@ def register_guide():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 
-    if 'register' in session and session['register']:
+    if current_user.is_authenticated:
 
-        if request.method == 'POST':
+        if 'register' in session and session['register']:
 
-            try:
-                create_registration_record(request)
-            except AlreadyExistsError:
-                session['notification'] = {'status': 'error', 'content': 'An application related to your account has already been submitted.'}
+            if request.method == 'POST':
+
+                try:
+                    create_registration_record(request)
+                except AlreadyExistsError:
+                    session['notification'] = {'status': 'error', 'content': 'An active user with your provided email already exists.'}
+                    return redirect(url_for('login'))
+
+                session['notification'] = {'status': 'success', 'content': 'Your application has been submitted. Please wait for approval from an OpenAPS admin, which you will be notified of via your provided email.'}
                 return redirect(url_for('login'))
 
-            session['notification'] = {'status': 'success', 'content': 'Your application has been submitted. Please wait for approval from an OpenAPS admin, which you will be notified of via your provided email.'}
-            return redirect(url_for('login'))
-
+        else:
+            return redirect(url_for('register_guide'))
     else:
-        return redirect(url_for('register_guide'))
+        return redirect(url_for('main'))
 
     return render_template('user/register.html')
 
