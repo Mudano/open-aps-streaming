@@ -63,6 +63,6 @@ def nightscout_ingest_job():
                         delete_local_file(local_copy_of_data_file_name)
             print(f'Ingest job completed successfully for user {user.member_code}')
         except Exception as e:
-            print(f'An exception wasa thrown carrying out ingest for user {user.member_code}: {e}')
+            print(f'An exception was thrown carrying out ingest for user {user.member_code}: {e}')
 
     print(f'Ingest job completed at {datetime.now()}')
