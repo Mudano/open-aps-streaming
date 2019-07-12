@@ -14,7 +14,7 @@ services:
       - open_aps
     labels:
       - traefik.backend=registration
-      - traefik.frontend.rule=Host:register.openaps.org
+      - traefik.frontend.rule=Host:upload.openaps.org
       - traefik.docker.network=open_aps
       - traefik.port=${OPEN_APS_REGISTRATION_PORT}
       - traefik.enable=true
@@ -53,7 +53,7 @@ services:
       - open_aps
     labels:
       - traefik.backend=metabase
-      - traefik.frontend.rule=Host:datavis.openaps.org
+      - traefik.frontend.rule=Host:dataviz.openaps.org
       - traefik.docker.network=open_aps
       - traefik.port=3000
       - traefik.enable=true
