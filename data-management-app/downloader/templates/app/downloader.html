@@ -107,7 +107,6 @@
 </div>
 
 
-
 <script>
 
     $('.fuller-button').on('click', function () {
@@ -175,9 +174,11 @@
             width: '60%',
             minimumResultsForSearch: -1,
             data: [
+                   { id: "all", text: "All"},
                    { id: "device_status", text: "Device Status"},
                    { id: "entries", text: "Entries"},
-                   { id: "treatments", text: "Treatments"}
+                   { id: "treatments", text: "Treatments"},
+                   { id: "profile", text: "Profiles"}
                   ]
         });
         $('.entity-select').fitText(1.4);
@@ -189,7 +190,7 @@
             minimumResultsForSearch: -1,
             data: [
                    { id: "json", text: ".json"},
-                   { id: "csv", text: ".csv"}
+                   { id: "excel", text: ".csv/.xlsx"}
                   ]
         });
         $('.entity-select').fitText(1.4);

@@ -3,11 +3,13 @@ from models import Treatment, Entry, Profile, DeviceStatus, DeviceStatusMetric
 from utils.stream_ingester import StreamIngester
 from helpers import get_connection
 from utils.database import Database
+import pandas as pd
 import traceback
 import json
 import sys
 import os
 
+from random import shuffle
 
 def get_user_filepaths(user_folder):
 
@@ -47,19 +49,29 @@ def get_user_records(file_paths):
     status_metrics = [{**x['openaps'], **{'device_status_id': x['_id']}} for x in device_status if 'openaps' in x]
 
     mapper = {
-        'treatment': {'entity': treatments, 'object': Treatment, 'table': 'treatments'},
-        'entries': {'entity': entries, 'object': Entry, 'table': 'entries'},
-        'profiles': {'entity': profiles, 'object': Profile, 'table': 'profile'},
-        'status_metrics': {'entity': status_metrics, 'object': DeviceStatusMetric, 'table': 'device_status_metrics'},
-        'devicestatus': {'entity': device_status, 'object': DeviceStatus, 'table': 'device_status'}
+        'treatment': {'entity': _shuffle(treatments), 'object': Treatment, 'table': 'treatments'},
+        'entries': {'entity': _shuffle(entries), 'object': Entry, 'table': 'entries'},
+        'profiles': {'entity': _shuffle(profiles), 'object': Profile, 'table': 'profile'},
+        'status_metrics': {'entity': _shuffle(status_metrics), 'object': DeviceStatusMetric, 'table': 'device_status_metrics'},
+        'devicestatus': {'entity': _shuffle(device_status), 'object': DeviceStatus, 'table': 'device_status'}
     }
 
     return mapper
 
 
+def _shuffle(lod):
+
+    try:
+        shuffle(lod)
+        return lod[:100]
+    except TypeError:
+        return []
+
 def ingest(mapper):
 
         for k, v in mapper.items():
+
+            print(f"{k} ({str(len(v['entity']))})")
 
             temp_list = []
             try:
@@ -76,15 +88,15 @@ def ingest(mapper):
 
                 unduplicated = [dict(t) for t in {tuple(d.items()) for d in temp_list}]
 
-                # try:
-                #     ingester.add_target(target_data=unduplicated,
-                #                         output_schema='openaps',
-                #                         table_name=v['table'],
-                #                         date_format='YYYY-MM-DD HH24:MI:SS'
-                #                         )
-                # except Exception:
-                #     print(traceback.format_exc())
-                #     break
+                try:
+                    ingester.add_target(target_data=unduplicated,
+                                        output_schema='openaps',
+                                        table_name=v['table'],
+                                        date_format='YYYY-MM-DD HH24:MI:SS'
+                                        )
+                except Exception:
+                    print(traceback.format_exc())
+                    break
 
 
 db = Database(get_connection())
@@ -99,10 +111,12 @@ for user_folder in user_folders:
     print(f'{user_folder}: {count}/{len(user_folders)}')
     count = count + 1
 
-    paths = get_user_filepaths(user_folder)
-    mapper = get_user_records(paths)
+    if count < 111: continue
 
     try:
+
+        paths = get_user_filepaths(user_folder)
+        mapper = get_user_records(paths)
         ingest(mapper)
 
     except Exception as e:

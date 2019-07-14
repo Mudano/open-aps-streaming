@@ -1,10 +1,9 @@
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from utils.slack_publisher import SlackPublisher
-from utils.logger import Logger
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from utils.logger import Logger
 from flask_mail import Mail
 from flask import Flask
 import traceback
@@ -46,9 +45,9 @@ try:
     login_manager.login_message_category = 'info'
     logger.debug('INIT - Flask Login initialised.')
 
-    APP_PUBLIC_URL = 'https://data.openaps.org'
+    APP_PUBLIC_URL = os.environ['DOWNLOADER_PUBLIC_URL']
     APP_DIRECTORY_PATH = '/downloader'
-    ADMIN_EMAIL = 'laurie.bamber@mudano.com'
+    ADMIN_EMAIL = os.environ['DOWNLOADER_ADMIN_EMAIL']
 
     from downloader.models import User
 
@@ -59,12 +58,10 @@ try:
 
     from downloader import routes
 
-
-    from downloader.functions import remove_temporary_files
+    from downloader.func.downloader import remove_temporary_files
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=remove_temporary_files, trigger='interval', minutes=10)
     scheduler.start()
-
 
     logger.debug('INIT - Finished initialision.')
 

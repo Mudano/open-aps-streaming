@@ -15,7 +15,7 @@ class Entry:
 
         self.sgv = entity.get('sgv')
         self.direction = entity.get('direction')
-        self.device = entity['device']
+        self.device = entity['device'].replace('\x00', '') if 'device' in entity else None
         self.type = entity.get('type')
         self.rssi = entity.get('rssi')
         self.rawbg = entity.get('rawbg')
@@ -29,6 +29,8 @@ class Entry:
         self.scale = entity.get('scale')
         self.slope = entity.get('slope')
         self.intercept = entity.get('intercept')
+
+        self.raw_json = json.dumps(entity)
 
         self.system_time = entity['system_time'] if 'system_time' in entity else entity.get('sysTime')
         self.date = datetime.fromtimestamp(entity['date']/1000).strftime('%Y-%m-%d %H:%M:%S')
@@ -80,6 +82,8 @@ class Treatment:
         self.reason = entity.get('reason')
         self.notes = entity.get('notes')
 
+        self.raw_json = json.dumps(entity)
+
         self.entered_by = entity.get('enteredBy')
         self.created_at = entity.get('created_at')
 
@@ -106,15 +110,17 @@ class Profile:
 
         self.app_id = entity['app_id']
         self.id = entity['_id']
-        self.default_profile = entity['defaultProfile']
-        self.mills = entity['mills']
-        self.units = entity['units']
+        self.default_profile = entity.get('defaultProfile')
+        self.mills = entity.get('mills')
+        self.units = entity.get('units')
 
-        self.store = json.dumps(entity['store'])
-        self.loop_settings = json.dumps(entity['loopSettings']) if 'loopSettings' in entity else None
+        self.store = json.dumps(entity.get('store'))
+        self.loop_settings = json.dumps(entity.get('loopSettings'))
 
-        self.start_date = entity['startDate']
-        self.created_at = entity['created_at']
+        self.raw_json = json.dumps(entity)
+
+        self.start_date = entity.get('startDate')
+        self.created_at = entity.get('created_at')
 
     def __enter__(self):
         return self
@@ -131,7 +137,7 @@ class DeviceStatus:
 
         self.app_id = entity['app_id']
         self.id = entity['_id']
-        self.device = entity['device']
+        self.device = entity.get('device')
 
         self.pump_id = self._extract(['pump', 'pumpID'])
         self.pump_bolusing = self._extract(['pump', 'bolusing']) if 'pump' in entity and 'bolusing' in entity['pump'] else self._extract(['pump', 'status', 'bolusing'])
@@ -145,6 +151,9 @@ class DeviceStatus:
 
         self.snooze = entity.get('snooze')
         self.override_active = self._extract(['override', 'active'])
+
+        self.raw_json = json.dumps(entity)
+
         self.created_at = entity['created_at']
 
         del self.entity
@@ -152,7 +161,7 @@ class DeviceStatus:
     def _extract(self, keys):
         try:
             return reduce(operator.getitem, keys, self.entity)
-        except KeyError:
+        except (KeyError,TypeError):
             return None
 
     def __enter__(self):
@@ -197,6 +206,9 @@ class DeviceStatusMetric:
         self.enacted_iob = self._extract(['enacted', 'IOB'])
         self.enacted_duration = self._extract(['enacted', 'duration'])
         self.enacted_rate = self._extract(['enacted', 'rate'])
+
+        self.raw_json = json.dumps(entity)
+
         self.enacted_timestamp = self._extract(['enacted', 'timestamp'])
 
         del self.entity
@@ -204,7 +216,7 @@ class DeviceStatusMetric:
     def _extract(self, keys):
         try:
             return reduce(operator.getitem, keys, self.entity)
-        except KeyError:
+        except (KeyError,TypeError):
             return None
 
     def __enter__(self):

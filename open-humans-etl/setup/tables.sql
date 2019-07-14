@@ -25,6 +25,7 @@ CREATE TABLE openaps.device_status (
 	loop_failure_reason TEXT,
 	snooze VARCHAR,
 	override_active BOOL,
+	raw_json JSONB,
 	created_at timestamp
 );
 ALTER TABLE openaps.device_status OWNER TO power_user;
@@ -62,6 +63,7 @@ CREATE TABLE openaps.device_status_metrics (
     enacted_iob NUMERIC,
     enacted_duration NUMERIC,
     enacted_rate NUMERIC,
+    raw_json JSONB,
     enacted_timestamp TIMESTAMP
 );
 ALTER TABLE openaps.device_status_metrics OWNER TO power_user;
@@ -93,6 +95,7 @@ CREATE TABLE openaps.entries (
 	slope NUMERIC,
 	intercept NUMERIC,
 	system_time VARCHAR,
+	raw_json JSONB,
 	"date" timestamp
 );
 ALTER TABLE openaps.entries OWNER TO power_user;
@@ -113,6 +116,7 @@ CREATE TABLE openaps.profile (
 	store JSON,
 	loop_settings JSON,
 	start_date TIMESTAMP,
+	raw_json JSONB,
 	created_at timestamp
 );
 ALTER TABLE openaps.profile OWNER TO power_user;
@@ -133,6 +137,7 @@ CREATE TABLE openaps.radio_adapter (
 	frequency NUMERIC,
 	"name" text,
 	firmware_version text,
+	raw_json JSONB,
 	hardware text
 );
 ALTER TABLE openaps.radio_adapter OWNER TO power_user;
@@ -178,6 +183,7 @@ CREATE TABLE openaps.treatments (
 	reason VARCHAR,
 	notes TEXT,
 	entered_by VARCHAR,
+	raw_json JSONB,
 	created_at timestamp
 );
 ALTER TABLE openaps.treatments OWNER TO power_user;
