@@ -18,7 +18,13 @@ try:
     logger.debug('INIT - Flask app initialised.')
     app.config['SECRET_KEY'] = os.environ['DOWNLOADER_SECRET_KEY']
 
-    database_uri = f"postgresql://{os.environ['POSTGRES_USER']}:{os.environ['POSTGRES_PASSWORD']}@{os.environ['POSTGRES_HOST']}:{os.environ['POSTGRES_PORT']}/{os.environ['POSTGRES_DB']}"
+    db_user = os.environ['POSTGRES_USER']
+    db_pass = os.environ['POSTGRES_PASSWORD']
+    db_host = os.environ['POSTGRES_HOST']
+    db_port = os.environ['POSTGRES_PORT']
+    db_name = os.environ['POSTGRES_DB']
+
+    database_uri = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
 
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['TEMPLATES_AUTO_RELOAD'] = True
