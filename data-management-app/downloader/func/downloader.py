@@ -1,15 +1,16 @@
 
 from downloader.models import Entry, Treatment, Profile, Device
-from downloader import db, APP_DIRECTORY_PATH
 from downloader.exception import DownloadError
+from downloader import APP_DIRECTORY_PATH, db
 from flask_login import current_user
 import pandas as pd
 import traceback
 import datetime
-import json
+import zipfile
 import os
 
 
+OUTFILE_DIR = f'C:/Users/Laurie Bamber/Work/open-aps-streaming/data-management-app/downloader/temp_files'
 ENTITY_MAPPER = {
     'entries': {'date_col': 'date', 'class': Entry},
     'treatments': {'date_col': 'created_at', 'class': Treatment},
@@ -20,93 +21,49 @@ ENTITY_MAPPER = {
 
 def create_download_file(request):
 
-    if request.form['filetype'] == 'json':
-        filetype = 'json'
-    elif request.form['filetype'] == 'excel' and request.form['entity'] == 'all':
-        filetype = 'xlsx'
-    else:
-        filetype = 'csv'
-
+    filetype = request.form['filetype'].split(' ')[0]
     entity = request.form['entity'].split(' ')[0]
     start_date = request.form['date-range'].split(' to ')[0].split(' ')[0]
     end_date = request.form['date-range'].split(' to ')[1].split(' ')[0]
 
-    outfile = f'{APP_DIRECTORY_PATH}/temp_files/{entity}_{start_date}_{end_date}.{filetype}'
-
     try:
-        results = _extract_results(get_entity_records(entity, start_date, end_date))
-        generate_outfile(results, outfile)
+
+        zip_file = f"{OUTFILE_DIR}/openaps_{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.zip"
+
+        with zipfile.ZipFile(zip_file, 'w', zipfile.ZIP_DEFLATED) as zip_folder:
+
+            populate_files(entity, start_date, end_date, filetype, zip_folder)
 
     except Exception:
         raise DownloadError(traceback.format_exc())
 
-    current_user.total_download_size_mb = current_user.total_download_size_mb + (os.path.getsize(outfile) / (1024 * 1024.0))
+    current_user.total_download_size_mb = current_user.total_download_size_mb + (os.path.getsize(f'{zip_file}') / (1024 * 1024.0))
     current_user.num_downloads = current_user.num_downloads + 1
     db.session.commit()
 
-    return outfile
+    return zip_file
 
 
-def get_entity_records(entity, start_date, end_date):
+def populate_files(entity, start_date, end_date, filetype, zip_folder):
 
-    outlist = []
     for k, v in ENTITY_MAPPER.items():
 
         if k == entity or entity == 'all':
 
-            records = v['class'].query.filter(v['class'].__getattribute__(v['date_col']) >= start_date)\
-                                      .filter(v['class'].__getattribute__(v['date_col']) <= end_date).all()
-            outlist.append(records)
+            outfile = f'{k}_{start_date}_{end_date}.{filetype}'
 
-    return outlist
+            records = [x.raw_json for x in v['class'].query.filter(getattr(v['class'], v['date_col']) >= start_date)\
+                                                           .filter(getattr(v['class'], v['date_col']) <= end_date)\
+                                                           .filter(v['class'].raw_json != None).all()]
 
+            df = pd.DataFrame(records)
 
-def _extract_results(results, entity):
+            if filetype == 'json':
 
-    outlist = []
-    if entity == 'all':
+                zip_folder.writestr(outfile, df.to_json(orient='table', index=False, compression='gzip'))
 
-        for res in results:
-
-            pass
-
-    return outlist
-
-
-def generate_outfile(outlist, outfile):
-
-    if 'all' in outfile:
-
-        if 'json' in outfile:
-
-            with open(outfile, 'w') as t:
-
-                t.write(json.dumps())
-
-        else:
-            writer = pd.ExcelWriter(outfile, engine='xlsxwriter')
-
-            for (entity, k) in (outlist, ENTITY_MAPPER.keys()):
-
-                df = pd.DataFrame(entity)
-                df.to_excel(writer, k)
-
-            writer.save()
-
-    else:
-        df = pd.DataFrame(outlist)
-
-        if 'json' in outfile:
-
-            df.to_json(outfile)
-
-        else:
-            df.to_csv(outfile)
-
-
-
-
-
+            else:
+                zip_folder.writestr(outfile, df.to_csv(index=False, compression='gzip'))
 
 
 
@@ -114,7 +71,7 @@ def generate_outfile(outlist, outfile):
 
 def remove_temporary_files():
 
-    cutoff = datetime.datetime.now() - datetime.timedelta(minutes=10)
+    cutoff = datetime.datetime.now() - datetime.timedelta(minutes=40)
     directory = f'{APP_DIRECTORY_PATH}/temp_files/'
 
     for filename in os.listdir(directory):

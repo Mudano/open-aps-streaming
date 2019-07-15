@@ -123,6 +123,7 @@ ALTER TABLE openaps.profile OWNER TO power_user;
 GRANT SELECT ON TABLE openaps.profile TO viewer;
 GRANT SELECT ON TABLE openaps.profile TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.profile TO ingestor;
+GRANT SELECT ON openaps.profile TO ext_openaps_app;
 
 
 
