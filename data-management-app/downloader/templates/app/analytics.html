@@ -3,50 +3,9 @@
 {% block content %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.1.1/iframeResizer.js"></script>
+
 <link href="{{ url_for('static', filename='css/' + 'tabs.css') }}" rel="stylesheet">
-<style>
-
-    .top-container {
-        width: 100%;
-        position: absolute;
-        top: 120px;
-        }
-
-    .message-box {
-        float: left;
-        height: 6%;
-        margin-left: 3%;
-        width: 33%;
-        }
-
-    .tabs-container {
-        text-align: center;
-        height: 5%;
-        width: 60%;
-        float: right;
-        text-align: right;
-        margin-right: 3%
-        }
-
-    .dashboard-section {
-        position: absolute;
-        width: 100%;
-        top: calc(8% + 120px);
-        display: flex;
-        z-index: -2;
-        }
-
-    iframe {
-        width: 1px;
-        min-width: 95%;
-        max-width: 95%;
-        margin-left: auto;
-        margin-right: auto;
-        }
-
-
-</style>
-
+<link href="{{ url_for('static', filename='css/' + 'analytics.css') }}" rel="stylesheet">
 
 
 <div class="background-content" id="bckgrnd">
@@ -83,7 +42,7 @@
 
     <div class="dashboard-section {{ dashboard }}" onload="resizeIframe(this)">
 
-        <iframe src="{{ iframe_mapper['entries']['url'] }}" allowtransparency="true">
+        <iframe frameborder="0" src="{{ iframe_mapper['entries']['url'] }}" allowtransparency="true">
 
         </iframe>
 

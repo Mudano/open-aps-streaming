@@ -3,14 +3,15 @@ from downloader.models import Entry, Treatment, Profile, Device
 from downloader.exception import DownloadError
 from downloader import APP_DIRECTORY_PATH, db
 from flask_login import current_user
-import pandas as pd
+from pandas.io.json import json_normalize
+from dateutil.parser import parse
 import traceback
 import datetime
 import zipfile
 import os
 
 
-OUTFILE_DIR = f'C:/Users/Laurie Bamber/Work/open-aps-streaming/data-management-app/downloader/temp_files'
+OUTFILE_DIR = f'D:/Work/OpSci/open-aps-streaming/data-management-app/downloader/temp_files'
 ENTITY_MAPPER = {
     'entries': {'date_col': 'date', 'class': Entry},
     'treatments': {'date_col': 'created_at', 'class': Treatment},
@@ -21,8 +22,10 @@ ENTITY_MAPPER = {
 
 def create_download_file(request):
 
-    filetype = request.form['filetype'].split(' ')[0]
-    entity = request.form['entity'].split(' ')[0]
+    _injection_check(request)
+
+    filetype = request.form['filetype']
+    entity = request.form['entity']
     start_date = request.form['date-range'].split(' to ')[0].split(' ')[0]
     end_date = request.form['date-range'].split(' to ')[1].split(' ')[0]
 
@@ -52,11 +55,12 @@ def populate_files(entity, start_date, end_date, filetype, zip_folder):
 
             outfile = f'{k}_{start_date}_{end_date}.{filetype}'
 
-            records = [x.raw_json for x in v['class'].query.filter(getattr(v['class'], v['date_col']) >= start_date)\
-                                                           .filter(getattr(v['class'], v['date_col']) <= end_date)\
-                                                           .filter(v['class'].raw_json != None).all()]
+            records = [x.raw_json for x in v['class'].query\
+                                                     .filter(getattr(v['class'], v['date_col']) >= start_date)\
+                                                     .filter(getattr(v['class'], v['date_col']) <= end_date)\
+                                                     .filter(v['class'].raw_json != None).all()]
 
-            df = pd.DataFrame(records)
+            df = json_normalize(records)
 
             if filetype == 'json':
 
@@ -66,7 +70,21 @@ def populate_files(entity, start_date, end_date, filetype, zip_folder):
                 zip_folder.writestr(outfile, df.to_csv(index=False, compression='gzip'))
 
 
+def _injection_check(request):
 
+    if request.form['filetype'] not in ['json', 'csv']:
+
+        raise DownloadError(f"Malicious filetype parameter identified, user was {current_user.email} and value was {request.form['filetype']}")
+
+    elif request.form['entity'] not in ['all', 'profile', 'treatments', 'entries', 'device_status']:
+
+            raise DownloadError(f"Malicious entity parameter identified, user was {current_user.email} and value was {request.form['entity']}")
+
+    try:
+        parse(request.form['date-range'].split(' to ')[0].split(' ')[0])
+        parse(request.form['date-range'].split(' to ')[1].split(' ')[0])
+    except ValueError:
+        raise DownloadError(f"Malicious date parameter identified, user was {current_user.email} and value was {request.form['date-range']}")
 
 
 def remove_temporary_files():

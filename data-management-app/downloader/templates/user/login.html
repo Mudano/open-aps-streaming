@@ -2,55 +2,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<style>
-
-    .login-box, .message-box {
-        position: absolute;
-        left: 3%;
-        color: #fff;
-        }
-
-    .login-box {
-        width: 25%;
-        top: 40%;
-        max-width: 350px;
-        }
-
-    .message-box {
-        width: 35%;
-        top: 25%;
-        }
-
-    .login-box input {
-        width: 100%;
-        border:none;
-	    padding:10px 20px;
-	    border-radius:10px;
-	    background:rgba(255,255,255,.2);
-	    color:#fff;
-	    display:block;
-	    margin-top: 5%;
-        }
-    .login-box .button {
-        margin-top: 17px;
-        margin-bottom: 5px;
-        color:#aaa;
-        background: rgba(21, 217, 213, 0.2);
-        }
-    .login-box .button:hover {
-        color: #fff !important;
-        background: rgba(21, 217, 213, 0.6);
-        }
-    .login-box a {
-        color: #aaa !important;
-        font-size: 12px;
-        padding-left: 2%;
-        }
-    .login-box a:hover {
-        color: #fff !important;
-        }
-
-</style>
+<link href="{{ url_for('static', filename='css/' + 'login.css') }}" rel="stylesheet">
 
 
 <div class="background-content">
