@@ -30,11 +30,11 @@ class Database:
 
                 self.cur.execute(query, args)
 
-            if multiple:
+            elif multiple:
 
                 self.cur.executemany(query, args)
 
-            if return_object:
+            elif return_object:
 
                 self.cur.execute(query, args)
                 query_object = self.cur.fetchall()

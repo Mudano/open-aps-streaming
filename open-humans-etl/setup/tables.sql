@@ -8,6 +8,7 @@
 --DROP TABLE IF EXISTS openaps.radio_adapter;
 --DROP TABLE IF EXISTS openaps.treatments;
 --DROP TABLE IF EXISTS openaps.heroku_apps;
+--DROP TABLE IF EXISTS openaps.member_demographics;
 
 
 CREATE TABLE openaps.device_status (
@@ -206,6 +207,39 @@ CREATE TABLE openaps.heroku_apps (
 );
 ALTER TABLE openaps.heroku_apps OWNER TO power_user;
 GRANT SELECT, INSERT ON TABLE openaps.heroku_apps TO ingestor;
+
+
+
+
+CREATE TABLE openaps.member_demographics (
+	seq_id bigserial NOT NULL,
+	ts timestamp NULL,
+	project_member_id int4 NULL,
+	date_of_birth date NULL,
+	gender varchar NULL,
+	ethnicity varchar NULL,
+	country varchar NULL,
+	first_diagnosed_date date NULL,
+	first_insulin_pump_date date NULL,
+	first_glucose_monitor_date date NULL,
+	first_diy_closed_loop_date date NULL,
+	diy_closed_loop_type varchar NULL,
+	who_uses_the_closed_loop_system varchar NULL,
+	weight varchar NULL,
+	height varchar NULL,
+	insulin_units_per_day numeric NULL,
+	basal_insulin_units_per_day numeric NULL,
+	carb_grams_per_day numeric NULL,
+	last_lab_reported_a1c numeric NULL,
+	last_lab_reported_a1c_date date NULL,
+	inserted_ts timestamp NULL DEFAULT now(),
+	updated_ts TIMESTAMP,
+	CONSTRAINT member_demographics_project_member_id_pkey UNIQUE (project_member_id, timestamp)
+);
+ALTER TABLE openaps.member_demographics OWNER TO power_user;
+GRANT SELECT ON TABLE openaps.member_demographics TO viewer;
+GRANT SELECT ON TABLE openaps.member_demographics TO admin_viewer;
+
 
 
 
