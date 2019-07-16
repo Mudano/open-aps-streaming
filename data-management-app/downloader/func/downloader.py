@@ -11,7 +11,7 @@ import zipfile
 import os
 
 
-OUTFILE_DIR = f'D:/Work/OpSci/open-aps-streaming/data-management-app/downloader/temp_files'
+OUTFILE_DIR = f'{APP_DIRECTORY_PATH}/temp_files'
 ENTITY_MAPPER = {
     'entries': {'date_col': 'date', 'class': Entry},
     'treatments': {'date_col': 'created_at', 'class': Treatment},
