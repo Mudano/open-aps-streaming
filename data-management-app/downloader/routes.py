@@ -6,11 +6,11 @@ from downloader.func.downloader import create_download_file
 from downloader.func.admin import process_admin_request
 from downloader.func.analytics import retrieve_iframes
 
+from downloader import app, logger, APP_DIRECTORY_PATH, APP_PUBLIC_URL
 from flask_login import current_user, login_required, logout_user
 from flask import session, redirect, url_for, request
 from downloader.models import User, RegApplication
 from flask import render_template, send_file
-from downloader import app, logger
 import traceback
 
 
@@ -206,7 +206,7 @@ def downloader():
 
             return send_file(file_location, as_attachment=True)
 
-        return render_template('app/downloader.html', notification=get_notification())
+        return render_template('app/downloader.html', notification=get_notification(), metadata_url=f'{APP_PUBLIC_URL}/metadata')
 
     except Exception:
         logger.error(f'DOWNLOADER - {str(traceback.format_exc())}')
@@ -222,6 +222,20 @@ def analytics():
     try:
         iframe_mapper = retrieve_iframes()
         return render_template('app/analytics.html', iframe_mapper=iframe_mapper, notification=get_notification())
+
+    except Exception:
+        logger.error(f'ANALYTICS - {str(traceback.format_exc())}')
+        session['notification'] = {'status': 'error', 'content': 'Error occurred, please try again later.'}
+        return redirect(url_for('main'))
+
+
+
+@app.route('/metadata', methods=['GET'])
+@login_required
+def metadata():
+
+    try:
+        return send_file(f'{APP_DIRECTORY_PATH}/static/metadata.xlsx')
 
     except Exception:
         logger.error(f'ANALYTICS - {str(traceback.format_exc())}')

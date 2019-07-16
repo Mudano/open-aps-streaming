@@ -44,7 +44,6 @@
   border-radius:50px;
   transition-duration:0.6s;
   transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
   background: #05abe0;
   background: -moz-linear-gradient(45deg, rgba(15, 17, 22, 0.8) 0%, rgba(15, 17, 22, 0.4) 100%);
   background: -webkit-linear-gradient(45deg, rgba(15, 17, 22, 0.8)0%,rgba(15, 17, 22, 0.4) 100%);
