@@ -19,6 +19,5 @@ GRANT USAGE ON SCHEMA openaps TO viewer;
 CREATE USER ext_openaps_app;
 ALTER USER ext_openaps_app WITH ENCRYPTED PASSWORD :'ext_openaps_app_password';
 GRANT USAGE ON SCHEMA openaps TO ext_openaps_app;
-GRANT SELECT, UPDATE, INSERT ON ALL TABLES IN SCHEMA openaps TO ext_openaps_app;
 
 

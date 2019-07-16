@@ -18,7 +18,7 @@ CREATE TABLE openaps.app_users (
 
 GRANT SELECT ON openaps.app_users TO admin_viewer;
 GRANT USAGE, SELECT ON SEQUENCE openaps.app_users_id_seq TO ext_openaps_app;
-GRANT SELECT, INSERT, DELETE ON TABLE openaps.app_users TO ext_openaps_app;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE openaps.app_users TO ext_openaps_app;
 
 
 CREATE TABLE openaps.researcher_applications (
