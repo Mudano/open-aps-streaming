@@ -224,3 +224,35 @@ class DeviceStatusMetric:
 
     def __exit__(self, exception_type, exception_value, traceback):
         pass
+
+
+
+class FormResponse:
+
+    def __init__(self, entity):
+
+        self.ts = entity['Timestamp']
+        self.project_member_id = entity['Your OpenHumans OpenAPS Data Commons "project member ID"']
+        self.date_of_birth = entity['When were you born?']
+        self.gender = entity['Gender']
+        self.ethnicity = entity['Ethnicity origin:']
+        self.country = entity['What country do you live in?']
+        self.first_diagnosed_date = entity['When were you diagnosed with diabetes?']
+        self.first_insulin_pump_date = entity['When did you first go on an insulin pump?']
+        self.first_glucose_monitor_date = entity['When did you first go on a continuous glucose monitor (CGM)?']
+        self.first_diy_closed_loop_date = entity['When did you first start using a DIY closed loop?']
+        self.diy_closed_loop_type = entity['What type of DIY close loop technology do you use? Select all that you actively use:']
+        self.who_uses_the_closed_loop_system = entity['Do you yourself have diabetes, or are you filling out this form for a child/loved one who has diabetes?']
+        self.weight = entity['How much do you weigh?']
+        self.height = entity['How tall are you?']
+        self.insulin_units_per_day = entity['How many units of insulin do you take per day?']
+        self.basal_insulin_units_per_day = entity['How many units of basal insulin do you take per day, on average?']
+        self.carb_grams_per_day = entity['On average, how many grams of carbohydrates do you eat in a day?']
+        self.last_lab_reported_a1c = entity['What was your last lab-reported A1C?']
+        self.last_lab_reported_a1c_date = entity['When was your last lab-reported A1C?']
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        pass
