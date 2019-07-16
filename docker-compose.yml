@@ -10,6 +10,7 @@ services:
       POSTGRES_REGISTER_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
       POSTGRES_NIGHTSCOUT_USER: ${OPEN_APS_POSTGRES_NIGHTSCOUT_USER}
       POSTGRES_NIGHTSCOUT_PASSWORD: ${OPEN_APS_NIGHTSCOUT_PASSWORD}
+      POSTGRES_METABASE_PASSWORD: ${OPEN_APS_POSTGRES_METABASE_PASSWORD}
     healthcheck:
       test:
         [
@@ -69,4 +70,12 @@ services:
     command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
   metabase:
     restart: always
+    environment: 
+      MB_DB_TYPE: 'postgres'
+      MB_DB_DBNAME: ${OPEN_APS_POSTGRES_DB}
+      MB_DB_PORT: ${OPEN_APS_POSTGRES_PORT}
+      MB_DB_USER: 'openapsuser'
+      MB_DB_PASS: ${OPEN_APS_POSTGRES_METABASE_PASSWORD}
+      MB_DB_HOST: 'open-aps-db'
+
 
