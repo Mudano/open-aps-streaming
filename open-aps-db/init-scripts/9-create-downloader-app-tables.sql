@@ -40,3 +40,12 @@ GRANT SELECT ON openaps.researcher_applications TO admin_viewer;
 GRANT USAGE, SELECT ON SEQUENCE openaps.researcher_applications_seq_id_seq TO ext_openaps_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON openaps.researcher_applications TO ext_openaps_app;
 
+-- create the default application admin user
+\set default_password_hash `echo "$DOWNLOADER_ADMIN_PASSWORD_HASH"`
+
+INSERT INTO openaps.app_users
+(email, hashed_pw, verified, verification_code, admin, created_ts, last_signin, login_count, num_downloads, total_download_size_mb, deactivated)
+VALUES
+('openaps.app@gmail.com', :'default_password_hash', TRUE, 'M3EM32O', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, FALSE);
+
+
