@@ -1,0 +1,127 @@
+
+
+CREATE TABLE openaps.device_status (
+  seq_id BIGSERIAL PRIMARY KEY,
+  app_id INTEGER,
+  id VARCHAR,
+  device VARCHAR,
+  pump_id VARCHAR,
+  pump_bolusing BOOL,
+  pump_suspended BOOL,
+  pump_model VARCHAR,
+  loop_cob NUMERIC,
+  loop_iob NUMERIC,
+  loop_version VARCHAR,
+  loop_failure_reason TEXT,
+  snooze VARCHAR,
+  override_active BOOL,
+  created_at timestamp
+);
+
+CREATE TABLE openaps.device_status_metrics (
+  seq_id BIGSERIAL PRIMARY KEY,
+  device_status_id VARCHAR,
+  iob_iob NUMERIC,
+  iob_activity NUMERIC,
+  iob_basal_iob NUMERIC,
+  iob_bolus_iob NUMERIC,
+  iob_net_basal_insulin NUMERIC,
+  iob_bolus_insulin NUMERIC,
+  iob_timestamp TIMESTAMP,
+  suggested_temp VARCHAR,
+  suggested_bg NUMERIC,
+  suggested_tick VARCHAR,
+  suggested_eventual_bg NUMERIC,
+  suggested_insulin_req NUMERIC,
+  suggested_reservoir NUMERIC,
+  suggested_cob NUMERIC,
+  suggested_iob NUMERIC,
+  enacted_temp VARCHAR,
+  enacted_bg NUMERIC,
+  enacted_tick VARCHAR,
+  enacted_eventual_bg NUMERIC,
+  enacted_insulin_req NUMERIC,
+  enacted_reservoir VARCHAR,
+  enacted_cob NUMERIC,
+  enacted_iob NUMERIC,
+  enacted_duration NUMERIC,
+  enacted_rate NUMERIC,
+  enacted_timestamp TIMESTAMP
+);
+
+CREATE TABLE openaps.entries (
+  seq_id BIGSERIAL PRIMARY KEY,
+  app_id INTEGER,
+  id VARCHAR,
+  sgv NUMERIC,
+  direction VARCHAR,
+  device VARCHAR,
+  type VARCHAR,
+  rssi NUMERIC,
+  rawbg NUMERIC,
+  trend VARCHAR,
+  glucose NUMERIC,
+  mbg NUMERIC,
+  delta NUMERIC,
+  filtered NUMERIC,
+  unfiltered NUMERIC,
+  noise NUMERIC,
+  "scale" NUMERIC,
+  slope NUMERIC,
+  intercept NUMERIC,
+  system_time VARCHAR,
+  "date" timestamp
+);
+
+CREATE TABLE openaps.profile (
+  seq_id BIGSERIAL PRIMARY KEY,
+  app_id INTEGER,
+  "id" VARCHAR,
+  "default_profile" text,
+  mills int8,
+  units VARCHAR,
+  store JSON,
+  loop_settings JSON,
+  start_date TIMESTAMP,
+  created_at timestamp
+);
+
+
+CREATE TABLE openaps.treatments (
+  seq_id BIGSERIAL PRIMARY KEY,
+  app_id INTEGER,
+  "id" VARCHAR,
+  event_type VARCHAR,
+  timestamp TIMESTAMP,
+  insulin NUMERIC,
+  carbs NUMERIC,
+  protein NUMERIC,
+  fat NUMERIC,
+  glucose NUMERIC,
+  glucose_type VARCHAR,
+  food_type VARCHAR,
+  temp VARCHAR,
+  rate NUMERIC,
+  duration NUMERIC,
+  units VARCHAR,
+  amount NUMERIC,
+  absolute NUMERIC,
+  bolus JSON,
+  boluscalc JSON,
+  medtronic VARCHAR,
+  type VARCHAR,
+  absorption_time NUMERIC,
+  unabsorbed NUMERIC,
+  ratio NUMERIC,
+  wizard JSON,
+  target_top NUMERIC,
+  target_bottom NUMERIC,
+  fixed NUMERIC,
+  programmed VARCHAR,
+  reason VARCHAR,
+  notes TEXT,
+  entered_by VARCHAR,
+  created_at timestamp
+);
+
+

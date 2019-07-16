@@ -1,3 +1,0 @@
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-CREATE SCHEMA ns_ingest;
-
