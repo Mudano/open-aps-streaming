@@ -12,7 +12,8 @@ CREATE TABLE openaps.app_users (
 	total_download_size_mb NUMERIC,
 	deactivated BOOLEAN,
 	deactivated_date TIMESTAMP,
-	created_ts TIMESTAMP
+	created_ts TIMESTAMP,
+    UNIQUE(email)
 );
 GRANT SELECT ON openaps.app_users TO admin_viewer;
 GRANT USAGE, SELECT ON SEQUENCE openaps.app_users_id_seq TO ext_openaps_app;
@@ -27,15 +28,14 @@ CREATE TABLE openaps.researcher_applications (
 	phone_number VARCHAR,
 	irb_approval TEXT,
 	sponsor_organisation VARCHAR,
-	oh_project_created BOOLEAN,
 	request_description TEXT,
 	application_processed BOOL,
 	application_granted BOOL,
 	processed_date TIMESTAMP,
-	inserted_ts TIMESTAMP
-
+	inserted_ts TIMESTAMP,
+    UNIQUE(email)
 );
 GRANT SELECT ON openaps.researcher_applications TO admin_viewer;
 GRANT USAGE, SELECT ON SEQUENCE openaps.researcher_applications_seq_id_seq TO ext_openaps_app;
-GRANT SELECT, INSERT, UPDATE ON openaps.researcher_applications TO ext_openaps_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON openaps.researcher_applications TO ext_openaps_app;
 

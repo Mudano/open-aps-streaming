@@ -7,51 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.2.3/themes/dark.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.2.3/flatpickr.js"></script>
 
-
-
-<style>
-
-    .message-box, .verify-form {
-        position: absolute;
-        left: 3%;
-        width: 35%;
-        padding-left: 2%;
-        }
-
-    .message-box {
-        top: 120px;
-        height: 6%;
-        }
-    .verify-form {
-        top: calc(8% + 120px);
-        max-width: 500px;
-        }
-
-    .verify-form h6 {
-        margin-bottom: 4%;
-        margin-top: 7%;
-        }
-
-    .verify-field {
-        padding-left: 8px;
-        background-color: rgba(15, 17, 22, 0.8);
-        color: #d6d6d6;
-        box-shadow: inset 0 0 1em rgba(0, 170, 170, 0.2), 0 0 1em rgba(0, 170, 170, 0.2);
-        height: 40px !important;
-        border: 1px solid rgba(250,250,250,0.2);
-        border-radius: 3px;
-        width: 70%;
-        }
-    .enter-user:hover {box-shadow: inset 0 0 1em rgba(0, 170, 170, 0.5), 0 0 1em rgba(0, 170, 170, 0.5);}
-
-    .title-hr {margin-left: 0%;}
-    .title-text {padding-left: 0%;}
-
-    .fuller-button {width: 70%; margin-top: 4%;}
-
-</style>
-
-
+<link href="{{ url_for('static', filename='css/' + 'verify.css') }}" rel="stylesheet">
 
 
 <div class="background-content">

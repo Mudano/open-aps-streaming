@@ -1,0 +1,38 @@
+
+.top-container {
+    width: 100%;
+    position: absolute;
+    top: 120px;
+    }
+
+.message-box {
+    float: left;
+    height: 6%;
+    margin-left: 3%;
+    width: 33%;
+    }
+
+.tabs-container {
+    text-align: center;
+    height: 5%;
+    width: 60%;
+    float: right;
+    text-align: right;
+    margin-right: 3%
+    }
+
+.dashboard-section {
+    position: absolute;
+    width: 100%;
+    top: calc(8% + 120px);
+    display: flex;
+    z-index: -2;
+    }
+
+iframe {
+    width: 1px;
+    min-width: 95%;
+    max-width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    }

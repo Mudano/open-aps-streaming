@@ -40,3 +40,43 @@ class RegApplication(db.Model):
     application_granted = db.Column(db.Boolean)
     processed_date = db.Column(db.Date)
     inserted_ts = db.Column(db.Date)
+
+
+class Entry(db.Model):
+    __tablename__ = "entries"
+    __table_args__ = ({"schema": "openaps"})
+
+    seq_id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+
+    raw_json = db.Column(db.JSON)
+
+
+class Treatment(db.Model):
+    __tablename__ = "treatments"
+    __table_args__ = ({"schema": "openaps"})
+
+    seq_id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.Date)
+
+    raw_json = db.Column(db.JSON)
+
+
+class Device(db.Model):
+    __tablename__ = "device_status"
+    __table_args__ = ({"schema": "openaps"})
+
+    seq_id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.Date)
+
+    raw_json = db.Column(db.JSON)
+
+
+class Profile(db.Model):
+    __tablename__ = "profile"
+    __table_args__ = ({"schema": "openaps"})
+
+    seq_id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.Date)
+
+    raw_json = db.Column(db.JSON)

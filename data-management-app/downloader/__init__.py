@@ -1,10 +1,9 @@
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from utils.slack_publisher import SlackPublisher
-from utils.logger import Logger
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from utils.logger import Logger
 from flask_mail import Mail
 from flask import Flask
 import traceback
@@ -18,7 +17,16 @@ try:
     app = Flask(__name__)
     logger.debug('INIT - Flask app initialised.')
     app.config['SECRET_KEY'] = os.environ['DOWNLOADER_SECRET_KEY']
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DOWNLOADER_POSTGRES_CON']
+
+    db_user = os.environ['POSTGRES_USER']
+    db_pass = os.environ['POSTGRES_PASSWORD']
+    db_host = os.environ['POSTGRES_HOST']
+    db_port = os.environ['POSTGRES_PORT']
+    db_name = os.environ['POSTGRES_DB']
+
+    database_uri = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['SQLALCHEMY_POOL_SIZE'] = 20
     app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20
@@ -43,10 +51,9 @@ try:
     login_manager.login_message_category = 'info'
     logger.debug('INIT - Flask Login initialised.')
 
-    APP_PUBLIC_URL = 'https://data.openaps.org'
+    APP_PUBLIC_URL = os.environ['DOWNLOADER_PUBLIC_URL']
     APP_DIRECTORY_PATH = '/downloader'
-    DOWNLOAD_DAYS_CUTOFF = 180
-    ADMIN_EMAIL = 'laurie.bamber@mudano.com'
+    ADMIN_EMAIL = os.environ['DOWNLOADER_ADMIN_EMAIL']
 
     from downloader.models import User
 
@@ -57,12 +64,10 @@ try:
 
     from downloader import routes
 
-
-    from downloader.functions import remove_temporary_files
+    from downloader.func.downloader import remove_temporary_files
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=remove_temporary_files, trigger='interval', minutes=10)
     scheduler.start()
-
 
     logger.debug('INIT - Finished initialision.')
 
