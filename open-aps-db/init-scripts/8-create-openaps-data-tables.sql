@@ -1,5 +1,4 @@
 
-
 CREATE TABLE openaps.device_status (
   seq_id BIGSERIAL PRIMARY KEY,
   app_id INTEGER,
@@ -15,8 +14,14 @@ CREATE TABLE openaps.device_status (
   loop_failure_reason TEXT,
   snooze VARCHAR,
   override_active BOOL,
+  raw_json JSONB,
   created_at timestamp
 );
+
+GRANT SELECT ON TABLE openaps.device_status TO viewer;
+GRANT SELECT ON TABLE openaps.device_status TO ext_openaps_app;
+GRANT SELECT, INSERT ON TABLE openaps.device_status TO ingestor;
+
 
 CREATE TABLE openaps.device_status_metrics (
   seq_id BIGSERIAL PRIMARY KEY,
@@ -46,8 +51,14 @@ CREATE TABLE openaps.device_status_metrics (
   enacted_iob NUMERIC,
   enacted_duration NUMERIC,
   enacted_rate NUMERIC,
+  raw_json JSONB,
   enacted_timestamp TIMESTAMP
 );
+
+GRANT SELECT ON TABLE openaps.device_status_metrics TO viewer;
+GRANT SELECT ON TABLE openaps.device_status_metrics TO ext_openaps_app;
+GRANT SELECT, INSERT ON TABLE openaps.device_status_metrics TO ingestor;
+
 
 CREATE TABLE openaps.entries (
   seq_id BIGSERIAL PRIMARY KEY,
@@ -70,8 +81,14 @@ CREATE TABLE openaps.entries (
   slope NUMERIC,
   intercept NUMERIC,
   system_time VARCHAR,
+  raw_json JSONB,
   "date" timestamp
 );
+
+GRANT SELECT ON TABLE openaps.entries TO viewer;
+GRANT SELECT ON TABLE openaps.entries TO ext_openaps_app;
+GRANT SELECT, INSERT ON TABLE openaps.entries TO ingestor;
+
 
 CREATE TABLE openaps.profile (
   seq_id BIGSERIAL PRIMARY KEY,
@@ -83,8 +100,14 @@ CREATE TABLE openaps.profile (
   store JSON,
   loop_settings JSON,
   start_date TIMESTAMP,
+  raw_json JSONB,
   created_at timestamp
 );
+
+GRANT SELECT ON TABLE openaps.profile TO viewer;
+GRANT SELECT ON TABLE openaps.profile TO ext_openaps_app;
+GRANT SELECT, INSERT ON TABLE openaps.profile TO ingestor;
+GRANT SELECT ON openaps.profile TO ext_openaps_app;
 
 
 CREATE TABLE openaps.treatments (
@@ -121,7 +144,46 @@ CREATE TABLE openaps.treatments (
   reason VARCHAR,
   notes TEXT,
   entered_by VARCHAR,
+  raw_json JSONB,
   created_at timestamp
 );
 
+GRANT SELECT ON TABLE openaps.treatments TO viewer;
+GRANT SELECT ON TABLE openaps.treatments TO ext_openaps_app;
+GRANT SELECT, INSERT ON TABLE openaps.treatments TO ingestor;
 
+
+CREATE TABLE openaps.member_demographics (
+  seq_id bigserial NOT NULL,
+  ts timestamp NULL,
+  project_member_id int4 NULL,
+  date_of_birth date NULL,
+  gender varchar NULL,
+  ethnicity varchar NULL,
+  country varchar NULL,
+  first_diagnosed_date date NULL,
+  first_insulin_pump_date date NULL,
+  first_glucose_monitor_date date NULL,
+  first_diy_closed_loop_date date NULL,
+  diy_closed_loop_type varchar NULL,
+  who_uses_the_closed_loop_system varchar NULL,
+  weight varchar NULL,
+  height varchar NULL,
+  insulin_units_per_day numeric NULL,
+  basal_insulin_units_per_day numeric NULL,
+  carb_grams_per_day numeric NULL,
+  last_lab_reported_a1c numeric NULL,
+  last_lab_reported_a1c_date date NULL,
+  inserted_ts timestamp NULL DEFAULT now(),
+  updated_ts TIMESTAMP,
+  CONSTRAINT member_demographics_project_member_id_pkey UNIQUE (project_member_id, ts)
+);
+
+GRANT SELECT ON TABLE openaps.member_demographics TO viewer;
+GRANT SELECT ON TABLE openaps.member_demographics TO admin_viewer;
+
+
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ingestor;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO viewer;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO admin_viewer;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ext_openaps_app;

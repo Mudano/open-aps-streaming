@@ -3,6 +3,8 @@ Database Initialisation Scripts
 
 This directory contains the raw SQL scripts that are used to initialise all elements of the application database, these scripts are handwritten and designed for security by using environment variables to specify any sensitive information (these environment variables should be provided in a `.env` file built form the `.env-template` file in the project root).
 
+### Metabase Tables Initialisation
+
 However, once metabase was added to the project to provide visualisation capabailities this solution couldn't be maintained for all database initialisation. Metabase stores all aspects of it's configuration in an accompanying application database, in this case a PostgreSQL database. This means that there is no way to make the initialisation of the metabase visualisations for this tool replicable (allowing for re-deployments of the tool if required) apart from by performing a dump of the metabase application database state via `pg_dump`. This provides a SQL file from which the metabase config can be re-initialised into an empty database if required.
 
 Unfortunately, all aspects of metabase config are stored in this database dump, including metabase user names, emails, and hashed passwords. Given this personal information, the potential vulnerability of hashed passwords to cracking, and the nature of the application. It was decided that this initialisation script should not be stored alongside the rest of the SQL initialisation scripts in version control.
