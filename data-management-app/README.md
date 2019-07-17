@@ -43,9 +43,9 @@ The process used for generating files for users to download is as follows:
 
 2. Records are extracted from the database according to user parameters
 
-3. Pandas is used to convert the records into a json or csv file, with 4 files rather than 1 being produced if **all** is selected
+3. Pandas is used to convert the records into a **json** or **csv** file, with 4 files rather than 1 being produced if **all** is selected
 
-4. The generated file/s is then moved to a .zip folder, which is sent to be downloaded by the user
+4. The generated file/s is then moved to a **.zip** folder, which is sent to be downloaded by the user
 
 ### Registration
 
