@@ -10,7 +10,7 @@
 create view openaps.loop_typ_reference
 as
 select 
-	app_id
+	user_id
 	,"created_at"::date as device_date
 	,case when max(loop_iob) is null then 'open loop' else 'closed loop' end as Loop_type
 from openaps.device_status
