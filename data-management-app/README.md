@@ -17,6 +17,8 @@ Prior to this application, OpenAPS staff relied on manual processes to extract a
   <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/analytics.JPG" width="60%">
 </p>
 
+
+
 ## Deployment
 
 
@@ -31,8 +33,6 @@ The dependencies required for the frontend of the application are specified in t
 
 ## Security
 
-### Credentials
-
 The passwords and tokens required to run the app are sourced from the following environment variables:
 
 - **DOWNLOADER_SECRET_KEY** - The secret key which is used when initialising the app
@@ -45,8 +45,27 @@ The passwords and tokens required to run the app are sourced from the following 
 - **METABASE_URL** - The URL of a hosted metabase instance
 - **DOWNLOADER_SLACK_KEY** - A Slack App API key used for sending error notifications to Slack
 
+## App Functioning
+
+### Downloading
+
+The process used for generating files for users to download is as follows:
+
+1. User specifies the following parameters on the download page:
+
+- Filetype - Either json or csv
+- Date-range - Date-picker allowing users to limit the time-period
+- Entity - Can be **All**, **Entries**, **Treatments**, **Device**, or **Profiles** (see <a href="https://github.com/danamlewis/OpenHumansDataTools/blob/master/NS-data-types.md">here</a>)
+
+2. Records are extracted from the DB according to user parameters
+
+3. Pandas is used to convert the data into json or csv (4 files rather than 1 are produced if 'All' is selected), using gzip compression
+
+4. The generated file/s is then moved to a .zip folder, and then this .zip is sent to be downloaded by the user
+
 ### Registration
-Excluding the admin account which is created during the applications initialisation, all other accounts are added via the following process.
+
+Excluding the admin account which is created during the applications initialisation, users are added via the following process:
 
 1. User applies for access to the site via  the 'Register' link on the login page, and is required to fill out a form containing information such as why they require access
 
@@ -56,5 +75,7 @@ Excluding the admin account which is created during the applications initialisat
 
 4. After entering the verification code and assigning a password, the user will be able to login and access the rest of the sites content
 
-**Nb**: *An admin can also add a user directly, by entering their email in the 'Add User' link on the admin page. This cuts out the first two steps of the above process.*
 
+### Password Reset
+
+Users can reset their password's by clicking on the 'Reset Password' link on the home page. This will ask them to enter their email, and a reset link will be sent containing a verification code and a link to the verification page.
