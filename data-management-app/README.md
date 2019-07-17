@@ -24,7 +24,7 @@ Prior to this application, OpenAPS staff relied on manual processes to extract a
 
 #### Dependencies/Requirements
 
-The application is ran with **Python 3.6**, with the <a href="https://github.com/Mudano/open-aps-streaming/blob/master/data-management-app/setup/requirements.txt">requirements.txt</a> file in the setup folder specifying all the required Python packages and versions. The application is based on a PostgreSQL database and uses SQLAlchemy as an interaction layer.
+The application is ran with **Python 3.6**, with the <a href="https://github.com/Mudano/open-aps-streaming/blob/master/data-management-app/setup/requirements.txt">requirements.txt</a> file in the setup folder specifying all the required packages. The application is based on a PostgreSQL database and uses SQLAlchemy as an interaction layer.
 
 The dependencies required for the frontend of the application are specified in the `<head>` tag of the apps <a href="">layout.html</a> template.
 
