@@ -53,15 +53,15 @@ The process used for generating files for users to download is as follows:
 
 1. User specifies the following parameters on the download page:
 
-- Filetype - Either json or csv
+- Filetype - Either **json** or **csv**
 - Date-range - Date-picker allowing users to limit the time-period
 - Entity - Can be **All**, **Entries**, **Treatments**, **Device**, or **Profiles** (see <a href="https://github.com/danamlewis/OpenHumansDataTools/blob/master/NS-data-types.md">here</a>)
 
-2. Records are extracted from the DB according to user parameters
+2. Records are extracted from the database according to user parameters
 
-3. Pandas is used to convert the data into json or csv (4 files rather than 1 are produced if 'All' is selected), using gzip compression
+3. Pandas is used to convert the records into a json or csv file, with 4 files rather than 1 being produced if **all** is selected
 
-4. The generated file/s is then moved to a .zip folder, and then this .zip is sent to be downloaded by the user
+4. The generated file/s is then moved to a .zip folder, which is sent to be downloaded by the user
 
 ### Registration
 
