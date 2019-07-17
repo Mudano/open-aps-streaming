@@ -191,7 +191,18 @@ values
 (2, 'NightScout Data Commons', CURRENT_TIMESTAMP);
 
 
+-- this statement pre-creates the etl python scheduler table, so that ingestor does not need create tables perms
+CREATE TABLE openaps.apscheduler_jobs (
+  id VARCHAR(191) NOT NULL,
+  next_run_time FLOAT(25),
+  job_state BYTEA NOT NULL,
+  PRIMARY KEY (id)
+);
+GRANT SELECT, INSERT, UPDATE ON TABLE openaps.apscheduler_jobs TO ingestor;
+
+
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ingestor;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO viewer;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO admin_viewer;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ext_openaps_app;
+
