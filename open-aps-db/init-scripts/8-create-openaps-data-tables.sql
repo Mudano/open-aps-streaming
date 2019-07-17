@@ -180,7 +180,6 @@ CREATE TABLE openaps.source_entities (
   name VARCHAR,
   inserted_ts TIMESTAMP
 	);
-ALTER TABLE openaps.source_entities OWNER TO power_user;
 GRANT SELECT, INSERT ON TABLE openaps.source_entities TO ingestor;
 GRANT SELECT ON TABLE openaps.source_entities TO viewer;
 GRANT SELECT ON TABLE openaps.source_entities TO admin_viewer;
