@@ -1,9 +1,9 @@
 ## Downloader Web App
 
 ### Purpose
-Prior to this application, OpenAPS staff relied on manual and time-intensive processes to extract and distribute the data held within the OpenAPS Data Commons to researchers. The purpose of this application therefore was to replace the manual elements of this process with an automated solution, which would reduce the input required from OpenAPS staff, and provide researchers with faster and more comprehensive access to data from the OpenAPS data commons. Additionally, this application hosts dashboards which researchers can use to gain light analytical insights regarding data from the OpenAPS Data Commons.
+Prior to this application, OpenAPS staff relied on manual processes to extract and distribute the data held within the OpenAPS Data Commons to researchers. The purpose of this application therefore was to provide a portal which could automate this process, and by doing so reduce waste and improve accessability for researchers.
 
-### Elements
+### Pages
 
 -   **Download page**: This page contains a form that researchers can use to download data sourced from the Data Commons. This form includes options which allow researchers to specify the filetype and records they wish to source, and filter by date-range.
 
@@ -11,7 +11,7 @@ Prior to this application, OpenAPS staff relied on manual and time-intensive pro
   <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/downloader.JPG" width="60%">
 </p>
 
--   **Analytics Page**: This page contains a series of dashboards which provide key insights surrounding data sourced from the OpenAPS Data Commons, including metrics such as the amount of users who have donated data, and average trends in blood-glucose levels.
+-   **Analytics Page**: Through a series of dashboards, this page provides information relating to the demographics and metadata of our donatees, and also an analytical breakdown of key metrics related to our donatees **APS** data, such as trends in blood-glocose level throughout the day.
 
 <p align="center">
   <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/analytics.JPG" width="60%">
