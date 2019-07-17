@@ -77,7 +77,7 @@ from
 		,first_diagnosed_date
 		,floor((current_date - date_of_birth)/365) as age_in_years
 		,floor((current_date - first_diagnosed_date)/365) as years_since_diagnosed
-	from openaps.openaps.member_demographics
+	from openaps.member_demographics
 	) t1
 ) t1
 )
