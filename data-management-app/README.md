@@ -1,9 +1,9 @@
-## Downloader Web App
+# Downloader Web App
 
-### Purpose
+## Purpose
 Prior to this application, OpenAPS staff relied on manual processes to extract and distribute the data held within the OpenAPS Data Commons to researchers. The purpose of this application therefore was to provide a portal which could automate this process, with the intention of reducing waste and improving accessibility for researchers.
 
-### Pages
+## Pages
 
 -   **Download page**: This page contains a form that researchers can use to download data sourced from the Data Commons. This form includes options which allow researchers to specify the filetype and records they wish to source, and filter by date-range.
 
@@ -18,11 +18,11 @@ Prior to this application, OpenAPS staff relied on manual processes to extract a
 </p>
 
 
-### Setup
-#### Deployment
+## Setup
+### Deployment
 
 
-#### Dependencies/Requirements
+### Dependencies/Requirements
 
 The application is ran with **Python 3.6**, with the <a href="https://github.com/Mudano/open-aps-streaming/blob/master/data-management-app/setup/requirements.txt">requirements.txt</a> file in the setup folder specifying all the required packages. The application is based on a PostgreSQL database and uses SQLAlchemy as an interaction layer.
 
@@ -31,9 +31,9 @@ The dependencies required for the frontend of the application are specified in t
 
 
 
-#### Security
+### Security
 
-##### Authentication Parameters
+#### Credentials
 
 The passwords and tokens required to run the app are sourced from the following environment variables:
 
@@ -47,7 +47,7 @@ The passwords and tokens required to run the app are sourced from the following 
 - **METABASE_URL** - The URL of a hosted metabase instance
 - **DOWNLOADER_SLACK_KEY** - A Slack App API key used for sending error notifications to Slack
 
-##### Registration
+#### Registration
 Excluding the admin account which is created during the applications initialisation, all other accounts are added via the following process.
 
 1. A user applies for access to the site via  the 'Register' link on the login page
@@ -59,6 +59,4 @@ Excluding the admin account which is created during the applications initialisat
 4. After entering the verification code and assigning a password, a user will be able to login and access the rest of the sites content
 
 **Nb**: *An admin can also add a user directly, by entering their email in the 'Add User' link on the admin page. This essentially cuts out the first two steps of the above process.*
-
-##### Credentials
 
