@@ -1,4 +1,9 @@
+--Times from 00:00:00 to 23:45 in 15 minute intervals
 
+--Parent tables/views:
+--n/a
+-----------------------------------------
+-----------------------------------------
 
 create table openaps.time_reference
 (index_id int
