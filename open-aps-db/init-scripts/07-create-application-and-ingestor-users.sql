@@ -6,6 +6,7 @@
 CREATE USER ingestor;
 ALTER USER ingestor WITH ENCRYPTED PASSWORD :'ingestor_password';
 GRANT USAGE ON SCHEMA openaps TO ingestor;
+ALTER ROLE ingestor SET search_path = 'openaps';
 
 CREATE USER admin_viewer;
 ALTER USER admin_viewer WITH ENCRYPTED PASSWORD :'admin_viewer_password';
