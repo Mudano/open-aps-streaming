@@ -22,6 +22,17 @@ ENTITY_MAPPER = {
 
 def create_download_file(request):
 
+    """
+    :param request: contains form from download page
+
+        1. Run injection check to prevent SQL injection
+        2. Create outfile name
+        3. Open .zip file, and run sub-function to populate .zip with the csv/json file/s
+        4. Update user download metrics
+
+    :return: the path location of the created .zip file, containing the generated csv/json files
+    """
+
     _injection_check(request)
 
     filetype = request.form['filetype']
@@ -48,6 +59,27 @@ def create_download_file(request):
 
 
 def populate_files(entity, start_date, end_date, filetype, zip_folder):
+
+    """
+    :param entity: refers to tables in db, can be all, entries, treatments, profiles or device
+    :param start_date: start date for records
+    :param end_date: end date for records
+    :param filetype: outfile type, can be csv or json
+    :param zip_folder: the opened .zip folder to be written to
+
+        1. Iterate over each table name in the mapper dict
+        2. If the table name is equal to the entity chosen, or if the entity is all, continue
+        3. Generate an outfile name
+        4. Retrieve records from db, query in raw SQL is as follows:
+
+            SELECT raw_json FROM openaps.<entity> WHERE <start_date> > <table_date_column>
+                                                  AND <end_date> < <table_date_column>
+                                                  AND raw_json IS NOT NULL
+
+        5. Normalize the retrieved records, turning raw_json from nested dictionary to one-dimensional object
+        6. Write to the .zip file using gzip compression
+
+    """
 
     for k, v in ENTITY_MAPPER.items():
 
@@ -88,6 +120,15 @@ def _injection_check(request):
 
 
 def remove_temporary_files():
+
+    """
+        Cron function used to delete processed downloads.
+
+        1. Find all files in the downloads directory
+        2. Check if the modified_time is greater than a cutoff time (40 minutes)
+        3. If true, delete file
+
+    """
 
     cutoff = datetime.datetime.now() - datetime.timedelta(minutes=40)
     directory = f'{APP_DIRECTORY_PATH}/temp_files/'

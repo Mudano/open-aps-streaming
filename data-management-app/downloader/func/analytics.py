@@ -5,6 +5,19 @@ import os
 
 def retrieve_iframes():
 
+    """
+        Called when a user visits the app/analytics.html page.
+
+            1. Define entities and dashboard numbers
+
+            For each entity:
+                2. Get token using environ Metabase Secret Key
+                3. Construct URL from token and environ Metabase URL
+
+        :returns: A dictionary containing dashboard URL's for Metabase
+
+    """
+
     iframe_mapper = {
         'entries': {'number': 6},
         'treatments': {'number': 7},

@@ -11,9 +11,15 @@ import datetime
 
 def process_admin_request(request):
 
+    """
+    :param request: One of the forms from the app/admin.html template.
+                    This function is used to determine which form is submitted,
+                    and to then direct to a sub-function.
+    """
+
     if 'add-user' in request.form:
 
-        create_new_user(request.form['add-user'])
+        process_adding_user(request.form['add-user'])
 
         return 'User added successfully, a verification link has been sent to their email.'
 
@@ -33,12 +39,20 @@ def process_admin_request(request):
 
         if request.form['application-action'] == 'approve':
 
-            create_new_user(request.form['application-email'])
+            process_adding_user(request.form['application-email'])
 
         return 'Action processed successfully, the user has been notified.'
 
 
 def update_application(request):
+
+    """
+    Called when an admin approves/rejects a request for access application.
+        1. Mark the application as processed
+        2. Set the granted status based on the form response
+        3. Notify user if they are rejected
+
+    """
 
     record = RegApplication.query.filter_by(email=request.form['application-email']).first()
 
@@ -56,7 +70,24 @@ def update_application(request):
                                  '{request.form['reject-reason']}'""")
 
 
-def create_new_user(email):
+def process_adding_user(email):
+
+    """
+    :param email: The email address of the user to be added
+
+    Called when a new user is to be created, or when a deactivated/unverified user re-applies.
+
+        1. generate a temporary verification code
+        2. determine if user exists
+
+             - if the user exists, is verifed, and is not deactivated, raise an already exists error
+             - if the user exists but is not verified or is deactivated, restart verification process
+             - if an application already exists for the user and is not processed, raise not processed error
+             - if the user does not exist and no/processed application is detected, create a new user in the app_users table, start verification process
+
+        3. If an error has not been raised, notify the user with a verification email
+
+    """
 
     temp_code = generate_code()
 
