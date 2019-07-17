@@ -17,12 +17,10 @@ Prior to this application, OpenAPS staff relied on manual processes to extract a
   <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/analytics.JPG" width="60%">
 </p>
 
-
-## Setup
-### Deployment
+## Deployment
 
 
-### Dependencies/Requirements
+## Dependencies/Requirements
 
 The application is ran with **Python 3.6**, with the <a href="https://github.com/Mudano/open-aps-streaming/blob/master/data-management-app/setup/requirements.txt">requirements.txt</a> file in the setup folder specifying all the required packages. The application is based on a PostgreSQL database and uses SQLAlchemy as an interaction layer.
 
@@ -31,9 +29,9 @@ The dependencies required for the frontend of the application are specified in t
 
 
 
-### Security
+## Security
 
-#### Credentials
+### Credentials
 
 The passwords and tokens required to run the app are sourced from the following environment variables:
 
@@ -47,7 +45,7 @@ The passwords and tokens required to run the app are sourced from the following 
 - **METABASE_URL** - The URL of a hosted metabase instance
 - **DOWNLOADER_SLACK_KEY** - A Slack App API key used for sending error notifications to Slack
 
-#### Registration
+### Registration
 Excluding the admin account which is created during the applications initialisation, all other accounts are added via the following process.
 
 1. A user applies for access to the site via  the 'Register' link on the login page
