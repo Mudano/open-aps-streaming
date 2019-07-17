@@ -10,7 +10,7 @@ class Entry:
 
     def __init__(self, entity):
 
-        self.app_id = entity['app_id']
+        self.user_id = entity['user_id']
         self.id = entity['_id']
 
         self.sgv = entity.get('sgv')
@@ -32,6 +32,7 @@ class Entry:
 
         self.raw_json = json.dumps(entity)
 
+        self.source_entity = entity['source_entity']
         self.system_time = entity['system_time'] if 'system_time' in entity else entity.get('sysTime')
         self.date = datetime.fromtimestamp(entity['date']/1000).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -46,7 +47,7 @@ class Treatment:
 
     def __init__(self, entity):
 
-        self.app_id = entity['app_id']
+        self.user_id = entity['user_id']
         self.id = entity['_id'] if '_id' in entity else entity['id'] if 'id' in entity else entity['uuid']
         self.event_type = entity.get('eventType')
         self.timestamp = self._parse_date(entity.get('timestamp'))
@@ -65,15 +66,12 @@ class Treatment:
         self.units = entity.get('units')
         self.amount = entity.get('amount')
         self.absolute = entity.get('absolute')
-        self.bolus = json.dumps(entity.get('bolus'))
-        self.boluscalc = json.dumps(entity.get('boluscalc'))
         self.medtronic = entity.get('medtronic')
 
         self.type = entity.get('type')
         self.absorption_time = entity.get('absorptionTime')
         self.unabsorbed = entity.get('unabsorbed')
         self.ratio = entity.get('ratio')
-        self.wizard = json.dumps(entity.get('wizard'))
         self.target_top = entity.get('targetTop')
         self.target_bottom = entity.get('targetBottom')
         self.fixed = entity.get('fixed')
@@ -84,6 +82,7 @@ class Treatment:
 
         self.raw_json = json.dumps(entity)
 
+        self.source_entity = entity['source_entity']
         self.entered_by = entity.get('enteredBy')
         self.created_at = entity.get('created_at')
 
@@ -108,17 +107,15 @@ class Profile:
 
     def __init__(self, entity):
 
-        self.app_id = entity['app_id']
+        self.user_id = entity['user_id']
         self.id = entity['_id']
         self.default_profile = entity.get('defaultProfile')
         self.mills = entity.get('mills')
         self.units = entity.get('units')
 
-        self.store = json.dumps(entity.get('store'))
-        self.loop_settings = json.dumps(entity.get('loopSettings'))
-
         self.raw_json = json.dumps(entity)
 
+        self.source_entity = entity['source_entity']
         self.start_date = entity.get('startDate')
         self.created_at = entity.get('created_at')
 
@@ -135,7 +132,7 @@ class DeviceStatus:
 
         self.entity = entity
 
-        self.app_id = entity['app_id']
+        self.user_id = entity['user_id']
         self.id = entity['_id']
         self.device = entity.get('device')
 
@@ -154,6 +151,7 @@ class DeviceStatus:
 
         self.raw_json = json.dumps(entity)
 
+        self.source_entity = entity['source_entity']
         self.created_at = entity['created_at']
 
         del self.entity

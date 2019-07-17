@@ -1,15 +1,14 @@
 
 from models import Treatment, Entry, Profile, DeviceStatus, DeviceStatusMetric
 from utils.stream_ingester import StreamIngester
-from helpers import get_connection
-from utils.database import Database
-import pandas as pd
+from helpers import get_openaps_con
 import traceback
 import json
 import sys
 import os
 
 from random import shuffle
+
 
 def get_user_filepaths(user_folder):
 
@@ -35,16 +34,16 @@ def get_user_records(file_paths):
             records = json.load(f)
 
         if 'entries' in file.lower():
-            [entries.append({**x, **{'app_id': user_folder, 'oh_source_entity': 'OpenAPS'}}) for x in records]
+            [entries.append({**x, **{'user_id': user_folder, 'source_entity': 1}}) for x in records]
 
         elif 'treatments' in file.lower():
-            [treatments.append({**x, **{'app_id': user_folder, 'oh_source_entity': 'OpenAPS'}}) for x in records]
+            [treatments.append({**x, **{'user_id': user_folder, 'source_entity': 1}}) for x in records]
 
         elif 'profile' in file.lower():
-            [profiles.append({**x, **{'app_id': user_folder, 'oh_source_entity': 'OpenAPS'}}) for x in records]
+            [profiles.append({**x, **{'user_id': user_folder, 'source_entity': 1}}) for x in records]
 
         elif 'device' in file.lower():
-            [device_status.append({**x, **{'app_id': user_folder, 'oh_source_entity': 'OpenAPS'}}) for x in records]
+            [device_status.append({**x, **{'user_id': user_folder, 'source_entity': 1}}) for x in records]
 
     status_metrics = [{**x['openaps'], **{'device_status_id': x['_id']}} for x in device_status if 'openaps' in x]
 
@@ -66,6 +65,7 @@ def _shuffle(lod):
         return lod[:100]
     except TypeError:
         return []
+
 
 def ingest(mapper):
 
@@ -99,9 +99,8 @@ def ingest(mapper):
                     break
 
 
-db = Database(get_connection())
-ingester = StreamIngester(get_connection())
-BASE_DIRECTORY = 'D:/Work/OpSci/openaps/src/ingest/openaps_data_2/'
+ingester = StreamIngester(get_openaps_con())
+BASE_DIRECTORY = 'C:/Users/Laurie Bamber/Work/open-aps-streaming/open-humans-etl/data/openaps/'
 
 user_folders = [x for x in next(os.walk(BASE_DIRECTORY))[1]]
 
@@ -110,8 +109,6 @@ for user_folder in user_folders:
 
     print(f'{user_folder}: {count}/{len(user_folders)}')
     count = count + 1
-
-    if count < 111: continue
 
     try:
 

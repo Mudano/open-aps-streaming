@@ -172,10 +172,10 @@ GRANT SELECT ON TABLE openaps.source_entities TO viewer;
 GRANT SELECT ON TABLE openaps.source_entities TO admin_viewer;
 
 INSERT INTO openaps.source_entities
-(name, inserted_ts)
+(id, name, inserted_ts)
 values
 (1, 'OpenAPS Data Commons', CURRENT_TIMESTAMP),
-(2, 'NightScout Data Commons', CURRENT_TIMESTAMP)
+(2, 'NightScout Data Commons', CURRENT_TIMESTAMP);
 
 
 
