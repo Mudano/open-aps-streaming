@@ -37,14 +37,70 @@
         <select class="entity-select" name="entity" required>
             <option selected disabled></option>
         </select>
+        <span class="sample-button">SAMPLE</span>
 
         <div class="fuller-button">DOWNLOAD</div>
+
+        <div class="metadata-button">DOWNLOAD METADATA</div>
 
     </form>
 
 </div>
 
+<div class="close-button">close</div>
+<div class="image-container">
 
+
+    <img class="sample-image entries" src="{{ url_for('static', filename='images/' + 'entries_sample.jpg') }}" >
+    <img class="sample-image treatments" src="{{ url_for('static', filename='images/' + 'treatments_sample.jpg') }}" >
+    <img class="sample-image profile" src="{{ url_for('static', filename='images/' + 'profiles_sample.jpg') }}" >
+    <img class="sample-image device_status" src="{{ url_for('static', filename='images/' + 'device_sample.jpg') }}" >
+</div>
+
+
+<script>
+
+        $('.metadata-button').on('click', function () {
+
+            window.open('{{ metadata_url }}');
+
+        });
+
+</script>
+<script>
+
+    $('.entity-select').on('change', function () {
+
+        if ( $('.entity-select').val() !== 'all' ) {
+
+            $('.sample-button').fadeIn('slow');
+
+        } else {
+
+            $('.sample-button').fadeOut('slow');
+
+        }
+
+    });
+
+    $('.sample-button').on('click', function () {
+
+        $('.sample-image').hide();
+        var chosenImg = $('.entity-select').val()
+
+        $('.' + chosenImg).show();
+        $('.image-container').fadeToggle('slow');
+        $('.close-button').fadeToggle('slow');
+
+    });
+    $('.close-button').on('click', function () {
+
+        $('.image-container').fadeOut('slow');
+        $('.close-button').fadeOut('slow');
+
+    });
+
+</script>
 <script>
 
     $('.fuller-button').on('click', function () {

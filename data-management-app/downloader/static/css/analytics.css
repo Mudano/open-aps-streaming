@@ -23,16 +23,21 @@
 
 .dashboard-section {
     position: absolute;
+    left: 0;
+    right: 0;
     width: 100%;
+    max-width: 1900px;
+    margin: 0 auto;
     top: calc(8% + 120px);
     display: flex;
     z-index: -2;
+    padding-bottom: 80px;
     }
 
 iframe {
     width: 1px;
-    min-width: 95%;
-    max-width: 95%;
+    min-width: 90%;
+    max-width: 90%;
     margin-left: auto;
     margin-right: auto;
     }

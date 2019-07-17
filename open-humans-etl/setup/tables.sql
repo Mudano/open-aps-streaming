@@ -1,19 +1,16 @@
 
---DROP VIEW openaps.heroku_ids;
 --DROP TABLE IF EXISTS openaps.device_status;
 --DROP TABLE IF EXISTS openaps.device_status_metrics;
 --DROP TABLE IF EXISTS openaps.entries;
---DROP TABLE IF EXISTS openaps."loop";
 --DROP TABLE IF EXISTS openaps.profile;
---DROP TABLE IF EXISTS openaps.radio_adapter;
 --DROP TABLE IF EXISTS openaps.treatments;
---DROP TABLE IF EXISTS openaps.heroku_apps;
+--DROP TABLE IF EXISTS opeanps.source_entities;
 --DROP TABLE IF EXISTS openaps.member_demographics;
 
 
 CREATE TABLE openaps.device_status (
     seq_id BIGSERIAL PRIMARY KEY,
-    app_id INTEGER,
+    user_id INTEGER,
 	id VARCHAR,
 	device VARCHAR,
 	pump_id VARCHAR,
@@ -26,10 +23,10 @@ CREATE TABLE openaps.device_status (
 	loop_failure_reason TEXT,
 	snooze VARCHAR,
 	override_active BOOL,
+	source_entity INTEGER,
 	raw_json JSONB,
 	created_at timestamp
 );
-ALTER TABLE openaps.device_status OWNER TO power_user;
 GRANT SELECT ON TABLE openaps.device_status TO viewer;
 GRANT SELECT ON TABLE openaps.device_status TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.device_status TO ingestor;
@@ -64,20 +61,17 @@ CREATE TABLE openaps.device_status_metrics (
     enacted_iob NUMERIC,
     enacted_duration NUMERIC,
     enacted_rate NUMERIC,
-    raw_json JSONB,
     enacted_timestamp TIMESTAMP
 );
-ALTER TABLE openaps.device_status_metrics OWNER TO power_user;
 GRANT SELECT ON TABLE openaps.device_status_metrics TO viewer;
 GRANT SELECT ON TABLE openaps.device_status_metrics TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.device_status_metrics TO ingestor;
 
 
 
-
 CREATE TABLE openaps.entries (
 	seq_id BIGSERIAL PRIMARY KEY,
-	app_id INTEGER,
+    user_id INTEGER,
 	id VARCHAR,
 	sgv NUMERIC,
 	direction VARCHAR,
@@ -96,31 +90,28 @@ CREATE TABLE openaps.entries (
 	slope NUMERIC,
 	intercept NUMERIC,
 	system_time VARCHAR,
+	source_entity INTEGER,
 	raw_json JSONB,
 	"date" timestamp
 );
-ALTER TABLE openaps.entries OWNER TO power_user;
 GRANT SELECT ON TABLE openaps.entries TO viewer;
 GRANT SELECT ON TABLE openaps.entries TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.entries TO ingestor;
 
 
 
-
 CREATE TABLE openaps.profile (
 	seq_id BIGSERIAL PRIMARY KEY,
-	app_id INTEGER,
+    user_id INTEGER,
 	"id" VARCHAR,
 	"default_profile" text,
 	mills int8,
 	units VARCHAR,
-	store JSON,
-	loop_settings JSON,
 	start_date TIMESTAMP,
+	source_entity INTEGER,
 	raw_json JSONB,
 	created_at timestamp
 );
-ALTER TABLE openaps.profile OWNER TO power_user;
 GRANT SELECT ON TABLE openaps.profile TO viewer;
 GRANT SELECT ON TABLE openaps.profile TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.profile TO ingestor;
@@ -128,32 +119,9 @@ GRANT SELECT ON openaps.profile TO ext_openaps_app;
 
 
 
-
-
-
-CREATE TABLE openaps.radio_adapter (
-    seq_id BIGSERIAL PRIMARY KEY,
-    app_id INTEGER,
-	devicestatus_id text,
-	last_tuned text,
-	frequency NUMERIC,
-	"name" text,
-	firmware_version text,
-	raw_json JSONB,
-	hardware text
-);
-ALTER TABLE openaps.radio_adapter OWNER TO power_user;
-GRANT SELECT ON TABLE openaps.radio_adapter TO viewer;
-GRANT SELECT ON TABLE openaps.radio_adapter TO ext_openaps_app;
-GRANT SELECT, INSERT ON TABLE openaps.radio_adapter TO ingestor;
-
-
-
-
-
 CREATE TABLE openaps.treatments (
     seq_id BIGSERIAL PRIMARY KEY,
-    app_id INTEGER,
+    user_id INTEGER,
 	"id" VARCHAR,
 	event_type VARCHAR,
 	timestamp TIMESTAMP,
@@ -170,14 +138,11 @@ CREATE TABLE openaps.treatments (
 	units VARCHAR,
 	amount NUMERIC,
 	absolute NUMERIC,
-	bolus JSON,
-	boluscalc JSON,
 	medtronic VARCHAR,
 	type VARCHAR,
 	absorption_time NUMERIC,
 	unabsorbed NUMERIC,
 	ratio NUMERIC,
-	wizard JSON,
 	target_top NUMERIC,
 	target_bottom NUMERIC,
 	fixed NUMERIC,
@@ -185,29 +150,32 @@ CREATE TABLE openaps.treatments (
 	reason VARCHAR,
 	notes TEXT,
 	entered_by VARCHAR,
+	source_entity INTEGER,
 	raw_json JSONB,
 	created_at timestamp
 );
-ALTER TABLE openaps.treatments OWNER TO power_user;
 GRANT SELECT ON TABLE openaps.treatments TO viewer;
 GRANT SELECT ON TABLE openaps.treatments TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.treatments TO ingestor;
 
 
 
-
-CREATE TABLE openaps.heroku_apps (
-
+CREATE TABLE openaps.source_entities (
+	
 	id BIGSERIAL PRIMARY KEY,
-	url VARCHAR,
-	permission_withdrawn BOOL,
-	withdrawal_date TIMESTAMP,
-	created_ts TIMESTAMP
+	name VARCHAR,
+	inserted_ts TIMESTAMP
+	);
+ALTER TABLE openaps.source_entities OWNER TO power_user;
+GRANT SELECT, INSERT ON TABLE openaps.source_entities TO ingestor;
+GRANT SELECT ON TABLE openaps.source_entities TO viewer;
+GRANT SELECT ON TABLE openaps.source_entities TO admin_viewer;
 
-);
-ALTER TABLE openaps.heroku_apps OWNER TO power_user;
-GRANT SELECT, INSERT ON TABLE openaps.heroku_apps TO ingestor;
-
+INSERT INTO openaps.source_entities
+(name, inserted_ts)
+values
+(1, 'OpenAPS Data Commons', CURRENT_TIMESTAMP),
+(2, 'NightScout Data Commons', CURRENT_TIMESTAMP)
 
 
 
@@ -236,20 +204,9 @@ CREATE TABLE openaps.member_demographics (
 	updated_ts TIMESTAMP,
 	CONSTRAINT member_demographics_project_member_id_pkey UNIQUE (project_member_id, timestamp)
 );
-ALTER TABLE openaps.member_demographics OWNER TO power_user;
 GRANT SELECT ON TABLE openaps.member_demographics TO viewer;
 GRANT SELECT ON TABLE openaps.member_demographics TO admin_viewer;
 
-
-
-
-
-CREATE VIEW openaps.heroku_ids
-AS SELECT id, created_ts FROM openaps.heroku_apps;
-
-ALTER VIEW openaps.heroku_ids OWNER TO power_user;
-GRANT SELECT ON openaps.heroku_ids TO viewer;
-GRANT SELECT ON openaps.heroku_ids TO admin_viewer;
 
 
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ingestor;

@@ -1,32 +1,36 @@
 
+.element-container {
+    position: absolute;
+    left: 3%;
+    width: 90%;
+    top: 15vh;
+    max-width: 1450px;
+    }
 
 
 .message-box {
-    position: absolute;
-    left: 3%;
+    float: left;
     color: #fff;
     width: 35%;
-    top: 30%;
     }
 
 .fuller-button {width: 70%;}
 
 .main-content {
-    position: absolute;
-    top: 30%;
-    left: 40%;
+    float: left;
+    margin-left: 5%;
     width: 60%;
     text-align: center;
     display: table;
     height: auto;
     }
 .cell-filler {display: table-cell;}
-.left-cell, .right-cell {width: 15%;}
-.middle-cell {width: 5%;}
+.left-cell, .right-cell {width: 6.25;}
+.middle-cell {width: 7.5%;}
 
 .service-box-1, .service-box-2 {
     display: table-cell;
-    width: 32.5%;
+    width: 40%;
     background-color: rgba(14, 17, 22, 0.9);
     border: 1px solid white;
     border-radius: 4px;
