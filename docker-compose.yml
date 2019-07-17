@@ -82,5 +82,14 @@ services:
       MB_DB_USER: 'openapsuser'
       MB_DB_PASS: ${OPEN_APS_POSTGRES_METABASE_PASSWORD}
       MB_DB_HOST: 'open-aps-db'
+  open-aps-etl:
+    restart: always
+    environment:
+      POSTGRES_HOST: 'open-aps-db'
+      POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
+      POSTGRES_USER: 'ingestor'
+      POSTGRES_PASSWORD: ${OPEN_APS_POSTGRES_INGESTOR_PASSWORD}
+      POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
+      ETL_INTERVAL_HOURS: ${OPEN_APS_ETL_INTERVAL_HOURS}
 
 

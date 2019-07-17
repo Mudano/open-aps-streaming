@@ -1,4 +1,4 @@
-# from ingester.scheduler import app_scheduler
+from etl.scheduler import app_scheduler
 # from ingester.jobs import nightscout_ingest_job
 from datetime import datetime
 import os
@@ -13,8 +13,8 @@ if __name__ == '__main__':
     #                       id='1', replace_existing=True)
 
     try:
-        print(f'{datetime.now()} - Beginning the scheduled ETL frmo Open Humans to Postgres.')
-        # app_scheduler.start()
+        print(f'{datetime.now()} - Beginning the scheduled ETL from Open Humans to Postgres.')
+        app_scheduler.start()
     except (KeyboardInterrupt, SystemExit) as e:
         print(f'an exception was encountered whilst running the ETL scheduler: {e}')
         pass

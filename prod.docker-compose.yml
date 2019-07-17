@@ -57,6 +57,10 @@ services:
       - traefik.docker.network=open_aps
       - traefik.port=3000
       - traefik.enable=true
+  open-aps-etl:
+    image: open-aps-open-humans-etl:latest
+    networks:
+      - open_aps
 
 
 volumes:

@@ -18,4 +18,8 @@ services:
       dockerfile: Dockerfile
   metabase:
     image: metabase/metabase:latest
+  open-aps-etl:
+    build:
+      context: ./open-humans-etl
+      dockerfile: Dockerfile
 
