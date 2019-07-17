@@ -1,7 +1,7 @@
 ## Downloader Web App
 
 ### Purpose
-Prior to this application, OpenAPS staff relied on manual processes to extract and distribute the data held within the OpenAPS Data Commons to researchers. The purpose of this application therefore was to provide a portal which could automate this process, and by doing so reduce waste and improve accessibility for researchers.
+Prior to this application, OpenAPS staff relied on manual processes to extract and distribute the data held within the OpenAPS Data Commons to researchers. The purpose of this application therefore was to provide a portal which could automate this process, with the intention of reducing waste and improving accessibility for researchers.
 
 ### Pages
 
