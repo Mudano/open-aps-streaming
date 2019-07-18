@@ -7,6 +7,10 @@ import sys
 import os
 
 
+class OHError(Exception):
+    pass
+
+
 class OHWrapper:
 
     def __init__(self, master_token):
@@ -23,8 +27,7 @@ class OHWrapper:
             return resp
 
         except Exception:
-            print(traceback)
-            sys.exit(1)
+            raise OHError(traceback.format_exc())
 
     def get_member_list(self):
 
