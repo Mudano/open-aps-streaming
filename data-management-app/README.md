@@ -17,6 +17,18 @@ Prior to this application, OpenAPS staff relied on manual processes to extract a
   <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/analytics.JPG" width="60%">
 </p>
 
+-   **Admin Page**: This page contains the core admin functioning of the app, namely where users can be added/removed, and have their applications responded to. There is also a user metrics table on this page that shows how much users have downloaded, number of downloads, login count and last signin.
+
+<p align="center">
+  <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/admin.JPG" width="60%">
+</p>
+
+-   **Register Page**: This page contains the registration form, which records the following items from the user: name, email, phone, organisation, whether IRB approval is needed, and the justification for requesting access.
+
+<p align="center">
+  <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/register.JPG" width="60%">
+</p>
+
 
 
 ## Deployment
