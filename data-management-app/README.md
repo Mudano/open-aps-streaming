@@ -17,6 +17,18 @@ Prior to this application, OpenAPS staff relied on manual processes to extract a
   <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/analytics.JPG" width="60%">
 </p>
 
+-   **Admin Page**: This page contains the core admin functioning of the app, namely where users can be added/removed, and have their applications responded to. There is also a user metrics table on this page that shows how much users have downloaded, number of downloads, login count and last signin.
+
+<p align="center">
+  <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/admin.JPG" width="60%">
+</p>
+
+-   **Register Page**: This page contains the registration form, which records the following items from the user: name, email, phone, organisation, whether IRB approval is needed, and the justification for requesting access.
+
+<p align="center">
+  <img src="https://github.com/Mudano/open-aps-streaming/blob/downloader-app/data-management-app/downloader/static/images/git_images/register.JPG" width="60%">
+</p>
+
 
 
 ## Deployment
@@ -59,11 +71,16 @@ Excluding the admin account which is created during the applications initialisat
 
 4. After entering the verification code and assigning a password, the user will be able to login and access the rest of the sites content
 
+**Alternatively**: An admin can add a user directly via the 'Add User' button on the admin page. This skips the first two steps in the above process, and proceeds directly to sending the specified user an email with a verification code and link.
 
 ### Password Reset
 
 Users can reset their password's by clicking on the 'Reset Password' link on the home page. This will ask them to enter their email, and a reset link will be sent containing a verification code and a link to the verification page.
 
+
+### Removing User
+
+Admin's can remove users by proceeding to the admin page, selecting the users email from the list next to the 'Remove User' button, and then pressing this button. This will not delete the user, instead it will deactivate their account, and they will have to re-register before they can can access the site again.
 
 
 ## Security
