@@ -6,7 +6,7 @@
 --DROP TABLE IF EXISTS openaps.treatments;
 --DROP TABLE IF EXISTS opeanps.source_entities;
 --DROP TABLE IF EXISTS openaps.member_demographics;
-
+--DROP TABLE IF EXISTS openaps.oh_etl_log;
 
 CREATE TABLE openaps.device_status (
     seq_id BIGSERIAL PRIMARY KEY,
@@ -209,7 +209,21 @@ GRANT SELECT ON TABLE openaps.member_demographics TO admin_viewer;
 
 
 
+CREATE TABLE openaps.oh_etl_log (
+	seq_id BIGSERIAL PRIMARY KEY,
+	openaps_id BIGINT UNIQUE,
+	treatments_last_index BIGINT,
+	entries_last_index BIGINT,
+	profile_last_index BIGINT,
+	device_last_index BIGINT,
+	inserted_ts TIMESTAMP DEFAULT NOW()
+);
+GRANT SELECT, INSERT, UPDATE ON openaps.oh_etl_log TO ingestor;
+
+
+
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ingestor;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO viewer;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO admin_viewer;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ext_openaps_app;
+

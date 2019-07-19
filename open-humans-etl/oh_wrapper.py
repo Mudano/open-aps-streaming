@@ -3,6 +3,7 @@ import traceback
 import shutil
 import ohapi
 import gzip
+import json
 import sys
 import os
 
@@ -34,17 +35,24 @@ class OHWrapper:
         return self.OHProject.project_data
 
     @staticmethod
-    def extract_directory_files(directory):
+    def get_files_by_extension(extension, directory):
 
-        zipped_files = []
+        file_list = []
 
         for subdir, dirs, files in os.walk(directory):
 
             for file in files:
 
-                if '.json.gz' in file and file not in zipped_files:
+                if file.endswith(extension):
 
-                    zipped_files.append(f'{subdir}/{file}'.replace('\\', '/'))
+                    file_list.append(f'{subdir}/{file}'.replace('\\', '/'))
+
+        return file_list
+
+
+    def extract_directory_files(self, files_directory):
+
+        zipped_files = self.get_files_by_extension('.json.gz', files_directory)
 
         for filepath in zipped_files:
 
@@ -52,4 +60,24 @@ class OHWrapper:
                  open(filepath.replace('.gz', ''), 'wb') as outfile:
 
                     shutil.copyfileobj(extract_file, outfile, length=65536)
+
+            os.remove(filepath)
+
+
+    def rowify_json_files(self, files_directory):
+
+        json_files = self.get_files_by_extension('.json', files_directory)
+
+        for filepath in json_files:
+
+            with open(filepath) as infile:
+
+                json_list = json.load(infile)
+
+            with open(filepath.replace('.json', '_rowified.json'), 'w') as outfile:
+
+                for line in json_list:
+
+                    outfile.write("%s\n" % json.dumps(line))
+
             os.remove(filepath)

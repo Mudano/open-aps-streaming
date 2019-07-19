@@ -15,7 +15,7 @@ class Entry:
 
         self.sgv = entity.get('sgv')
         self.direction = entity.get('direction')
-        self.device = entity['device'].replace('\x00', '') if 'device' in entity else None
+        self.device = entity['device'].replace('\x00', '').replace('\\u0000', '') if 'device' in entity else None
         self.type = entity.get('type')
         self.rssi = entity.get('rssi')
         self.rawbg = entity.get('rawbg')
@@ -25,7 +25,7 @@ class Entry:
         self.delta = entity.get('delta')
         self.filtered = entity.get('filtered')
         self.unfiltered = entity.get('unfiltered')
-        self.noise = entity.get('noise')
+        self.noise = entity.get('noise') if entity.get('noise') != 'Clean' else None
         self.scale = entity.get('scale')
         self.slope = entity.get('slope')
         self.intercept = entity.get('intercept')
@@ -50,7 +50,7 @@ class Treatment:
         self.user_id = entity['user_id']
         self.id = entity['_id'] if '_id' in entity else entity['id'] if 'id' in entity else entity['uuid']
         self.event_type = entity.get('eventType')
-        self.timestamp = self._parse_date(entity.get('timestamp'))
+        self.timestamp = self._parse_date(entity.get('timestamp')) if entity.get('timestamp') != 0 else entity.get('created_at')
 
         self.insulin = entity.get('insulin')
         self.carbs = entity.get('carbs')
@@ -61,7 +61,7 @@ class Treatment:
         self.food_type = entity.get('foodType')
 
         self.temp = entity.get('temp')
-        self.rate = entity.get('rate')
+        self.rate = entity.get('rate') if entity.get('rate') != 'offset' else None
         self.duration = entity.get('duration')
         self.units = entity.get('units')
         self.amount = entity.get('amount')
@@ -205,8 +205,6 @@ class DeviceStatusMetric:
         self.enacted_duration = self._extract(['enacted', 'duration'])
         self.enacted_rate = self._extract(['enacted', 'rate'])
 
-        self.raw_json = json.dumps(entity)
-
         self.enacted_timestamp = self._extract(['enacted', 'timestamp'])
 
         del self.entity
@@ -222,7 +220,6 @@ class DeviceStatusMetric:
 
     def __exit__(self, exception_type, exception_value, traceback):
         pass
-
 
 
 class FormResponse:

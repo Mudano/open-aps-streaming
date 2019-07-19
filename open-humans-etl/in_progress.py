@@ -21,24 +21,22 @@
 """
 
 from models import Treatment, Entry, Profile, DeviceStatus, DeviceStatusMetric
-from helpers import get_openaps_con, get_master_token
 from utils.database import Database, Psycopg2Error
 from utils.stream_ingester import StreamIngester
-from datetime import datetime, timedelta
-from json.decoder import JSONDecodeError
 from oh_wrapper import OHWrapper, OHError
+from json.decoder import JSONDecodeError
+from helpers import get_openaps_con
 from utils.logger import Logger
+
 import traceback
 import json
 import sys
 import os
 
 
-FILES_DIRECTORY = '/temp_files'
-LAST_RUN = datetime.now() - timedelta(weeks=1)
-
+FILES_DIRECTORY = 'C:/Users/Laurie Bamber/Work/open-aps-streaming/open-humans-etl/data/openaps/'
 ENTITY_MAPPER = {
-    'treatment': {'object': Treatment, 'table': 'treatments'},
+    'treatments': {'object': Treatment, 'table': 'treatments'},
     'entries': {'object': Entry, 'table': 'entries'},
     'profile': {'object': Profile, 'table': 'profile'},
     'device': {'object': DeviceStatus, 'table': 'device_status'},
@@ -46,36 +44,37 @@ ENTITY_MAPPER = {
 }
 
 
-
 def add_user_to_etl_log(user_id):
 
     db.execute_query(""" INSERT INTO openaps.oh_etl_log
-                         (openhumans_id, treatments_last_index, entries_last_index, profile_last_index, device_last_index)
+                         (openaps_id, treatments_last_index, entries_last_index, profile_last_index, device_last_index)
                          VALUES
-                         (%(openhumans_id)s, 0,0,0,0)
+                         (%(openaps_id)s::BIGINT, 0,0,0,0)
                          LIMIT 1
-                         """, {'openhumans_id': user_id})
+                         """, {'openaps_id': user_id})
 
 
 def update_user_index(user_id, entity, index):
 
-    db.execute_query(""" UPDATE openaps.oh_etl_log
-                         SET %(entity)s_last_index = %(new_index)s
-                         WHERE openhumans_id = %(openhumans_id)s
-                         ;""",
-                         {'entity': entity, 'new_index': index, 'openhumans_id': user_id})
+    target_col = entity + '_last_index'
+
+    db.execute_query(f""" UPDATE openaps.oh_etl_log
+                          SET {target_col} = %(new_index)s
+                          WHERE openaps_id = %(openaps_id)s::BIGINT
+                          ;""",
+                          {'entity': target_col, 'new_index': index, 'openaps_id': user_id})
 
 
 def get_user(openhumans_id):
 
-    db_user = db.execute_query(""" SELECT * FROM openaps.oh_etl_log WHERE openhumans_id = %(openhumans_id)s """, {'openhumans_id': openhumans_id})
+    db_user = db.execute_query(""" SELECT * FROM openaps.oh_etl_log WHERE openaps_id = %(openaps_id)s::BIGINT """, {'openaps_id': openhumans_id}, return_object=True)
 
     if not db_user:
 
         add_user_to_etl_log(openhumans_id)
-        db_user = db.execute_query(""" SELECT * FROM openaps.oh_etl_log WHERE openhumans_id = %(openhumans_id)s """, {'openhumans_id': openhumans_id})
+        db_user = db.execute_query(""" SELECT * FROM openaps.oh_etl_log WHERE openaps_id = %(openaps_id)s::BIGINT """, {'openaps_id': openhumans_id}, return_object=True)
 
-    return db_user
+    return db_user[0]
 
 
 def get_user_filepaths(user_id):
@@ -88,24 +87,36 @@ def get_user_filepaths(user_id):
 
             if '.json' in file and file not in openhumans_files:
 
-                openhumans_files.append(f'{subdirs}/{file}')
+                openhumans_files.append(f'{subdirs}/{file}'.replace('\\', '/'))
 
     return openhumans_files
 
 
-
+from random import shuffle
 def process_file_load(user_id, file, entity, slice_index):
 
+    lines = []
     with open(file) as infile:
 
-        lines = [{**json.loads(json_line), **{'user_id': user_id}} for json_line in infile[slice_index:]]
+        if slice_index != 0:
 
-    ingest(lines, ENTITY_MAPPER[entity])
+            for i in range(slice_index - 1):
+                infile.readline()
+
+        for json_line in infile:
+
+            lines.append({**json.loads(json_line), **{'user_id': user_id, 'source_entity': 0}})
+
+    print(user_id, entity, str(len(lines)))
+
+    shuffle(lines)
+
+    ingest(lines[:100], ENTITY_MAPPER[entity])
     update_user_index(user_id, entity, slice_index + len(lines))
 
     if entity == 'device':
 
-        status_metrics = [{**device['openaps'], **{'device_status_id': device['id']}} for device in lines if 'openaps' in device]
+        status_metrics = [{**device['openaps'], **{'device_status_id': device['_id']}} for device in lines[:100] if 'openaps' in device]
         ingest(status_metrics, ENTITY_MAPPER['status_metrics'])
         update_user_index(user_id, entity, slice_index + len(lines))
 
@@ -129,15 +140,17 @@ def ingest(lod, lod_params):
 
 def main(output_directory):
 
-    oh.get_all_records(output_directory)
-    oh.extract_directory_files(output_directory)
+    # oh.get_all_records(output_directory)
+    # oh.extract_directory_files(output_directory)
 
-    user_folders = [x for x in next(os.walk(FILES_DIRECTORY))[1]]
+    user_folders = [x for x in next(os.walk(output_directory))[1]]
+
     for folder_id in user_folders:
 
         user_id = str(folder_id)
 
         user = get_user(user_id)
+
         user_files = get_user_filepaths(user_id)
 
         for file in user_files:
@@ -152,13 +165,13 @@ def main(output_directory):
                         process_file_load(user_id, file, entity, last_index)
 
                     except (JSONDecodeError, TypeError):
-                        logger.error(f'Incorrect json format found for user with ID {user_id} and file with name {file}. Traceback was: {traceback.format_exc()}')
-
+                        logger.error(f'Incorrect json format found for user with ID {user_id} and file with name {file}. {traceback.format_exc()}')
                     except IndexError:
-                        logger.error(f'Index out of sync for user with ID {user_id} and file with name {file}. Traceback was: {traceback.format_exc()}')
-
+                        logger.error(f'Index out of sync for user with ID {user_id} and file with name {file}. {traceback.format_exc()}')
                     except Psycopg2Error:
-                        logger.error(f'Insert error while working with ID {user_id} and entity device metrics: {traceback.format_exc()}')
+                        logger.error(f'Insert error while working with ID {user_id} and file with name {file}. {traceback.format_exc()}')
+                    except MemoryError:
+                        logger.error(f'Memory maxed while working with ID {user_id} and file with name {file}. {traceback.format_exc()}')
 
 
 if __name__ == '__main__':
@@ -173,20 +186,19 @@ if __name__ == '__main__':
         logger.error(f'Error while establishing connection with DB: {traceback.format_exc()}')
         sys.exit(1)
 
-    try:
-        oh = OHWrapper(get_master_token())
-
-    except OHError:
-        logger.error(f'Error while authenticating with OpenHumans: {traceback.format_exc()}')
+    # try:
+    #     oh = OHWrapper(get_master_token())
+    #
+    # except OHError:
+    #     logger.error(f'Error while authenticating with OpenHumans: {traceback.format_exc()}')
 
     try:
         main(FILES_DIRECTORY)
 
     except Psycopg2Error:
         logger.error(f'Error occurred while working with DB: {traceback.format_exc()}')
+        sys.exit(1)
 
     except Exception:
         logger.error(f'Error occurred during ingestion: {traceback.format_exc()}')
-
-    finally:
         sys.exit(1)
