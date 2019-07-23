@@ -13,9 +13,31 @@ class OHError(Exception):
 
 class OHWrapper:
 
-    def __init__(self, master_token):
+    def __init__(self, users_dict, days_cutoff=7):
+
+        """
+        :param users_dict: Takes the form of a list of dictionaries with user ids as keys and access tokens as values
+        :param days_cutoff: The number of days past which files are ignored rather than downloaded
+        """
+        self.users_dict = users_dict
+        self.days_cutoff = days_cutoff
+
+        for user_id, access_token in users_dict.items():
+
+            self.download_user_files(user_id, access_token)
+
+
+    def download_user_files(self, user_id, access_token):
+
+
 
         self.OHProject = ohapi.OHProject(master_token)
+
+    def get_users(self):
+
+
+
+
 
     def get_all_records(self, output_directory, max_file_size='999m'):
 
@@ -32,6 +54,11 @@ class OHWrapper:
     def get_member_list(self):
 
         return self.OHProject.project_data
+
+    def get_user_files(self, user_id):
+
+        pass
+
 
     @staticmethod
     def get_files_by_extension(extension, directory):
@@ -80,3 +107,11 @@ class OHWrapper:
                     outfile.write("%s\n" % json.dumps(line))
 
             os.remove(filepath)
+
+
+
+import ohapi
+
+data = ohapi.api.exchange_oauth2_member('')
+
+qaferq = ohapi.api.get_all_results(1)
