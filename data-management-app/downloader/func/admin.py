@@ -114,7 +114,7 @@ def process_adding_user(email):
 
     else:
         new_user = User(
-            email=email,
+            email=email.lower(),
             verified=False,
             verification_code=temp_code,
             admin=False,

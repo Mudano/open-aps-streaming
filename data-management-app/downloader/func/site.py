@@ -37,7 +37,7 @@ def process_user_login(request):
     3. Login if true, raise error if any conditions fail
     """
 
-    email = request.form['login-email']
+    email = request.form['login-email'].lower()
     pw = request.form['login-password']
 
     user = User.query.filter_by(email=email).first()
