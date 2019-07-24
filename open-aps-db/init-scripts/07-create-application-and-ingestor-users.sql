@@ -20,6 +20,7 @@ CREATE USER viewer;
 ALTER USER viewer WITH ENCRYPTED PASSWORD :'viewer_password';
 GRANT USAGE ON SCHEMA openaps TO viewer;
 ALTER DEFAULT PRIVILEGES IN schema openaps GRANT SELECT ON TABLES TO viewer;
+ALTER DEFAULT PRIVILEGES IN schema openaps GRANT SELECT ON SEQUENCES TO viewer;
 
 CREATE USER ext_openaps_app;
 ALTER USER ext_openaps_app WITH ENCRYPTED PASSWORD :'ext_openaps_app_password';

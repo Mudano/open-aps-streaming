@@ -88,6 +88,8 @@ def create_demographics_table(pg_connection):
 
     create unique index seq_id_indx on openaps.member_demographics_cleaned (seq_id);
     create index project_member_id_indx on openaps.member_demographics_cleaned (project_member_id);
+    
+    GRANT SELECT ON openaps.member_demographics_cleaned TO viewer; 
     """
 
     try:
@@ -147,6 +149,8 @@ def create_entries_table(pg_connection):
     create index date_exact_indx on openaps.entries_data (date_exact);
     create index device_group_indx on openaps.entries_data (device_group);
     create index country_indx on openaps.entries_data (country_corrected);
+    
+    GRANT SELECT ON openaps.entries_data TO viewer; 
     """
 
     try:
