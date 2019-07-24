@@ -7,6 +7,9 @@ from helpers import get_openaps_con
 from oh_wrapper import OHWrapper
 from utils.logger import Logger
 
+
+from models import dave
+
 import traceback
 import shutil
 import json
@@ -87,8 +90,6 @@ def process_file_load(user_id, file, entity, slice_index):
 
             lines.append({**json.loads(json_line), **{'user_id': user_id, 'source_entity': 0}})
 
-    print(user_id, entity, str(len(lines)))
-
     shuffle(lines)
 
     ingest(lines[:1000], ENTITY_MAPPER[entity])
@@ -118,42 +119,10 @@ def ingest(lod, lod_params):
         )
 
 
-def main(output_directory):
-
-    user_folders = [x for x in next(os.walk(output_directory))[1]]
-
-    for folder_id in user_folders:
-
-        user_id = str(folder_id)
-
-        user = get_user(user_id)
-
-        user_files = get_user_filepaths(user_id)
-
-        for file in user_files:
-
-            for entity in ENTITY_MAPPER.keys():
-
-                if entity in file:
-
-                    last_index = user[entity + '_last_index']
-
-                    try:
-                        process_file_load(user_id, file, entity, last_index)
-
-                    except (JSONDecodeError, TypeError):
-                        logger.error(f'Incorrect json format found for user with ID {user_id} and file with name {file}. {traceback.format_exc()}')
-                    except IndexError:
-                        logger.error(f'Index out of sync for user with ID {user_id} and file with name {file}. {traceback.format_exc()}')
-                    except Psycopg2Error:
-                        logger.error(f'Insert error while working with ID {user_id} and file with name {file}. {traceback.format_exc()}')
-                    except MemoryError:
-                        logger.error(f'Memory maxed while working with ID {user_id} and file with name {file}. {traceback.format_exc()}')
-
-
 if __name__ == '__main__':
 
     logger = Logger()
+    os.makedirs(FILES_DIRECTORY, exist_ok=True)
 
     try:
         db = Database(get_openaps_con())
@@ -170,7 +139,40 @@ if __name__ == '__main__':
 
     try:
         oh.download_user_files()
-        main(FILES_DIRECTORY)
+
+        user_folders = [x for x in next(os.walk(FILES_DIRECTORY))[1]]
+
+        for folder_id in user_folders:
+
+            user_id = str(folder_id)
+
+            user = get_user(user_id)
+
+            user_files = get_user_filepaths(user_id)
+
+            for file in user_files:
+
+                for entity in ENTITY_MAPPER.keys():
+
+                    if entity in file:
+
+                        last_index = user[entity + '_last_index']
+
+                        try:
+                            process_file_load(user_id, file, entity, last_index)
+
+                        except (JSONDecodeError, TypeError):
+                            logger.error(
+                                f'Incorrect json format found for user with ID {user_id} and file with name {file}. {traceback.format_exc()}')
+                        except IndexError:
+                            logger.error(
+                                f'Index out of sync for user with ID {user_id} and file with name {file}. {traceback.format_exc()}')
+                        except Psycopg2Error:
+                            logger.error(
+                                f'Insert error while working with ID {user_id} and file with name {file}. {traceback.format_exc()}')
+                        except MemoryError:
+                            logger.error(
+                                f'Memory maxed while working with ID {user_id} and file with name {file}. {traceback.format_exc()}')
 
     except Psycopg2Error:
         logger.error(f'Error occurred while working with DB: {traceback.format_exc()}')

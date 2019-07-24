@@ -51,7 +51,7 @@ class OHWrapper:
 
             try:
                 user_directory = f"{self.FILES_DIRECTORY}/{user_record['oh_id']}/"
-                filelist = self.get_user_filelinks(user_record['access_token'], user_record['user_id'])
+                filelist = self.get_user_filelinks(user_record['access_token'], user_record['oh_id'])
 
                 self.download_files_by_links(filelist, user_directory)
 
@@ -66,13 +66,14 @@ class OHWrapper:
         user_files = []
 
         try:
-            record = ohapi.api.exchange_oauth2_member('bqsldkjf234lqe.fkj434')
+            record = ohapi.api.exchange_oauth2_member(access_token)
         except Exception:
             raise OHError(f'Incorrect access token provided for user with ID {user_id}. Breaking script.')
 
         for fileinfo in record['data']:
 
-            if parse(fileinfo['created']).replace(tzinfo=None) > self.date_cutoff and '.json' in fileinfo['basename']:
+            if parse(fileinfo['created']).replace(tzinfo=None) > self.date_cutoff and\
+               self.filename_checker(fileinfo['basename']):
 
                 user_files.append({'url': fileinfo['download_url'], 'filename': fileinfo['basename']})
 
@@ -86,6 +87,20 @@ class OHWrapper:
 
             ohapi.projects.download_file(link['url'], f"{user_directory}/{link['filename']}")
 
+    def filename_checker(self, filename):
+
+        try:
+            int(filename.split('_')[0])
+            int(filename.split('_')[1])
+            name = filename.split('_')[2].rsplit('.')[0]
+            fileformat = filename.rsplit('.')[-1]
+
+            if name in ['entries', 'treatments', 'profile', 'devicestatus'] and fileformat == 'json':
+                return True
+            else:
+                return False
+        except Exception:
+            return False
 
     # Master-token functions
     def get_all_records(self, max_file_size='999m'):
