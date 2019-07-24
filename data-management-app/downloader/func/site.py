@@ -29,7 +29,15 @@ def send_message(subject, email, content):
 
 def process_user_login(request):
 
-    email = request.form['login-email']
+    """
+    :param request: contains email and pw submitted in login form
+
+    1. Find user
+    2. Check conditions: user exists, user is verified, user not deactivated, user pw matches db pw
+    3. Login if true, raise error if any conditions fail
+    """
+
+    email = request.form['login-email'].lower()
     pw = request.form['login-password']
 
     user = User.query.filter_by(email=email).first()
@@ -94,6 +102,15 @@ def reset_user_password(email):
 
 def create_registration_record(request):
 
+    """
+    :param request: contains the application form submitted by user
+
+    1. If user already exists and is not verified/is deactivated, delete user
+    2. If a registration record already exists, delete it
+    3. Create new registration record filled with form responses
+    4. Send message to site admin with the form responses
+    """
+
     user = User.query.filter_by(email=request.form['register-email']).first()
     reg = RegApplication.query.filter_by(email=request.form['register-email']).first()
 
@@ -156,6 +173,17 @@ def create_registration_record(request):
 
 
 def verify_user(request):
+
+    """
+    Note: this form is used to reset a users password, as well as just verify new users
+
+    :param request: contains user email, verification code, password and password confirm
+
+    1. Find user
+    2. Check conditions: user exists, user is not verified or user already has a password, users code matches code in db, users passwords match
+    3. Mark user as verified and set their password
+
+    """
 
     email = request.form['verify-email']
     code = request.form['verification-code']

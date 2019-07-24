@@ -10,12 +10,12 @@ class Entry:
 
     def __init__(self, entity):
 
-        self.app_id = entity['app_id']
+        self.user_id = entity['user_id']
         self.id = entity['_id']
 
         self.sgv = entity.get('sgv')
         self.direction = entity.get('direction')
-        self.device = entity['device'].replace('\x00', '') if 'device' in entity else None
+        self.device = entity['device'].replace('\x00', '').replace('\\u0000', '') if 'device' in entity else None
         self.type = entity.get('type')
         self.rssi = entity.get('rssi')
         self.rawbg = entity.get('rawbg')
@@ -25,13 +25,14 @@ class Entry:
         self.delta = entity.get('delta')
         self.filtered = entity.get('filtered')
         self.unfiltered = entity.get('unfiltered')
-        self.noise = entity.get('noise')
+        self.noise = entity.get('noise') if entity.get('noise') != 'Clean' else None
         self.scale = entity.get('scale')
         self.slope = entity.get('slope')
         self.intercept = entity.get('intercept')
 
         self.raw_json = json.dumps(entity)
 
+        self.source_entity = entity['source_entity']
         self.system_time = entity['system_time'] if 'system_time' in entity else entity.get('sysTime')
         self.date = datetime.fromtimestamp(entity['date']/1000).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -46,10 +47,10 @@ class Treatment:
 
     def __init__(self, entity):
 
-        self.app_id = entity['app_id']
+        self.user_id = entity['user_id']
         self.id = entity['_id'] if '_id' in entity else entity['id'] if 'id' in entity else entity['uuid']
         self.event_type = entity.get('eventType')
-        self.timestamp = self._parse_date(entity.get('timestamp'))
+        self.timestamp = self._parse_date(entity.get('timestamp')) if entity.get('timestamp') != 0 else entity.get('created_at')
 
         self.insulin = entity.get('insulin')
         self.carbs = entity.get('carbs')
@@ -60,20 +61,17 @@ class Treatment:
         self.food_type = entity.get('foodType')
 
         self.temp = entity.get('temp')
-        self.rate = entity.get('rate')
+        self.rate = entity.get('rate') if entity.get('rate') != 'offset' else None
         self.duration = entity.get('duration')
         self.units = entity.get('units')
         self.amount = entity.get('amount')
         self.absolute = entity.get('absolute')
-        self.bolus = json.dumps(entity.get('bolus'))
-        self.boluscalc = json.dumps(entity.get('boluscalc'))
         self.medtronic = entity.get('medtronic')
 
         self.type = entity.get('type')
         self.absorption_time = entity.get('absorptionTime')
         self.unabsorbed = entity.get('unabsorbed')
         self.ratio = entity.get('ratio')
-        self.wizard = json.dumps(entity.get('wizard'))
         self.target_top = entity.get('targetTop')
         self.target_bottom = entity.get('targetBottom')
         self.fixed = entity.get('fixed')
@@ -84,6 +82,7 @@ class Treatment:
 
         self.raw_json = json.dumps(entity)
 
+        self.source_entity = entity['source_entity']
         self.entered_by = entity.get('enteredBy')
         self.created_at = entity.get('created_at')
 
@@ -108,17 +107,15 @@ class Profile:
 
     def __init__(self, entity):
 
-        self.app_id = entity['app_id']
+        self.user_id = entity['user_id']
         self.id = entity['_id']
         self.default_profile = entity.get('defaultProfile')
         self.mills = entity.get('mills')
         self.units = entity.get('units')
 
-        self.store = json.dumps(entity.get('store'))
-        self.loop_settings = json.dumps(entity.get('loopSettings'))
-
         self.raw_json = json.dumps(entity)
 
+        self.source_entity = entity['source_entity']
         self.start_date = entity.get('startDate')
         self.created_at = entity.get('created_at')
 
@@ -135,7 +132,7 @@ class DeviceStatus:
 
         self.entity = entity
 
-        self.app_id = entity['app_id']
+        self.user_id = entity['user_id']
         self.id = entity['_id']
         self.device = entity.get('device')
 
@@ -154,6 +151,7 @@ class DeviceStatus:
 
         self.raw_json = json.dumps(entity)
 
+        self.source_entity = entity['source_entity']
         self.created_at = entity['created_at']
 
         del self.entity
@@ -207,8 +205,6 @@ class DeviceStatusMetric:
         self.enacted_duration = self._extract(['enacted', 'duration'])
         self.enacted_rate = self._extract(['enacted', 'rate'])
 
-        self.raw_json = json.dumps(entity)
-
         self.enacted_timestamp = self._extract(['enacted', 'timestamp'])
 
         del self.entity
@@ -224,7 +220,6 @@ class DeviceStatusMetric:
 
     def __exit__(self, exception_type, exception_value, traceback):
         pass
-
 
 
 class FormResponse:

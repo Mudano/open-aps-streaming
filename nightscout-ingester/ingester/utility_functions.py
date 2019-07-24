@@ -141,7 +141,8 @@ def build_ns_file_metadata(file_type):
     """
     file_description = f"Your Nightscout {file_type} data, uploaded at {datetime.utcnow()} UTC."
     file_tags = ["open-aps", "Nightscout", file_type, "json"]
-    return {"tags": file_tags, "description": file_description}
+	file_updated = str(datetime.now())
+    return {"tags": file_tags, "description": file_description, "updated_at": file_updated}
 
 
 def delete_oh_file(access_token, file_name):
