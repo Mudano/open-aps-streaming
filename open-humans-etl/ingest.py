@@ -2,18 +2,19 @@
 from models import Treatment, Entry, Profile, DeviceStatus, DeviceStatusMetric
 from utils.database import Database, Psycopg2Error
 from utils.stream_ingester import StreamIngester
-# from oh_wrapper import OHWrapper, OHError
+from oh_wrapper import OHWrapper, OHError
 from json.decoder import JSONDecodeError
 from helpers import get_openaps_con
 from utils.logger import Logger
 
 import traceback
+import shutil
 import json
 import sys
 import os
 
 
-FILES_DIRECTORY = 'C:/Users/Laurie Bamber/Work/open-aps-streaming/open-humans-etl/data/openaps/'
+FILES_DIRECTORY = 'C:/Users/Laurie Bamber/Work/open-aps-streaming/open-humans-etl/data/test'
 ENTITY_MAPPER = {
     'treatments': {'object': Treatment, 'table': 'treatments'},
     'entries': {'object': Entry, 'table': 'entries'},
@@ -60,7 +61,7 @@ def get_user_filepaths(user_id):
 
     openhumans_files = []
 
-    for subdirs, dirs, files in os.walk(FILES_DIRECTORY + user_id):
+    for subdirs, dirs, files in os.walk(f'{FILES_DIRECTORY}/{user_id}'):
 
         for file in files:
 
@@ -90,7 +91,7 @@ def process_file_load(user_id, file, entity, slice_index):
 
     shuffle(lines)
 
-    ingest(lines[:100], ENTITY_MAPPER[entity])
+    ingest(lines[:1000], ENTITY_MAPPER[entity])
     update_user_index(user_id, entity, slice_index + len(lines))
 
     if entity == 'device':
@@ -118,9 +119,6 @@ def ingest(lod, lod_params):
 
 
 def main(output_directory):
-
-    # oh.get_all_records(output_directory)
-    # oh.extract_directory_files(output_directory)
 
     user_folders = [x for x in next(os.walk(output_directory))[1]]
 
@@ -161,17 +159,17 @@ if __name__ == '__main__':
         db = Database(get_openaps_con())
         ingester = StreamIngester(get_openaps_con())
 
+        users_dict = db.execute_query(""" SELECT oh_id, access_token FROM register.openhumans_openhumansmember; """, return_object=True)
+        oh = OHWrapper(logger=logger,
+                       files_directory=FILES_DIRECTORY,
+                       users_dict=users_dict)
+
     except Psycopg2Error:
-        logger.error(f'Error while establishing connection with DB: {traceback.format_exc()}')
+        logger.error(f'Error occurred while initialising classes and sourcing user records: {traceback.format_exc()}')
         sys.exit(1)
 
-    # try:
-    #     oh = OHWrapper(get_master_token())
-    #
-    # except OHError:
-    #     logger.error(f'Error while authenticating with OpenHumans: {traceback.format_exc()}')
-
     try:
+        oh.download_user_files()
         main(FILES_DIRECTORY)
 
     except Psycopg2Error:
@@ -181,3 +179,7 @@ if __name__ == '__main__':
     except Exception:
         logger.error(f'Error occurred during ingestion: {traceback.format_exc()}')
         sys.exit(1)
+
+    finally:
+        shutil.rmtree(FILES_DIRECTORY)
+        os.mkdir(FILES_DIRECTORY)
