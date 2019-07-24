@@ -1,29 +1,8 @@
 
-
-"""
-
-    1. Extract records from OH
-
-        Options:
-            - download_all function
-            - download_specific, based on ingestion ETL table
-
-    2. Extract compressed .gz files
-
-    3. For each file:
-
-        a. Slice .json file based on index in ETL table
-
-        b. If new records after slice, upload to db
-
-        c. Update/add row in ETL table showing the most recent completed slice
-
-"""
-
 from models import Treatment, Entry, Profile, DeviceStatus, DeviceStatusMetric
 from utils.database import Database, Psycopg2Error
 from utils.stream_ingester import StreamIngester
-from oh_wrapper import OHWrapper, OHError
+# from oh_wrapper import OHWrapper, OHError
 from json.decoder import JSONDecodeError
 from helpers import get_openaps_con
 from utils.logger import Logger
