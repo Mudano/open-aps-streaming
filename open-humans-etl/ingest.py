@@ -2,9 +2,9 @@
 from models import Treatment, Entry, Profile, DeviceStatus, DeviceStatusMetric
 from utils.database import Database, Psycopg2Error
 from utils.stream_ingester import StreamIngester
-from oh_wrapper import OHWrapper, OHError
 from json.decoder import JSONDecodeError
 from helpers import get_openaps_con
+from oh_wrapper import OHWrapper
 from utils.logger import Logger
 
 import traceback
