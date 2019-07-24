@@ -1,4 +1,6 @@
 
+from datetime import datetime, timedelta
+from dateutil.parser import parse
 import traceback
 import shutil
 import ohapi
@@ -13,69 +15,80 @@ class OHError(Exception):
 
 class OHWrapper:
 
-    def __init__(self, users_dict, days_cutoff=7):
+    def __init__(self, master_token: str=None, users_dict: dict=None, days_cutoff: int=7):
 
         """
+        :param master_token: The master access token for an OH project
         :param users_dict: Takes the form of a list of dictionaries with user ids as keys and access tokens as values
-        :param days_cutoff: The number of days past which files are ignored rather than downloaded
+        :param days_cutoff: The number of days past which updated files are ignored rather than downloaded
         """
-        self.users_dict = users_dict
-        self.days_cutoff = days_cutoff
 
-        for user_id, access_token in users_dict.items():
+        if users_dict:
 
-            self.download_user_files(user_id, access_token)
+            self.users_dict = users_dict
+            self.date_cutoff = datetime.now() - timedelta(days=days_cutoff)
+
+        elif master_token:
+
+            self.OHProject = ohapi.OHProject(master_token)
+
+        else:
+            raise OHError('No master token/access-token dictionary specified.')
+
+    # Access-token functions
+    def download_user_files(self, outdirectory):
+
+        for user_id, access_token in self.users_dict.items():
+
+            try:
+                user_directory = f'{outdirectory}/{user_id}'
+                filelist = self.get_user_filelinks(access_token)
+
+                self.download_files_by_links(filelist, user_directory)
+
+            except Exception:
+                print(traceback.format_exc())
+                continue
+
+        self.extract_directory_files(outdirectory)
+
+    def get_user_filelinks(self, access_token):
+
+        user_files = []
+        record = ohapi.api.exchange_oauth2_member(access_token)
+
+        for fileinfo in record['data']:
+
+            if parse(fileinfo['created']) > self.date_cutoff and '.json' in fileinfo['basename']:
+
+                user_files.append(fileinfo['download_url'])
+
+        return user_files
+
+    def download_files_by_links(self, links, directory):
+
+        os.makedirs(directory, exist_ok=True)
+
+        for link in links:
+
+            ohapi.projects.download_file(link, directory)
 
 
-    def download_user_files(self, user_id, access_token):
-
-
-
-        self.OHProject = ohapi.OHProject(master_token)
-
-    def get_users(self):
-
-
-
-
-
+    # Master-token functions
     def get_all_records(self, output_directory, max_file_size='999m'):
 
         try:
-            resp = self.OHProject.download_all(
+            self.OHProject.download_all(
                 target_dir=output_directory,
                 max_size=max_file_size
             )
-            return resp
+            self.extract_directory_files(output_directory)
 
         except Exception:
             raise OHError(traceback.format_exc())
 
-    def get_member_list(self):
 
-        return self.OHProject.project_data
-
-    def get_user_files(self, user_id):
-
-        pass
-
-
-    @staticmethod
-    def get_files_by_extension(extension, directory):
-
-        file_list = []
-
-        for subdir, dirs, files in os.walk(directory):
-
-            for file in files:
-
-                if file.endswith(extension):
-
-                    file_list.append(f'{subdir}/{file}'.replace('\\', '/'))
-
-        return file_list
-
-
+    # Shared
     def extract_directory_files(self, files_directory):
 
         zipped_files = self.get_files_by_extension('.json.gz', files_directory)
@@ -89,6 +102,19 @@ class OHWrapper:
 
             os.remove(filepath)
 
+    @staticmethod
+    def get_files_by_extension(extension, directory):
+
+        file_list = []
+
+        for subdir, dirs, files in os.walk(directory):
+
+            for file in files:
+
+                if file.endswith(extension):
+                    file_list.append(f'{subdir}/{file}'.replace('\\', '/'))
+
+        return file_list
 
     def rowify_json_files(self, files_directory):
 
@@ -107,11 +133,3 @@ class OHWrapper:
                     outfile.write("%s\n" % json.dumps(line))
 
             os.remove(filepath)
-
-
-
-import ohapi
-
-data = ohapi.api.exchange_oauth2_member('')
-
-qaferq = ohapi.api.get_all_results(1)
