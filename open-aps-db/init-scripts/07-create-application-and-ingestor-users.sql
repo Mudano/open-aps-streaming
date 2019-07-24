@@ -14,10 +14,12 @@ CREATE USER admin_viewer;
 ALTER USER admin_viewer WITH ENCRYPTED PASSWORD :'admin_viewer_password';
 GRANT USAGE ON SCHEMA openaps TO admin_viewer;
 GRANT SELECT ON ALL TABLES IN SCHEMA openaps TO admin_viewer;
+ALTER DEFAULT PRIVILEGES IN schema openaps GRANT SELECT ON TABLES TO admin_viewer;
 
 CREATE USER viewer;
 ALTER USER viewer WITH ENCRYPTED PASSWORD :'viewer_password';
 GRANT USAGE ON SCHEMA openaps TO viewer;
+ALTER DEFAULT PRIVILEGES IN schema openaps GRANT SELECT ON TABLES TO viewer;
 
 CREATE USER ext_openaps_app;
 ALTER USER ext_openaps_app WITH ENCRYPTED PASSWORD :'ext_openaps_app_password';
