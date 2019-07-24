@@ -15,26 +15,20 @@ class OHError(Exception):
 
 class OHWrapper:
 
-    def __init__(self, logger, files_directory, master_token: str=None, users_dict: dict=None, days_cutoff: int=7):
+    def __init__(self, logger, files_directory, master_token: str=None, days_cutoff: int=7):
 
         """
         :param logger: The class object used for logging application errors. See utils folder
         :param files_directory: The directory for files to be downloaded to. End of path should not have leading slash
-        :param master_token: A token used to initialise the OHAPI Project class
-        or
-        :param users_dict: Takes the form of a list of dictionaries with user ids as keys and access tokens as values
-        :param days_cutoff: The number of days past which updated files are ignored rather than downloaded
+        :param master_token (optional): A token used to initialise the OHAPI Project class
+        :param days_cutoff (optional): The number of days past which updated files are ignored rather than downloaded
         """
 
         self.logger = logger
         self.FILES_DIRECTORY = files_directory
+        self.DATE_CUTOFF = datetime.now() - timedelta(days=days_cutoff)
 
-        if users_dict:
-
-            self.users_dict = users_dict
-            self.date_cutoff = datetime.now() - timedelta(days=days_cutoff)
-
-        elif master_token:
+        if master_token:
 
             try:
                 self.OHProject = ohapi.OHProject(master_token)
@@ -45,13 +39,18 @@ class OHWrapper:
             raise OHError('No master token/access-token dictionary specified.')
 
     # Access-token functions
-    def download_user_files(self):
+    def download_user_files(self, users_dict):
 
-        for user_record in self.users_dict:
+        """
+        Iterates over a list of users, gets their download links from OH, downloads each file in turn
+        :param users_dict: Takes the form of a list of dictionaries with user ids as keys and access tokens as values
+        """
+
+        for user_record in users_dict:
 
             try:
                 user_directory = f"{self.FILES_DIRECTORY}/{user_record['oh_id']}/"
-                filelist = self.get_user_filelinks(user_record['access_token'], user_record['oh_id'])
+                filelist = self.get_user_filelinks(user_record['access_token'])
 
                 self.download_files_by_links(filelist, user_directory)
 
@@ -61,25 +60,33 @@ class OHWrapper:
 
         self.extract_directory_files()
 
-    def get_user_filelinks(self, access_token, user_id):
+    def get_user_filelinks(self, access_token):
+
+        """
+        Queries OH for user info, appends filelinks to be downloaded if the file is recently updated and the name matches a specific format
+        :param access_token: Unique token for project member
+        :param user_id: ID of user used for error-logging
+        :return: List of download links in URL format
+        """
 
         user_files = []
 
-        try:
-            record = ohapi.api.exchange_oauth2_member(access_token)
-        except Exception:
-            raise OHError(f'Incorrect access token provided for user with ID {user_id}. Breaking script.')
+        record = ohapi.api.exchange_oauth2_member(access_token)
 
         for fileinfo in record['data']:
 
-            if parse(fileinfo['created']).replace(tzinfo=None) > self.date_cutoff and\
-               self.filename_checker(fileinfo['basename']):
+            if parse(fileinfo['created']).replace(tzinfo=None) > self.DATE_CUTOFF and self.filename_checker(fileinfo['basename']):
 
                 user_files.append({'url': fileinfo['download_url'], 'filename': fileinfo['basename']})
 
         return user_files
 
     def download_files_by_links(self, links, user_directory):
+
+        """
+        :param links: List of download links for a users files
+        :param user_directory: Output directory for files to be downloaded to
+        """
 
         os.makedirs(user_directory, exist_ok=True)
 
@@ -88,6 +95,10 @@ class OHWrapper:
             ohapi.projects.download_file(link['url'], f"{user_directory}/{link['filename']}")
 
     def filename_checker(self, filename):
+
+        """
+        Expected file-format is '<integer_ts>_<integer_user_id>_<entity_string>.json'
+        """
 
         try:
             int(filename.split('_')[0])
@@ -99,11 +110,16 @@ class OHWrapper:
                 return True
             else:
                 return False
-        except Exception:
+        except (TypeError, ValueError, IndexError):
             return False
 
     # Master-token functions
     def get_all_records(self, max_file_size='999m'):
+
+        """
+        Downloads all files for an OH project to a given directory, and then unzips all files from .gz format
+        :param max_file_size: Maximum size of a file allowed to be downloaded
+        """
 
         try:
             self.OHProject.download_all(
@@ -119,7 +135,11 @@ class OHWrapper:
     # Shared
     def extract_directory_files(self):
 
-        zipped_files = self.get_files_by_extension('.json.gz')
+        """
+        Gets list of all .gz files in directory, unzips and copies contents to .json, removes .gz file
+        """
+
+        zipped_files = self.get_files_by_extension(self.FILES_DIRECTORY, '.json.gz')
 
         for filepath in zipped_files:
 
@@ -130,11 +150,16 @@ class OHWrapper:
 
             os.remove(filepath)
 
-    def get_files_by_extension(self, extension):
+    def get_files_by_extension(self, directory, extension):
+
+        """
+        Finds all files in the files directory with a given extension
+        :param extension:
+        """
 
         file_list = []
 
-        for subdir, dirs, files in os.walk(self.FILES_DIRECTORY):
+        for subdir, dirs, files in os.walk(directory):
 
             for file in files:
 
@@ -145,7 +170,11 @@ class OHWrapper:
 
     def rowify_json_files(self):
 
-        json_files = self.get_files_by_extension('.json')
+        """
+        Used to convert a json array into individual records separated by '\n'
+        """
+
+        json_files = self.get_files_by_extension(self.FILES_DIRECTORY, '.json')
 
         for filepath in json_files:
 
