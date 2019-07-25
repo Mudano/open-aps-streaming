@@ -71,7 +71,7 @@ class Database:
     def add_user_to_etl_log(self, user_id):
 
         self.execute_query(""" INSERT INTO openaps.oh_etl_log
-                               (openaps_id, treatments_last_index, entries_last_index, profile_last_index, device_last_index)
+                               (openaps_id, treatments_last_index, entries_last_index, profile_last_index, devicestatus_last_index)
                                VALUES
                                (%(openaps_id)s::BIGINT, 0,0,0,0)
                                LIMIT 1

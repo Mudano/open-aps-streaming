@@ -1,7 +1,7 @@
 
 from constants import FILES_DIRECTORY, ENTITY_MAPPER
 from utils.database import Database, Psycopg2Error
-from utils.stream_ingester import StreamIngester
+from utils.upsert_ingester import UpsertIngester
 from json.decoder import JSONDecodeError
 from helpers import get_openaps_con
 from oh_wrapper import OHWrapper
@@ -28,7 +28,7 @@ class OpenHumansETL:
         try:
             self.db = Database(db_connection)
 
-            self.ingester = StreamIngester(get_openaps_con())
+            self.ingester = UpsertIngester(get_openaps_con())
 
             self.oh = OHWrapper(logger=logger, files_directory=FILES_DIRECTORY)
 
@@ -52,7 +52,7 @@ class OpenHumansETL:
             try:
 
                 user = self.db.get_user(user_id)
-                user_files = self.oh.get_files_by_extension(f'{directory}/{user_id}', user_id)
+                user_files = self.oh.get_files_by_extension(f'{directory}/{user_id}', '.json')
 
                 for filename in user_files:
 
@@ -104,6 +104,8 @@ class OpenHumansETL:
 
                 lines.append({**json.loads(json_line), **{'user_id': user_id, 'source_entity': 0}})
 
+        print(f'{user_id} ~ {entity} ~ {str(len(lines))}')
+
         self.ingest(lines, ENTITY_MAPPER[entity])
         self.db.update_user_index(user_id, entity, slice_index + len(lines))
 
@@ -135,6 +137,7 @@ class OpenHumansETL:
                 target_data=temp_list,
                 output_schema='openaps',
                 table_name=lod_params['table'],
+                primary_keys=lod_params['primary_keys'],
                 date_format='YYYY-MM-DD HH24:MI:SS'
             )
 

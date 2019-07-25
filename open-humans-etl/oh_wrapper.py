@@ -35,9 +35,6 @@ class OHWrapper:
             except Exception:
                 raise OHError(f'Error while initialising project class with master token: {traceback.format_exc()}')
 
-        else:
-            raise OHError('No master token/access-token dictionary specified.')
-
     # Access-token functions
     def download_user_files(self, users_dict):
 
@@ -57,8 +54,6 @@ class OHWrapper:
             except Exception:
                 self.logger.error(f"Error while downloading records for ID {user_record['oh_id']}: {traceback.format_exc()}")
                 continue
-
-        self.extract_directory_files()
 
     def get_user_filelinks(self, access_token):
 

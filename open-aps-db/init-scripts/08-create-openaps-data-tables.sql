@@ -181,7 +181,7 @@ CREATE TABLE openaps.oh_etl_log (
 	treatments_last_index BIGINT,
 	entries_last_index BIGINT,
 	profile_last_index BIGINT,
-	device_last_index BIGINT,
+	devicestatus_last_index BIGINT,
 	inserted_ts TIMESTAMP DEFAULT NOW()
 );
 GRANT SELECT, INSERT, UPDATE ON openaps.oh_etl_log TO ingestor;
