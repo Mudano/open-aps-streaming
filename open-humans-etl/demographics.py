@@ -58,7 +58,7 @@ def ingest_demographics(logger_class, connection):
     try:
         demo_ingestor = DemographicsIngest(
             logger=logger_class,
-            google_key=os.environ['OPEN_APS_DEMOGRAPHICS_GOOGLE_KEYPATH'],
+            google_key='/credentials.json',
             demographics_url=os.environ['OPEN_APS_DEMOGRAPHICS_SHEET_URL'],
             db_connection=connection
         )
