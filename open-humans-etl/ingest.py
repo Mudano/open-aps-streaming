@@ -3,7 +3,6 @@ from constants import FILES_DIRECTORY, ENTITY_MAPPER
 from utils.database import Database, Psycopg2Error
 from utils.upsert_ingester import UpsertIngester
 from json.decoder import JSONDecodeError
-from helpers import get_openaps_con
 from oh_wrapper import OHWrapper
 
 import traceback
@@ -28,7 +27,7 @@ class OpenHumansETL:
         try:
             self.db = Database(db_connection)
 
-            self.ingester = UpsertIngester(get_openaps_con())
+            self.ingester = UpsertIngester(db_connection)
 
             self.oh = OHWrapper(logger=logger, files_directory=FILES_DIRECTORY)
 
