@@ -2,6 +2,7 @@
 \set admin_viewer_password `echo "$POSTGRES_ADMIN_VIEWER_PASSWORD"`
 \set viewer_password `echo "$POSTGRES_VIEWER_PASSWORD"`
 \set ext_openaps_app_password `echo "$POSTGRES_EXT_OPENAPS_APP_PASSWORD"`
+\set register_user `echo "$POSTGRES_REGISTER_USER"`
 
 CREATE USER ingestor;
 ALTER USER ingestor WITH ENCRYPTED PASSWORD :'ingestor_password';
@@ -11,8 +12,8 @@ GRANT ALL ON schema openaps TO ingestor;
 ALTER DEFAULT PRIVILEGES IN schema openaps GRANT UPDATE, INSERT, SELECT, DELETE ON TABLES TO ingestor;
 GRANT USAGE ON SCHEMA register TO ingestor;
 GRANT ALL ON schema register TO ingestor;
-ALTER DEFAULT PRIVILEGES FOR USER ingestor IN schema register GRANT SELECT ON TABLES TO ingestor;
-ALTER DEFAULT PRIVILEGES FOR USER ingestor IN schema register GRANT SELECT ON SEQUENCES TO ingestor;
+ALTER DEFAULT PRIVILEGES FOR USER :register_user IN schema register GRANT SELECT ON TABLES TO ingestor;
+ALTER DEFAULT PRIVILEGES FOR USER :register_user IN schema register GRANT SELECT ON SEQUENCES TO ingestor;
 
 CREATE USER admin_viewer;
 ALTER USER admin_viewer WITH ENCRYPTED PASSWORD :'admin_viewer_password';
