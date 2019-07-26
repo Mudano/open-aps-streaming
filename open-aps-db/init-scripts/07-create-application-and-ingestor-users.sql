@@ -9,6 +9,9 @@ GRANT USAGE ON SCHEMA openaps TO ingestor;
 ALTER ROLE ingestor SET search_path = 'openaps';
 GRANT ALL ON schema openaps TO ingestor;
 ALTER DEFAULT PRIVILEGES IN schema openaps GRANT UPDATE, INSERT, SELECT, DELETE ON TABLES TO ingestor;
+GRANT USAGE ON SCHEMA register TO ingestor;
+GRANT ALL ON schema register TO ingestor;
+ALTER DEFAULT PRIVILEGES IN schema register GRANT SELECT ON TABLES TO ingestor;
 
 CREATE USER admin_viewer;
 ALTER USER admin_viewer WITH ENCRYPTED PASSWORD :'admin_viewer_password';
