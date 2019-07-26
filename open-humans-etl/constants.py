@@ -1,7 +1,7 @@
 
 from models import Treatment, Entry, Profile, DeviceStatus, DeviceStatusMetric
 
-FILES_DIRECTORY='C:/Users/Laurie Bamber/Work/open-aps-streaming/open-humans-etl/data/test'
+FILES_DIRECTORY = '/data'
 ENTITY_MAPPER = {
     'treatments': {'object': Treatment, 'table': 'treatments', 'primary_keys': ['id']},
     'entries': {'object': Entry, 'table': 'entries', 'primary_keys': ['id']},

@@ -1,71 +1,75 @@
 
-from helpers import get_connection, get_google_key, get_demographics_url
 from utils.upsert_ingester import UpsertIngester
 from utils.google_api import Google
-from utils.logger import Logger
 from models import FormResponse
 import traceback
 import sys
+import os
 
 
-def retrieve_records():
+class DemographicsIngest:
 
-    records = google.retrieve_worksheet('Form Responses 1')
+    def __init__(self, logger, google_key, demographics_url, db_connection):
 
-    mapper = {
-        'demographics': {'entity': records, 'object': FormResponse, 'primary_keys': ['project_member_id', 'ts'], 'table': 'member_demographics'}
-    }
+        self.logger = logger
+        self.google = Google(gdrive_key=google_key,spreadsheet_url=demographics_url)
+        self.ingester = UpsertIngester(db_connection)
 
-    return mapper
+    def retrieve_records(self):
 
+        records = self.google.retrieve_worksheet('Form Responses 1')
 
-def ingest(mapper):
+        mapper = {
+            'demographics': {'entity': records, 'object': FormResponse, 'primary_keys': ['project_member_id', 'ts'], 'table': 'member_demographics'}
+        }
+        return mapper
 
-    for k, v in mapper.items():
+    def ingest(self, mapper):
 
-        temp_list = []
-        try:
+        for k, v in mapper.items():
 
-            for item in v['entity']:
-                with v['object'](item) as t:
-                    temp_list.append(vars(t))
-
-        except Exception:
-            logger.error(traceback.format_exc())
-            sys.exit(1)
-
-        if temp_list:
-
+            temp_list = []
             try:
-                ingester.add_target(target_data=temp_list,
-                                    output_schema='openaps',
-                                    table_name=v['table'],
-                                    date_format='YYYY-MM-DD HH24:MI:SS',
-                                    primary_keys=v['primary_keys']
-                                    )
+
+                for item in v['entity']:
+                    with v['object'](item) as t:
+                        temp_list.append(vars(t))
+
             except Exception:
-                print(traceback.format_exc())
-                break
+                self.logger.error(traceback.format_exc())
+                sys.exit(1)
+
+            if temp_list:
+
+                try:
+                    self.ingester.add_target(target_data=temp_list,
+                                        output_schema='openaps',
+                                        table_name=v['table'],
+                                        date_format='YYYY-MM-DD HH24:MI:SS',
+                                        primary_keys=v['primary_keys']
+                                        )
+                except Exception:
+                    print(traceback.format_exc())
+                    break
 
 
-if __name__ == '__main__':
-
-    logger = Logger()
+def ingest_demographics(logger_class, connection):
 
     try:
-        google = Google(gdrive_key=get_google_key(),
-                        spreadsheet_url=get_demographics_url())
-
-        ingester = UpsertIngester(get_connection())
+        demo_ingestor = DemographicsIngest(
+            logger=logger_class,
+            google_key=os.environ['OPEN_APS_DEMOGRAPHICS_GOOGLE_KEYPATH'],
+            demographics_url=os.environ['OPEN_APS_DEMOGRAPHICS_SHEET_URL'],
+            db_connection=connection
+        )
 
     except Exception:
-        logger.error(traceback.format_exc())
-        sys.exit(1)
+        raise ConnectionError(f'Error while initiating Demographics Ingestor: {traceback.format_exc()}')
 
     try:
-        mapper = retrieve_records()
-        ingest(mapper)
+        mapper = demo_ingestor.retrieve_records()
+        demo_ingestor.ingest(mapper)
 
     except Exception:
-        logger.error(traceback.format_exc())
-        sys.exit(1)
+        logger_class.error(traceback.format_exc())
+        pass

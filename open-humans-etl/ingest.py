@@ -104,8 +104,6 @@ class OpenHumansETL:
 
                 lines.append({**json.loads(json_line), **{'user_id': user_id, 'source_entity': 0}})
 
-        print(f'{user_id} ~ {entity} ~ {str(len(lines))}')
-
         self.ingest(lines, ENTITY_MAPPER[entity])
         self.db.update_user_index(user_id, entity, slice_index + len(lines))
 

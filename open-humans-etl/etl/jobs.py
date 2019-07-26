@@ -1,5 +1,6 @@
 from datetime import datetime
 from .refresh_view_tables import do_tables_exist, remove_tables, create_tables
+from demographics import ingest_demographics
 from ingest import ingest_openhumans
 from .database import postgres_connection_string
 import psycopg2
@@ -17,6 +18,9 @@ def prep_open_humans_etl_job(logger_class):
 
             # ingest data from OH to db
             ingest_openhumans(logger_class, connection)
+
+            # ingest data from demographics gsheet
+            ingest_demographics(logger_class, connection)
 
             # refresh the 'view' tables created for metabase
             tables_exist = do_tables_exist(view_table_names, connection)

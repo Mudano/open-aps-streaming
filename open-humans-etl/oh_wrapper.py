@@ -28,6 +28,9 @@ class OHWrapper:
         self.FILES_DIRECTORY = files_directory
         self.DATE_CUTOFF = datetime.now() - timedelta(days=days_cutoff)
 
+        if not os.path.isdir(self.FILES_DIRECTORY):
+            os.mkdir(self.FILES_DIRECTORY)
+
         if master_token:
 
             try:
