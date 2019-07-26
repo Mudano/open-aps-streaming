@@ -91,6 +91,8 @@ services:
       POSTGRES_PASSWORD: ${OPEN_APS_POSTGRES_INGESTOR_PASSWORD}
       POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
       ETL_INTERVAL_HOURS: ${OPEN_APS_ETL_INTERVAL_HOURS}
+    volumes:
+      - $PWD/credentials.json:/credentials.json
     command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
 
 
