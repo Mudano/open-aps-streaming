@@ -2,6 +2,7 @@
 from dateutil.parser import parse
 import re
 
+
 class Utils:
 
     def keys_to_snakecase(self, list_of_dicts):

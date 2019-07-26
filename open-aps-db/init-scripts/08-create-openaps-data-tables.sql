@@ -168,7 +168,6 @@ CREATE TABLE openaps.member_demographics (
   last_lab_reported_a1c numeric NULL,
   last_lab_reported_a1c_date date NULL,
   inserted_ts timestamp NULL DEFAULT now(),
-  updated_ts TIMESTAMP,
   CONSTRAINT member_demographics_project_member_id_pkey UNIQUE (project_member_id, ts)
 );
 GRANT SELECT ON TABLE openaps.member_demographics TO viewer;
@@ -181,7 +180,7 @@ CREATE TABLE openaps.oh_etl_log (
 	treatments_last_index BIGINT,
 	entries_last_index BIGINT,
 	profile_last_index BIGINT,
-	device_last_index BIGINT,
+	devicestatus_last_index BIGINT,
 	inserted_ts TIMESTAMP DEFAULT NOW()
 );
 GRANT SELECT, INSERT, UPDATE ON openaps.oh_etl_log TO ingestor;

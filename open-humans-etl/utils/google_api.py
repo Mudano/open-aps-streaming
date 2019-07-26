@@ -1,5 +1,4 @@
 
-from oauth2client import file
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 import sys

@@ -19,8 +19,6 @@ class UpsertIngester(Utils):
 
         date_cols = [x['column_name'] for x in self.db.execute_query(f""" SELECT column_name FROM information_schema.columns WHERE table_schema = '{output_schema}' AND table_name = '{table_name}' AND ( data_type ILIKE '%timestamp%' OR data_type ILIKE '%date%' ); """, return_object=True)]
 
-        print(date_cols)
-
         if not self.target_data:
 
             raise IndexError('Target data for table ' + self.table_name + ' is empty.')
@@ -37,24 +35,13 @@ class UpsertIngester(Utils):
 
     def _ingest_target(self):
 
-        query = f""" INSERT INTO       {self.schema}.{self.table_name}
-                                                     ({self.column_names}, inserted_ts)
-                                   VALUES            ({self.columns_insert}, CURRENT_TIMESTAMP)
-                                   ON CONFLICT       (""" + ', '.join([x for x in self.primary_keys]) + """)
-                                   DO UPDATE SET     (""" + ', '.join([x for x in self.target_columns if x not in self.primary_keys]) + """, updated_ts)
-                                   =                 (""" + ', '.join(['EXCLUDED.' + x for x in self.target_columns if x not in self.primary_keys]) + """, CURRENT_TIMESTAMP)
-        """
-
-        print(query)
-
         self.db.execute_query(f""" INSERT INTO       {self.schema}.{self.table_name}
-                                                     ({self.column_names}, inserted_ts)
-                                   VALUES            ({self.columns_insert}, CURRENT_TIMESTAMP)
+                                                     ({self.column_names})
+                                   VALUES            ({self.columns_insert})
                                    ON CONFLICT       (""" + ', '.join([x for x in self.primary_keys]) + """)
-                                   DO UPDATE SET     (""" + ', '.join([x for x in self.target_columns if x not in self.primary_keys]) + """, updated_ts)
-                                   =                 (""" + ', '.join(['EXCLUDED.' + x for x in self.target_columns if x not in self.primary_keys]) + """, CURRENT_TIMESTAMP)
-        """, multiple=True,
-             args=self.target_data)
+                                   DO NOTHING
+                                   ;
+                                   """, multiple=True, args=self.target_data)
 
     def close(self):
 
