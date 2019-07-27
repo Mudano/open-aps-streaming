@@ -16,7 +16,8 @@ CREATE TABLE openaps.device_status (
   override_active BOOL,
   source_entity INTEGER,
   raw_json JSONB,
-  created_at timestamp
+  created_at timestamp,
+  UNIQUE (id, created_at)
 );
 GRANT SELECT ON TABLE openaps.device_status TO viewer;
 GRANT SELECT ON TABLE openaps.device_status TO ext_openaps_app;
@@ -51,7 +52,8 @@ CREATE TABLE openaps.device_status_metrics (
   enacted_iob NUMERIC,
   enacted_duration NUMERIC,
   enacted_rate NUMERIC,
-  enacted_timestamp TIMESTAMP
+  enacted_timestamp TIMESTAMP,
+  UNIQUE (device_status_id, enacted_timestamp)
 );
 GRANT SELECT ON TABLE openaps.device_status_metrics TO viewer;
 GRANT SELECT ON TABLE openaps.device_status_metrics TO ext_openaps_app;
@@ -81,7 +83,8 @@ CREATE TABLE openaps.entries (
   system_time VARCHAR,
   source_entity INTEGER,
   raw_json JSONB,
-  "date" timestamp
+  "date" timestamp,
+  UNIQUE (id, "date")
 );
 GRANT SELECT ON TABLE openaps.entries TO viewer;
 GRANT SELECT ON TABLE openaps.entries TO ext_openaps_app;
@@ -98,7 +101,8 @@ CREATE TABLE openaps.profile (
   start_date TIMESTAMP,
   source_entity INTEGER,
   raw_json JSONB,
-  created_at timestamp
+  created_at timestamp,
+  UNIQUE (id, created_at)
 );
 GRANT SELECT ON TABLE openaps.profile TO viewer;
 GRANT SELECT ON TABLE openaps.profile TO ext_openaps_app;
@@ -139,7 +143,8 @@ CREATE TABLE openaps.treatments (
   entered_by VARCHAR,
   source_entity INTEGER,
   raw_json JSONB,
-  created_at timestamp
+  created_at timestamp,
+  UNIQUE (id, created_at)
 );
 GRANT SELECT ON TABLE openaps.treatments TO viewer;
 GRANT SELECT ON TABLE openaps.treatments TO ext_openaps_app;
@@ -168,7 +173,7 @@ CREATE TABLE openaps.member_demographics (
   last_lab_reported_a1c numeric NULL,
   last_lab_reported_a1c_date date NULL,
   inserted_ts timestamp NULL DEFAULT now(),
-  CONSTRAINT member_demographics_project_member_id_pkey UNIQUE (project_member_id, ts)
+  UNIQUE (project_member_id, ts)
 );
 GRANT SELECT ON TABLE openaps.member_demographics TO viewer;
 GRANT SELECT ON TABLE openaps.member_demographics TO admin_viewer;
@@ -181,7 +186,8 @@ CREATE TABLE openaps.oh_etl_log (
 	entries_last_index BIGINT,
 	profile_last_index BIGINT,
 	devicestatus_last_index BIGINT,
-	inserted_ts TIMESTAMP DEFAULT NOW()
+	inserted_ts TIMESTAMP DEFAULT NOW(),
+	UNIQUE (openaps_id)
 );
 GRANT SELECT, INSERT, UPDATE ON openaps.oh_etl_log TO ingestor;
 
@@ -218,3 +224,15 @@ GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO viewer;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO admin_viewer;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ext_openaps_app;
 
+CREATE INDEX openaps_entries_index_id ON openaps.entries (id);
+CREATE INDEX openaps_entries_index_time ON openaps.entries ("date");
+CREATE INDEX openaps_treatments_index_id ON openaps.treatments (id);
+CREATE INDEX openaps_treatments_index_time ON openaps.treatments (created_at);
+CREATE INDEX openaps_profile_index_id ON openaps.profile (id);
+CREATE INDEX openaps_profile_index_time ON openaps.profile (created_at);
+CREATE INDEX openaps_device_status_index_id ON openaps.device_status (id);
+CREATE INDEX openaps_device_status_index_time ON openaps.device_status (created_at);
+CREATE INDEX openaps_status_metrics_index_id ON openaps.device_status_metrics (device_status_id);
+CREATE INDEX openaps_status_metrics_index_time ON openaps.device_status_metrics (enacted_timestamp);
+CREATE INDEX openaps_demographics_index_id ON openaps.member_demographics (project_member_id);
+CREATE INDEX openaps_demographics_index_time ON openaps.member_demographics (ts);
