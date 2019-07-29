@@ -27,9 +27,9 @@ def open_humans_etl_job():
         # refresh the 'view' tables created for metabase
         tables_exist = do_tables_exist(view_table_names, connection)
 
-    if tables_exist:
-        logger.debug('deleting existing view tables')
-        tables_removed = remove_tables(view_table_names, connection)
+        if tables_exist:
+            logger.debug('deleting existing view tables')
+            tables_removed = remove_tables(view_table_names, connection)
 
         logger.debug('creating view tables')
         create_tables(connection)
