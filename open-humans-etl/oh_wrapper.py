@@ -74,7 +74,7 @@ class OHWrapper:
 
         for fileinfo in record['data']:
 
-            if parse(fileinfo['created']).replace(tzinfo=None) > self.DATE_CUTOFF and self.filename_checker(fileinfo['basename']):
+            if parse(fileinfo['updated_at']).replace(tzinfo=None) > self.DATE_CUTOFF and self.filename_checker(fileinfo['basename']):
 
                 user_files.append({'url': fileinfo['download_url'], 'filename': fileinfo['basename']})
 
