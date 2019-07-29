@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 import traceback
+import requests
 import shutil
 import ohapi
 import gzip
@@ -90,7 +91,17 @@ class OHWrapper:
 
         for link in links:
 
-            ohapi.projects.download_file(link['url'], f"{user_directory}/{link['filename']}")
+            tries = 0
+            while True:
+                try:
+                    ohapi.projects.download_file(link['url'], f"{user_directory}/{link['filename']}")
+                    break
+
+                except requests.exceptions.ConnectionError:
+                    if tries < 5:
+                        tries = tries + 1
+                    else:
+                        raise requests.exceptions.ConnectionError
 
     def filename_checker(self, filename):
 

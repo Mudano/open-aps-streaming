@@ -109,9 +109,7 @@ class OpenHumansETL:
         if entity == 'devicestatus':
 
             status_metrics = [{**device['openaps'], **{'device_status_id': device['_id']}} for device in lines if 'openaps' in device]
-
             self.ingest(status_metrics, ENTITY_MAPPER['status_metrics'])
-            self.db.update_user_index(user_id, entity, slice_index + len(lines))
 
     def ingest(self, lod, lod_params):
 
