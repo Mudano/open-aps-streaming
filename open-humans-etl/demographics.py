@@ -1,5 +1,6 @@
 
 from utils.upsert_ingester import UpsertIngester
+from gspread.exceptions import APIError
 from utils.google_api import Google
 from models import FormResponse
 import traceback
@@ -64,12 +65,19 @@ def ingest_demographics(logger_class, connection):
         )
 
     except Exception:
-        raise ConnectionError(f'Error while initiating Demographics Ingestor: {traceback.format_exc()}')
+        raise ConnectionError(f'DEMOGRAPHICS: Error while initiating Demographics Ingestor: {traceback.format_exc()}')
 
     try:
         mapper = demo_ingestor.retrieve_records()
         demo_ingestor.ingest(mapper)
 
+    except APIError as e:
+
+        if e.response.json['code'] == 503:
+            logger_class.error(f'DEMOGRAPHICS: Service unavailable for demographics ingest, skipping.')
+
+        else:
+            logger_class.error(f'DEMOGRAPHICS: API Error occurred during demographics ingest: {traceback.format_exc()}')
+
     except Exception:
-        logger_class.error(traceback.format_exc())
-        pass
+        logger_class.error(f'DEMOGRAPHICS: Unexpected error while working with demographics data: {traceback.format_exc()}')
