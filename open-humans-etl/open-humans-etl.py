@@ -12,8 +12,7 @@ if __name__ == '__main__':
     etl_interval_hours = float(os.getenv('ETL_INTERVAL_HOURS'))
     etl_interval_seconds = int(math.ceil(etl_interval_hours * 3600))
 
-    app_scheduler.add_job(open_humans_etl_job, 'interval', seconds=etl_interval_seconds,
-                          id='2', replace_existing=True)
+    app_scheduler.add_job(open_humans_etl_job, 'interval', seconds=etl_interval_seconds)
 
     try:
         logger.debug(f'{datetime.now()} - Beginning the scheduled ETL from Open Humans to Postgres.')
