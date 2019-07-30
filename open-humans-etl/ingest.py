@@ -93,11 +93,9 @@ class OpenHumansETL:
         lines = []
         with open(file) as infile:
 
-            if slice_index != 0:
-
-                for i in range(slice_index - 1):
-
-                    infile.readline()
+            # if slice_index != 0:
+            #     for i in range(slice_index - 1):
+            #         infile.readline()
 
             for json_line in infile:
 

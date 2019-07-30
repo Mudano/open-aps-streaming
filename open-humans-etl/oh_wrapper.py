@@ -70,7 +70,6 @@ class OHWrapper:
 
         user_files = []
         record = ohapi.api.exchange_oauth2_member(access_token)
-        print(record)
 
         for fileinfo in record['data']:
             if self.filename_checker(fileinfo['basename']):
