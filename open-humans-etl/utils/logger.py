@@ -63,3 +63,7 @@ class Logger(object):
         self.logger.debug(msg)
         db.close()
         sys.exit(0)
+
+
+# initialise the logger outside of the job definition
+logger = Logger()
