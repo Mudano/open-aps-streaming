@@ -143,8 +143,8 @@ def ingest_openhumans(logger, connection, users_dict=None):
         etl_class = OpenHumansETL(logger=logger, db_connection=connection)
 
         if not users_dict:
-
-            users_dict = etl_class.db.execute_query(""" SELECT oh_id, access_token FROM register.openhumans_openhumansmember; """, return_object=True)
+            get_users_tokens_sql = """SELECT oh_id, access_token FROM register.openhumans_openhumansmember"""
+            users_dict = etl_class.db.execute_query(get_users_tokens_sql, return_object=True)
 
         etl_class.oh.download_user_files(users_dict)
         etl_class.upload_to_db()
