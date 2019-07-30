@@ -8,7 +8,7 @@ import ohapi
 import gzip
 import json
 import os
-
+import re
 
 class OHError(Exception):
     pass
@@ -103,24 +103,13 @@ class OHWrapper:
                     else:
                         raise requests.exceptions.ConnectionError
 
-    def filename_checker(self, filename):
+    @staticmethod
+    def filename_checker(filename):
 
         """
         Expected file-format is '<integer_ts>_<integer_user_id>_<entity_string>.json'
         """
-
-        try:
-            int(filename.split('_')[0])
-            int(filename.split('_')[1])
-            name = filename.split('_')[2].rsplit('.')[0]
-            fileformat = filename.rsplit('.')[-1]
-
-            if name in ['entries', 'treatments', 'profile', 'devicestatus'] and fileformat == 'json':
-                return True
-            else:
-                return False
-        except (TypeError, ValueError, IndexError):
-            return False
+        return bool(re.match(r"^\d+_\d+_(treatments|devicestatus|entries|profile)\.json$", filename))
 
     # Master-token functions
     def get_all_records(self, max_file_size='999m'):
