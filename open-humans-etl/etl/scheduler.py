@@ -16,4 +16,4 @@ job_defaults = {
     'max_instances': 5
 }
 
-app_scheduler = BlockingScheduler(jobstores=job_stores, executors=executors, job_defaults=job_defaults, timezone=utc)
+app_scheduler = BlockingScheduler(executors=executors, job_defaults=job_defaults, timezone=utc)
