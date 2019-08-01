@@ -225,7 +225,7 @@ def delete_users_data(member_code):
         ('openaps.entries', 'user_id'),
         ('openaps.oh_etl_log', 'openaps_id'),
         ('openaps.profile', 'user_id'),
-        ('treatments', 'user_id')
+        ('openaps.treatments', 'user_id')
     ]
 
     delete_device_status_metrics_sql = """
