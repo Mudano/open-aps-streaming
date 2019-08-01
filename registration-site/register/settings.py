@@ -68,6 +68,9 @@ POSTGRES_DB_NAME = os.environ['POSTGRES_DB']
 POSTGRES_USER = os.environ['POSTGRES_USER']
 POSTGRES_PASS = os.environ['POSTGRES_PASSWORD']
 
+postgres_connection_string =\
+    f'postgresql://{POSTGRES_USER}:{POSTGRES_PASS}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB_NAME}'
+
 OPENHUMANS_APP_BASE_URL = os.getenv('APP_BASE_URL')
 APPLICATION_PORT = os.getenv('APP_PORT')
 

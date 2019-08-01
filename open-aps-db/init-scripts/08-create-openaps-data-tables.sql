@@ -1,3 +1,5 @@
+\set register_user `echo "$POSTGRES_REGISTER_USER"`
+GRANT USAGE ON SCHEMA openaps TO :register_user;
 
 CREATE TABLE openaps.device_status (
   seq_id BIGSERIAL PRIMARY KEY,
@@ -22,6 +24,7 @@ CREATE TABLE openaps.device_status (
 GRANT SELECT ON TABLE openaps.device_status TO viewer;
 GRANT SELECT ON TABLE openaps.device_status TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.device_status TO ingestor;
+GRANT DELETE ON TABLE openaps.device_status TO :register_user;
 
 
 CREATE TABLE openaps.device_status_metrics (
@@ -58,6 +61,7 @@ CREATE TABLE openaps.device_status_metrics (
 GRANT SELECT ON TABLE openaps.device_status_metrics TO viewer;
 GRANT SELECT ON TABLE openaps.device_status_metrics TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.device_status_metrics TO ingestor;
+GRANT DELETE ON TABLE openaps.device_status_metrics TO :register_user;
 
 
 CREATE TABLE openaps.entries (
@@ -89,6 +93,7 @@ CREATE TABLE openaps.entries (
 GRANT SELECT ON TABLE openaps.entries TO viewer;
 GRANT SELECT ON TABLE openaps.entries TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.entries TO ingestor;
+GRANT DELETE ON TABLE openaps.entries TO :register_user;
 
 
 CREATE TABLE openaps.profile (
@@ -108,6 +113,7 @@ GRANT SELECT ON TABLE openaps.profile TO viewer;
 GRANT SELECT ON TABLE openaps.profile TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.profile TO ingestor;
 GRANT SELECT ON openaps.profile TO ext_openaps_app;
+GRANT DELETE ON TABLE openaps.profile TO :register_user;
 
 
 CREATE TABLE openaps.treatments (
@@ -149,6 +155,7 @@ CREATE TABLE openaps.treatments (
 GRANT SELECT ON TABLE openaps.treatments TO viewer;
 GRANT SELECT ON TABLE openaps.treatments TO ext_openaps_app;
 GRANT SELECT, INSERT ON TABLE openaps.treatments TO ingestor;
+GRANT DELETE ON TABLE openaps.treatments TO :register_user;
 
 
 CREATE TABLE openaps.member_demographics (
@@ -190,6 +197,7 @@ CREATE TABLE openaps.oh_etl_log (
 	UNIQUE (openaps_id)
 );
 GRANT SELECT, INSERT, UPDATE ON openaps.oh_etl_log TO ingestor;
+GRANT DELETE ON TABLE openaps.oh_etl_log TO :register_user;
 
 
 
@@ -223,6 +231,7 @@ GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ingestor;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO viewer;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO admin_viewer;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO ext_openaps_app;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA openaps TO :register_user;
 
 CREATE INDEX openaps_entries_index_id ON openaps.entries (id);
 CREATE INDEX openaps_entries_index_time ON openaps.entries ("date");

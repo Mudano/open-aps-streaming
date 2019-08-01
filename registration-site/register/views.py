@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import io
+import psycopg2
+from .settings import postgres_connection_string
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -86,6 +88,7 @@ def deauth_view(request):
     if erasure_requested:
         logger.debug(f'Request received to delete member {member_code}')
         delete_user(member_code)
+        delete_users_data(member_code)
 
     return HttpResponse(status=200)
 
@@ -203,3 +206,56 @@ def delete_user(member_code):
 
     except Exception as e:
         logger.error(f'error encountered attempting to delete member {member_code}: {e}')
+
+
+def delete_users_data(member_code):
+    """
+    Given an Open Humans member code, will attempt to delete all of that users Nightscout data from
+    the application database. This and the `delete_user` function should fully remove any record of
+    a registered user if called successfully.
+
+    :param member_code:  The Open Humans code of the member to be deleted
+    :return: None
+    """
+
+    # this list gives the tables that should be deleted when clearing a user data, along with the
+    # column in which their member code is stored.
+    tables_to_delete_from = [
+        ('openaps.device_status', 'user_id'),
+        ('openaps.entries', 'user_id'),
+        ('openaps.oh_etl_log', 'openaps_id'),
+        ('openaps.profile', 'user_id'),
+        ('treatments', 'user_id')
+    ]
+
+    delete_device_status_metrics_sql = """
+        DELETE FROM
+          openaps.device_status_metrics as dsm
+        USING
+          openaps.device_status as ds
+        WHERE
+          dsm.device_status_id = ds.id
+        AND
+          ds.user_id = %s
+    """
+
+    try:
+        with psycopg2.connect(postgres_connection_string) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(delete_device_status_metrics_sql, (member_code,))
+
+                for to_delete in tables_to_delete_from:
+                    deletion_sql = generate_user_deletion_sql(to_delete[0], to_delete[1])
+                    cursor.execute(deletion_sql, (member_code,))
+
+    except Exception as e:
+        print(f"Error encountered attempting to delete data for user {member_code}: {e}")
+
+
+def generate_user_deletion_sql(tbl_name, user_id_colname):
+    return f"""
+        DELETE FROM
+          {tbl_name}
+        WHERE
+          {tbl_name}.{user_id_colname} = %s
+    """
