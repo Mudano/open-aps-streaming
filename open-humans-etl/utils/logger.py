@@ -36,10 +36,10 @@ class Logger(object):
 
             self.logger.addHandler(fh)
 
-        else:
-            sh = logging.StreamHandler()
-            sh.setFormatter(stream_formatter)
-            self.logger.addHandler(sh)
+        # else:
+        #     sh = logging.StreamHandler()
+        #     sh.setFormatter(stream_formatter)
+        #     self.logger.addHandler(sh)
 
     def debug(self, msg):
         self.logger.debug(msg)
