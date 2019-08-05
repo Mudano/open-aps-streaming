@@ -99,14 +99,14 @@ class OpenHumansETL:
 
             for json_line in infile:
 
-                lines.append({**json.loads(json_line), **{'user_id': user_id, 'source_entity': 0}})
+                lines.append({**{'user_id': user_id, 'source_entity': 0}, **json.loads(json_line)})
 
         self.ingest(lines, ENTITY_MAPPER[entity])
         self.db.update_user_index(user_id, entity, slice_index + len(lines))
 
         if entity == 'devicestatus':
 
-            status_metrics = [{**device['openaps'], **{'device_status_id': device['_id']}} for device in lines if 'openaps' in device]
+            status_metrics = [{**{'device_status_id': device['_id']}, **device['openaps']} for device in lines if 'openaps' in device]
             self.ingest(status_metrics, ENTITY_MAPPER['status_metrics'])
 
     def ingest(self, lod, lod_params):
