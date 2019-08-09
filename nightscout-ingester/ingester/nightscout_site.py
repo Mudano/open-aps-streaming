@@ -61,7 +61,7 @@ class NightscoutSite:
             end_datetime = datetime.utcfromtimestamp(end_datetime / 1000).isoformat()
 
         ns_params = {
-            'count': 1000,
+            'count': 1000000,
             f'find[{nightscout_data_type.time_filter_name}][$gt]': start_datetime,
             f'find[{nightscout_data_type.time_filter_name}][$lte]': end_datetime
         }
