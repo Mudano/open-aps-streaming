@@ -42,8 +42,8 @@ def transfer(request):
     ns_url = request.POST['nightscoutURL']
     logger.debug(f"Pushing NS URL '{ns_url}' to OH Member {oh_member.oh_id}")
 
-    nsf_consent = request.POST['nightscoutFoundationConsent']
-    openaps_consent = request.POST['openApsConsent']
+    nsf_consent = request.POST.get('nightscoutFoundationConsent', False)
+    openaps_consent = request.POST.get('openApsConsent', False)
     consent_string = get_consent_string(nsf_consent, openaps_consent)
 
     logger.debug(f"OH Member {oh_member.oh_id} has specified sharing consent for: {consent_string}")
