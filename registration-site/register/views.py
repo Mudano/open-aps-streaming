@@ -42,9 +42,9 @@ def transfer(request):
     ns_url = request.POST['nightscoutURL']
     logger.debug(f"Pushing NS URL '{ns_url}' to OH Member {oh_member.oh_id}")
 
-    nsf_consent = request.POST.get('nightscoutFoundationConsent', False)
-    openaps_consent = request.POST.get('openApsConsent', False)
-    consent_string = get_consent_string(nsf_consent, openaps_consent)
+    consent_string = get_consent_string(request)
+    consent_filename = f'{oh_member.oh_id}_open_aps_data_sharing_consent.txt'
+    consent_metadata = build_consent_metadata(settings.OPENHUMANS_PROJECT_ADDRESS)
 
     logger.debug(f"OH Member {oh_member.oh_id} has specified sharing consent for: {consent_string}")
 
@@ -57,8 +57,9 @@ def transfer(request):
                 logger.debug('Found an existing Nightscout URL file(s) for user. Deleting these before upload.')
                 oh_member.delete_single_file(file_basename=ns_url_filename)  # this deletes all files with the name
 
-            upload_successful = upload_string_file_to_oh(oh_member, ns_url, ns_url_filename, ns_url_file_metadata)
-            handle_oh_upload_attempt(request, upload_successful)
+            ns_upload_successful = upload_string_file_to_oh(oh_member, ns_url, ns_url_filename, ns_url_file_metadata)
+            consent_upload_successful = upload_string_file_to_oh(oh_member, consent_string, consent_filename, consent_metadata)
+            handle_oh_upload_attempt(request, ns_upload_successful, consent_upload_successful)
         except Exception as e:
             logger.error(e)
             messages.error(request, 'Failed to update Nightscout URL information on Open Humans')
@@ -99,7 +100,10 @@ def deauth_view(request):
     return HttpResponse(status=200)
 
 
-def get_consent_string(nsf_consent, openaps_consent):
+def get_consent_string(request):
+    nsf_consent = request.POST.get('nightscoutFoundationConsent', False)
+    openaps_consent = request.POST.get('openApsConsent', False)
+
     if nsf_consent and openaps_consent:
         return 'both'
     elif nsf_consent:
@@ -119,6 +123,18 @@ def build_ns_url_metadata(oh_project_address):
     """
     file_description = f"Your Nightscout URL, uploaded by {oh_project_address}"
     file_tags = ["open-aps", "Nightscout", "url", "text"]
+    return {"tags": file_tags, "description": file_description}
+
+
+def build_consent_metadata(oh_project_address):
+    """
+    Given the OH project URL returns the metadata for a data sharing consent file.
+
+    :param oh_project_address: The url of the OH project pushing the data
+    :return: A dictionary of metadata information.
+    """
+    file_description = f"Your Nightscout data sharing consent, uploaded by {oh_project_address}"
+    file_tags = ["open-aps", "Nightscout", "consent", "text", "sharing"]
     return {"tags": file_tags, "description": file_description}
 
 
@@ -188,18 +204,19 @@ def upload_string_file_to_oh(oh_member, string_content, filename, file_metadata)
             oh_member.upload(s, filename, file_metadata)
         return True
     except:
-        logger.error(f'Failed to upload Nightscout URL to OH for OH member {oh_member.oh_id}')
+        logger.error(f'Failed to upload file {filename} to OH for OH member {oh_member.oh_id}')
         return False
 
 
-def handle_oh_upload_attempt(request, upload_successful):
+def handle_oh_upload_attempt(request, ns_upload_successful, consent_upload_successful):
     """
-    Returns a message to the user indicating the outcome of the Nightscout URL upload attempt.
+    Returns a message to the user indicating the outcome of the Nightscout URL and consent file upload attempt.
     :param request: The Django request object.
-    :param upload_successful: boolean, indicating success (true) or failure (false)
+    :param ns_upload_successful: boolean, indicating success (true) or failure (false) for upload of the NS URL.
+    :param consent_upload_successful: boolean, indicating success (true) or failure (false) for upload of the consent string.
     :return: None
     """
-    if upload_successful:
+    if ns_upload_successful and consent_upload_successful:
         messages.success(request, 'Successfully updated Nightscout URL information on Open Humans')
     else:
         messages.error(request, 'An error occurred uploading the file to Open Humans.')
