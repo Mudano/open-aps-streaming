@@ -57,6 +57,10 @@ def transfer(request):
                 logger.debug('Found an existing Nightscout URL file(s) for user. Deleting these before upload.')
                 oh_member.delete_single_file(file_basename=ns_url_filename)  # this deletes all files with the name
 
+            if consent_filename in get_oh_member_file_names(oh_member):
+                logger.debug('Found an existing data consent file(s) for user. Deleting these before upload.')
+                oh_member.delete_single_file(file_basename=consent_filename)  # this deletes all files with the name
+
             ns_upload_successful = upload_string_file_to_oh(oh_member, ns_url, ns_url_filename, ns_url_file_metadata)
             consent_upload_successful = upload_string_file_to_oh(oh_member, consent_string, consent_filename, consent_metadata)
             handle_oh_upload_attempt(request, ns_upload_successful, consent_upload_successful)
