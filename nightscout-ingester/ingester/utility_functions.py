@@ -94,7 +94,7 @@ def build_new_oh_filename(end_data_timestamp, oh_user_code, data_type):
     return f'{end_data_timestamp}_{oh_user_code}_{data_type}.json'
 
 
-def process_ns_data(ns_data_dict, sensitive_keys):
+def process_ns_data(ns_data_dict, sensitive_keys, sharing_consent_value):
     """
     Takes a dictionary of pulled Nightscout data and a list of any sensitive keys, any instances of these keys will
     have their values replaced by random values. The dictionary is then converted to a JSON string representation with
@@ -102,11 +102,12 @@ def process_ns_data(ns_data_dict, sensitive_keys):
 
     :param ns_data_dict: The NightScout data as a python dictionary.
     :param sensitive_keys: A list of any keys that might contain sensitive information.
+    :param sharing_consent_value:
     :return: A string representing cleaned json data records, separated by linebreaks.
     """
     ns_data_dict.reverse()
 
-    processed_list_of_data = [dict_to_minified_json_string(sub_sensitive_key(d, sensitive_keys)) for d in ns_data_dict]
+    processed_list_of_data = [process_single_ns_record(d, sensitive_keys, sharing_consent_value) for d in ns_data_dict]
     json_string = reduce(concat, processed_list_of_data, '')
 
     return json_string
@@ -188,4 +189,35 @@ def sub_sensitive_key(target_dict, sensitive_key_names):
         if sensitive_key in target_dict:
             target_dict[sensitive_key] = generate_random_string(6)
 
+    return target_dict
+
+
+def process_single_ns_record(target_dict, sensitive_key_names, sharing_consent_value):
+    """
+    Helper function that makes it easier to process all incoming NS data in a list comprehension. All that
+    this function does is compose together the various data processing function to be applied to all records
+    in the correct order.
+
+    :param target_dict:
+    :param sensitive_key_names:
+    :param sharing_consent_value:
+    :return: A string representation of the dictionary as json, with no whitespace apart from a linebreak at the end.
+    """
+    return dict_to_minified_json_string(
+        add_sharing_consent(
+            sub_sensitive_key(target_dict, sensitive_key_names),
+            sharing_consent_value
+        )
+    )
+
+
+def add_sharing_consent(target_dict, sharing_consent_value):
+    """
+    Adds a new key to a given dictionary that records the sharing preferences for that user.
+
+    :param target_dict:
+    :param sharing_consent_value:
+    :return: The target dictionary, with a new key recording sharing preferences.
+    """
+    target_dict['sharing_consent'] = sharing_consent_value
     return target_dict

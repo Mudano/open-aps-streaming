@@ -63,6 +63,7 @@ def transfer(request):
 
             ns_upload_successful = upload_string_file_to_oh(oh_member, ns_url, ns_url_filename, ns_url_file_metadata)
             consent_upload_successful = upload_string_file_to_oh(oh_member, consent_string, consent_filename, consent_metadata)
+
             handle_oh_upload_attempt(request, ns_upload_successful, consent_upload_successful)
         except Exception as e:
             logger.error(e)

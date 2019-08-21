@@ -46,12 +46,13 @@ class NightscoutSite:
             return None
         return url
 
-    def get_new_data_since(self, nightscout_data_type, start_datetime, end_datetime):
+    def get_new_data_since(self, nightscout_data_type, start_datetime, end_datetime, sharing_consent_value):
         """
 
         :param nightscout_data_type: The NightscoutDataTpe class for the data to be fetched from NS (e.g. entries)
         :param start_datetime: Unix timestamp (ms). Data fetched will have a date greater than this.
         :param end_datetime: Unix timestamp (ms). Data fetched will have a date lesser than or equal to this.
+        :param sharing_consent_value:
         :return: String containing the processed data as json objects separated by linebreaks.
         """
         ns_data_url = f'{self.url}/api/v1/{nightscout_data_type.name}.json'
@@ -71,7 +72,8 @@ class NightscoutSite:
 
             if new_data_response.status_code == 200:
                 new_data_json = new_data_response.json()
-                new_processed_data = process_ns_data(new_data_json, nightscout_data_type.sensitive_keys)
+                new_processed_data = \
+                    process_ns_data(new_data_json, nightscout_data_type.sensitive_keys, sharing_consent_value)
             else:
                 print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}')
                 new_processed_data = []

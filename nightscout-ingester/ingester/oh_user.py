@@ -111,6 +111,28 @@ class OhUser:
         else:
             return ns_url_files[0].get_text_contents()
 
+    def fetch_ns_sharing_consent(self):
+        """
+        Looks in the user's OpenHumans account and checks if it has a sharing consent file with the expected name.
+        If a matching file is found it is fetched, and it's contents returned as a string by this function. If no
+        matching files (or more than one) are found  then None is returned.
+
+        :return: String | None
+        """
+        all_file_info = self.fetch_all_file_info()
+        ns_consent_files = [f for f in all_file_info
+                        if f.basename == f'{self.member_code}_open_aps_data_sharing_consent.txt']
+
+        if len(ns_consent_files) > 1:
+            print(f'Found multiple sharing consent files for user {self.member_code}, '
+                  f'this is not supported and data will not be fetched.')
+            return None
+        elif len(ns_consent_files) < 1:
+            print(f'No sharing consent files found for user {self.member_code}, no data will be fetched.')
+            return None
+        else:
+            return ns_consent_files[0].get_text_contents()
+
     def fetch_all_file_info(self):
         """
         Fetches the file info for all files stored in OpenHumans by this member.

@@ -27,9 +27,10 @@ def nightscout_ingest_job():
             # Refresh tokens against OH and pull the nightscout URL file from OH
             token_refresh_outcome = user.refresh_oh_token(CLIENT_ID, CLIENT_SECRET)
             nightscout_url = user.fetch_ns_url()
+            sharing_consent_value = user.fetch_ns_sharing_consent()
 
             # any failure to fetch a nightscout url will result in no transfer
-            if nightscout_url and token_refresh_outcome:
+            if nightscout_url and token_refresh_outcome and sharing_consent_value:
                 nightscout_site = NightscoutSite(nightscout_url)
                 ns_valid = nightscout_site.validate_url()
 
@@ -43,15 +44,19 @@ def nightscout_ingest_job():
                             data_file_name = get_basename(local_copy_of_data_file_name)
                             data_last_loaded_at = get_previous_upload_timestamp(data_file_name)
 
-                            new_data = nightscout_site.get_new_data_since(data_type, data_last_loaded_at, data_pulled_until)
+                            new_data = nightscout_site.get_new_data_since(data_type,
+                                                                          data_last_loaded_at, data_pulled_until,
+                                                                          sharing_consent_value)
 
                             # if no new data is fetched for the given type then no further action is taken
                             if new_data:
                                 print(f"new {data_type.name} found for user {user.member_code}")
-                                update_file_with_string(local_copy_of_data_file_name, new_data, data_type.file_update_method)
+                                update_file_with_string(local_copy_of_data_file_name,
+                                                        new_data, data_type.file_update_method)
 
                                 entries_metadata = build_ns_file_metadata(data_type.name)
-                                new_oh_file_name = build_new_oh_filename(data_pulled_until, user.member_code, data_type.name)
+                                new_oh_file_name = build_new_oh_filename(data_pulled_until,
+                                                                         user.member_code, data_type.name)
 
                                 print(f'pushing new data file to {new_oh_file_name} for user {user.member_code}')
                                 upload_local_file_to_oh(local_copy_of_data_file_name, new_oh_file_name,
