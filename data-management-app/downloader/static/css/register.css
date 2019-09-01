@@ -28,7 +28,7 @@
     background-color: #fff;
     }
 
-.register-text-field, .register-textarea, .irb-select {
+.register-text-field, .register-textarea, .irb-select, .access-select {
     width: 50%;
     font-size: 14px;
     padding-left: 2.5%;

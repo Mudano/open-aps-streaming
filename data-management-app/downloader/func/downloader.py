@@ -76,8 +76,9 @@ def populate_files(entity, start_date, end_date, filetype, zip_folder):
                                                   AND <end_date> < <table_date_column>
                                                   AND raw_json IS NOT NULL
 
-        5. Normalize the retrieved records, turning raw_json from nested dictionary to one-dimensional object
-        6. Write to the .zip file using gzip compression
+        5. Filter records based on user access, level 2 means user has access to all projects
+        6. Normalize the retrieved records, turning raw_json from nested dictionary to one-dimensional object
+        7. Write to the .zip file using gzip compression
 
     """
 
@@ -91,6 +92,9 @@ def populate_files(entity, start_date, end_date, filetype, zip_folder):
                                                      .filter(getattr(v['class'], v['date_col']) >= start_date)\
                                                      .filter(getattr(v['class'], v['date_col']) <= end_date)\
                                                      .filter(v['class'].raw_json != None).all()]
+
+            if current_user.allowed_projects != 2:
+                records = [x for x in records if x['source_entity'] == current_user.allowed_projects]
 
             df = json_normalize(records)
 

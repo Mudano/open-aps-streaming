@@ -56,6 +56,7 @@ CREATE TABLE openaps.device_status_metrics (
   enacted_duration NUMERIC,
   enacted_rate NUMERIC,
   enacted_timestamp TIMESTAMP,
+  source_entity INTEGER,
   UNIQUE (device_status_id, enacted_timestamp)
 );
 GRANT SELECT ON TABLE openaps.device_status_metrics TO viewer;
@@ -213,8 +214,9 @@ GRANT SELECT ON TABLE openaps.source_entities TO admin_viewer;
 INSERT INTO openaps.source_entities
 (id, name, inserted_ts)
 values
-(1, 'OpenAPS Data Commons', CURRENT_TIMESTAMP),
-(2, 'NightScout Data Commons', CURRENT_TIMESTAMP);
+(0, 'OpenAPS Data Commons', CURRENT_TIMESTAMP),
+(1, 'NightScout Data Commons', CURRENT_TIMESTAMP),
+(2, 'All', CURRENT_TIMESTAMP);
 
 
 -- this statement pre-creates the etl python scheduler table, so that ingestor does not need create tables perms
