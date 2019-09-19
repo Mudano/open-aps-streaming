@@ -196,9 +196,9 @@ class OHWrapper:
             return 0
         else:
             file = open(sharing_file, 'r').read()
-            if 'openaps_data_commons' in file:
+            if 'openaps' in file:
                 return 0
-            elif 'nightscout_data_commons' in file:
+            elif 'nsf' in file:
                 return 1
             elif 'both' in file:
                 return 2

@@ -123,8 +123,7 @@ left join openaps.loop_typ_reference t3
     on t1.app_id = t3.user_id
     and t1.date_exact = t3.device_date
 left join openaps.member_demographics_cleaned t4
-    on t1.app_id = t4.project_member_id --THIS IS PURELY TEMPORARY AND NEEDS CHANGING BEFORE PRODUCTION
-
+    on t1.app_id = t4.project_member_id
 )
 ;
 

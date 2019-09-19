@@ -103,7 +103,14 @@ class OpenHumansETL:
             #         infile.readline()
 
             for json_line in infile:
-                lines.append({**{'user_id': user_id, 'source_entity': sharing_flag}, **json.loads(json_line)})
+
+                line = json.loads(json_line)
+
+                for k in line.keys():
+                    if '\u0000' in str(line[k]):
+                        line[k] = line[k].replace('\u0000', '')
+
+                lines.append({**{'user_id': user_id, 'source_entity': sharing_flag}, **line})
 
         self.ingest(lines, ENTITY_MAPPER[entity])
         self.db.update_user_index(user_id, entity, slice_index + len(lines))
