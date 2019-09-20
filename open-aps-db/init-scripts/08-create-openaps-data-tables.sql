@@ -188,14 +188,14 @@ GRANT SELECT ON TABLE openaps.member_demographics TO admin_viewer;
 
 
 CREATE TABLE openaps.oh_etl_log (
-	seq_id BIGSERIAL PRIMARY KEY,
-	openaps_id BIGINT UNIQUE,
-	treatments_last_index BIGINT,
-	entries_last_index BIGINT,
-	profile_last_index BIGINT,
-	devicestatus_last_index BIGINT,
-	inserted_ts TIMESTAMP DEFAULT NOW(),
-	UNIQUE (openaps_id)
+  seq_id BIGSERIAL PRIMARY KEY,
+  openaps_id BIGINT UNIQUE,
+  treatments_last_index BIGINT,
+  entries_last_index BIGINT,
+  profile_last_index BIGINT,
+  devicestatus_last_index BIGINT,
+  inserted_ts TIMESTAMP DEFAULT NOW(),
+  UNIQUE (openaps_id)
 );
 GRANT SELECT, INSERT, UPDATE ON openaps.oh_etl_log TO ingestor;
 GRANT SELECT, DELETE ON TABLE openaps.oh_etl_log TO :register_user;

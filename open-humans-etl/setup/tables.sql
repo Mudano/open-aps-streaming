@@ -62,7 +62,7 @@ CREATE TABLE openaps.device_status_metrics (
     enacted_duration NUMERIC,
     enacted_rate NUMERIC,
     enacted_timestamp TIMESTAMP,
-	source_entity INTEGER
+    source_entity INTEGER
 );
 GRANT SELECT ON TABLE openaps.device_status_metrics TO viewer;
 GRANT SELECT ON TABLE openaps.device_status_metrics TO ext_openaps_app;
