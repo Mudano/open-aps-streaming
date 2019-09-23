@@ -19,7 +19,7 @@ def process_admin_request(request):
 
     if 'add-user' in request.form:
 
-        process_adding_user(request.form['add-user'])
+        process_adding_user(request.form['add-user'], request.form['user-access-level'])
 
         return 'User added successfully, a verification link has been sent to their email.'
 
@@ -35,11 +35,11 @@ def process_admin_request(request):
 
     elif 'application-email' in request.form:
 
-        update_application(request)
+        user_access_level = update_application(request)
 
         if request.form['application-action'] == 'approve':
 
-            process_adding_user(request.form['application-email'])
+            process_adding_user(request.form['application-email'], user_access_level)
 
         return 'Action processed successfully, the user has been notified.'
 
@@ -69,8 +69,10 @@ def update_application(request):
                                  <br><br>
                                  '{request.form['reject-reason']}'""")
 
+    return record.project_requests
 
-def process_adding_user(email):
+
+def process_adding_user(email, access_level):
 
     """
     :param email: The email address of the user to be added
@@ -118,6 +120,7 @@ def process_adding_user(email):
             verified=False,
             verification_code=temp_code,
             admin=False,
+            allowed_projects=access_level,
             login_count=0,
             num_downloads=0,
             total_download_size_mb=0,

@@ -20,18 +20,21 @@
         text-align: center;
         display: none;
         }
-
     .applications-overlay tbody tr {cursor: pointer;}
 
-    .email-col, .email-head {width: 30%;}
+    .name-col, .name-head {width: 16%;}
+    .email-col, .email-head {width: 23%;}
+
+    .project-head, .project-col {
+        width: 14.9%;
+        }
 
     .irb-col, .sponsor-col, .phone-col,
     .irb-head, .sponsor-head, .phone-head {
-        width: 16.3%;
+        width: 15%;
         }
     .description-col {width: 0%;}
 
-     .name-col, .name-head {width: 20%;}
 
     h4 {margin-bottom: 15px; margin-top: 20px;}
 
@@ -80,6 +83,7 @@
               <th class="sponsor-head">Sponsor</th>
               <th class="irb-head">IRB Approval</th>
               <th class="phone-head">Phone</th>
+              <th class="project-head">Project/s</th>
             </tr>
           </thead>
         </table>
@@ -94,6 +98,11 @@
                   <td class="sponsor-col">{{ app.sponsor_organisation }}</td>
                   <td class="irb-col">{{ app.irb_approval|title }}</td>
                   <td class="phone-col">{{ app.phone_number }}</td>
+                  <td class="project-col">
+                      {{ 'Openaps' if app.project_requests == 0
+                          else 'Nightscout' if app.project_requests == 1
+                          else 'All' }}
+                  </td>
                   <td class="description-col">{{ app.request_description }}</td>
                 </tr>
             {% endfor %}

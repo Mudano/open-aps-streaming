@@ -106,7 +106,7 @@ class OHWrapper:
         """
         Expected file-format is '<integer_ts>_<integer_user_id>_<entity_string>.json'
         """
-        return bool(re.match(r"^\d+_\d+_(treatments|devicestatus|entries|profile)\.json$", filename))
+        return bool(re.match(r"^\d+_\d+_(treatments|devicestatus|entries|profile)\.json$", filename)) or 'data_sharing_consent.txt' in filename
 
     # Master-token functions
     def get_all_records(self, max_file_size='999m'):
@@ -149,7 +149,6 @@ class OHWrapper:
 
         """
         Finds all files in the files directory with a given extension
-        :param extension:
         """
 
         file_list = []
@@ -184,3 +183,24 @@ class OHWrapper:
                     outfile.write("%s\n" % json.dumps(line))
 
             os.remove(filepath)
+
+    def get_user_sharing_flag(self, user_id):
+
+        """
+        Used to identify sharing permissions for each user, based on a .txt file
+        """
+
+        sharing_file = f'{self.FILES_DIRECTORY}/{user_id}/{user_id}_open_aps_data_sharing_consent.txt'
+
+        if not os.path.isfile(sharing_file):
+            return 0
+        else:
+            file = open(sharing_file, 'r').read()
+            if 'openaps' in file:
+                return 0
+            elif 'nsf' in file:
+                return 1
+            elif 'both' in file:
+                return 2
+            elif 'none' in file:
+                return 3

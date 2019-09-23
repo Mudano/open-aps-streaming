@@ -27,6 +27,12 @@
         <form method="POST">
             <h6>Add User</h6>
             <input class="enter-user" name="add-user" placeholder="Enter user email.." spellcheck="false" required>
+
+            <br clear="all"><br>
+            <select class="access-select" name="user-access-level" required>
+                <option selected disabled></option>
+            </select>
+
             <span class="fuller-button admin-button">ADD</span>
         </form>
 
@@ -118,6 +124,19 @@
             data: [{% for user in users %}
                    { id: "{{ user.id }}", text: "{{ user.email }}"},
                    {% endfor %}
+                  ]
+        });
+    });
+
+    $(document).ready(function() {
+        $('.access-select').select2({
+            tags: false,
+            width: '70%',
+            placeholder: 'Set project access..',
+            data: [
+                   { id: "0", text: "OpenAPS Data Commons"},
+                   { id: "1", text: "Nightscout Data Commons"},
+                   { id: "2", text: "Access to both"},
                   ]
         });
     });

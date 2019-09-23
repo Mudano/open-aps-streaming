@@ -129,6 +129,7 @@ def create_registration_record(request):
             researcher_name=request.form['register-name'],
             email=request.form['register-email'],
             phone_number=request.form['register-phone'],
+            project_requests=request.form['register-access'],
             irb_approval=request.form['register-irb'],
             sponsor_organisation=request.form['register-sponsor'],
             request_description=request.form['register-textarea'],
@@ -162,6 +163,11 @@ def create_registration_record(request):
            --><br><br><!--
            --><b>Sponsor</b><!--
            --><br>{new_application.sponsor_organisation}<!--
+           --><br><br><!--
+           --><b>Project Access</b><!--
+           --><br>{'Openaps Data Commons' if new_application.project_requests == 0
+              else 'Nightscout Data Commons' if new_application.project_requests == 1
+              else 'All Projects'}<!--
            --><br><br><!--
            --><b>Application Description</b><!--
            --><br>{new_application.request_description}<!--

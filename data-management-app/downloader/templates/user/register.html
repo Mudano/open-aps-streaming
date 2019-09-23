@@ -42,6 +42,13 @@
 
     <div class="form-breaker"></div>
 
+    <h5>Which OpenHumans projects do you wish to source data from?</h5>
+    <select class="access-select" required name="register-access">
+        <option selected disabled></option>
+    </select>
+
+    <div class="form-breaker"></div>
+
     <h5>Please give a high level overview of your proposed project, and explain why you want access to the OpenAPS Data Commons data.</h5>
 
     <textarea class="register-textarea" required name="register-textarea"></textarea>
@@ -85,6 +92,18 @@
                    { id: "yes", text: "Yes, it is a study and I will have IRB approval for the project."},
                    { id: "no", text: "No, it does not require IRB approval"},
                    { id: "unsure", text: "Not sure"}
+                  ]
+        });
+    });
+    $(document).ready(function() {
+        $('.access-select').select2({
+            tags: false,
+            width: '50%',
+            minimumResultsForSearch: -1,
+            data: [
+                   { id: 0, text: "OpenAPS Data Commons"},
+                   { id: 1, text: "Nightscout Data Commons"},
+                   { id: 2, text: "Access to both"},
                   ]
         });
     });

@@ -53,13 +53,17 @@ class OpenHumansETL:
                 user = self.db.get_user(user_id)
                 user_files = self.oh.get_files_by_extension(f'{directory}/{user_id}', '.json')
 
+                user_sharing = self.oh.get_user_sharing_flag(user_id)
+                if user_sharing == 3:
+                    continue
+
                 for filename in user_files:
 
                     entity_name = [k for k in ENTITY_MAPPER.keys() if k in filename][0]
                     last_index = user[entity_name + '_last_index']
 
                     try:
-                        self.process_file_load(user_id, filename, entity_name, last_index)
+                        self.process_file_load(user_id, filename, entity_name, last_index, user_sharing)
 
                     except (JSONDecodeError, TypeError):
                         self.logger.error(
@@ -80,7 +84,7 @@ class OpenHumansETL:
                 self.logger.error(f'Error while working with user {user_id}: {traceback.format_exc()}')
                 continue
 
-    def process_file_load(self, user_id, file, entity, slice_index):
+    def process_file_load(self, user_id, file, entity, slice_index, sharing_flag):
 
         """
         Navigates to slice point in json file, extracts records, passes to ingest function, updates user indexes
@@ -88,6 +92,7 @@ class OpenHumansETL:
         :param file: local file to extract records from
         :param entity: table entity, either treatments, entries, devicestatus or profile
         :param slice_index: The last line records were downloaded from in the json file
+        :param sharing_flag: Integer representing which data commons users would like to share files with
         """
 
         lines = []
@@ -99,7 +104,13 @@ class OpenHumansETL:
 
             for json_line in infile:
 
-                lines.append({**{'user_id': user_id, 'source_entity': 0}, **json.loads(json_line)})
+                line = json.loads(json_line)
+
+                for k in line.keys():
+                    if '\u0000' in str(line[k]):
+                        line[k] = line[k].replace('\u0000', '')
+
+                lines.append({**{'user_id': user_id, 'source_entity': sharing_flag}, **line})
 
         self.ingest(lines, ENTITY_MAPPER[entity])
         self.db.update_user_index(user_id, entity, slice_index + len(lines))

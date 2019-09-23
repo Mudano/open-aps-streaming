@@ -6,6 +6,7 @@ CREATE TABLE openaps.app_users (
 	verified BOOL,
 	verification_code TEXT,
 	admin BOOL DEFAULT FALSE,
+	allowed_projects INT,
 	last_signin TIMESTAMP,
 	login_count INTEGER,
 	num_downloads INTEGER,
@@ -26,6 +27,7 @@ CREATE TABLE openaps.researcher_applications (
 	researcher_name VARCHAR,
 	email VARCHAR,
 	phone_number VARCHAR,
+	project_requests INT,
 	irb_approval TEXT,
 	sponsor_organisation VARCHAR,
 	request_description TEXT,
@@ -38,4 +40,3 @@ CREATE TABLE openaps.researcher_applications (
 GRANT SELECT ON openaps.researcher_applications TO admin_viewer;
 GRANT USAGE, SELECT ON SEQUENCE openaps.researcher_applications_seq_id_seq TO ext_openaps_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON openaps.researcher_applications TO ext_openaps_app;
-
