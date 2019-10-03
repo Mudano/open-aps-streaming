@@ -1,4 +1,5 @@
 
+from flask_login import current_user
 import jwt
 import os
 
@@ -18,6 +19,9 @@ def retrieve_iframes():
 
     """
 
+
+
+
     iframe_mapper = {
         'entries': {'number': 6},
         'treatments': {'number': 7},
@@ -34,3 +38,32 @@ def retrieve_iframes():
         params['url'] = os.environ['METABASE_URL'] + "/embed/dashboard/" + token.decode("utf8") + "#theme=night&bordered=false&titled=false"
 
     return iframe_mapper
+
+
+def dashboard_mapper():
+
+    mapper = os.environ['METABASE_DASHBOARD_ID']
+
+    if current_user.allowed_projects == 1:
+
+        return {
+            'entries': {'number': 6},
+            'treatments': {'number': 7},
+            'demographics': {'number': 8}
+        }
+
+    elif current_user.allowed_projects == 2:
+
+        return {
+            'entries': {'number': 6},
+            'treatments': {'number': 7},
+            'demographics': {'number': 8}
+        }
+
+    elif current_user.allowed_projects == 3:
+
+        return {
+            'entries': {'number': 6},
+            'treatments': {'number': 7},
+            'demographics': {'number': 8}
+        }
