@@ -76,6 +76,7 @@ def process_adding_user(email, access_level):
 
     """
     :param email: The email address of the user to be added
+    :param access_level: The access flag which determines the data entities a user can view
 
     Called when a new user is to be created, or when a deactivated/unverified user re-applies.
 

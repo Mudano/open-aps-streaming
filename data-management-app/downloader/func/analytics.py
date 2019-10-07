@@ -19,37 +19,44 @@ def retrieve_iframes():
 
     """
 
+    from downloader.helpers import metabase_secret_key, metabase_url
+    METABASE_URL = metabase_url()
+    METABASE_KEY = metabase_secret_key()
 
-
-
-    iframe_mapper = {
-        'entries': {'number': 6},
-        'treatments': {'number': 7},
-        'demographics': {'number': 8}
-    }
+    iframe_mapper = get_dashboard_mapper()
 
     for dashboard, params in iframe_mapper.items():
-        payload = {
-            "resource": {"dashboard": params['number']},
-            "params": {
+
+        if params['number'] == 'NA':
+            params['url'] = 'none'
+        else:
+            payload = {
+                "resource": {"dashboard": params['number']},
+                "params": {
+                }
             }
-        }
-        token = jwt.encode(payload, os.environ['METABASE_SECRET_KEY'], "HS256")
-        params['url'] = os.environ['METABASE_URL'] + "/embed/dashboard/" + token.decode("utf8") + "#theme=night&bordered=false&titled=false"
+            token = jwt.encode(payload, METABASE_KEY, "HS256")
+            params['url'] = METABASE_URL + "/embed/dashboard/" + token.decode("utf8") + "#theme=night&bordered=false&titled=false"
 
     return iframe_mapper
 
 
-def dashboard_mapper():
+def get_dashboard_mapper():
 
-    mapper = os.environ['METABASE_DASHBOARD_ID']
-
-    if current_user.allowed_projects == 1:
+    if current_user.allowed_projects == 0:
 
         return {
-            'entries': {'number': 6},
-            'treatments': {'number': 7},
-            'demographics': {'number': 8}
+            'entries': {'number': 9},
+            'treatments': {'number': 12},
+            'demographics': {'number': 'NA'}
+        }
+
+    elif current_user.allowed_projects == 1:
+
+        return {
+            'entries': {'number': 10},
+            'treatments': {'number': 11},
+            'demographics': {'number': 'NA'}
         }
 
     elif current_user.allowed_projects == 2:
@@ -60,10 +67,9 @@ def dashboard_mapper():
             'demographics': {'number': 8}
         }
 
-    elif current_user.allowed_projects == 3:
-
+    else:
         return {
-            'entries': {'number': 6},
-            'treatments': {'number': 7},
-            'demographics': {'number': 8}
+            'entries': 'NA',
+            'treatments': 'NA',
+            'demographics': 'NA'
         }
