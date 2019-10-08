@@ -222,20 +222,79 @@ class DeviceStatusMetric:
         pass
 
 
-class FormResponse:
+class NightscoutSurvey:
 
     def __init__(self, entity):
 
-        self.ts = self._date(entity['Timestamp'])
+        self.ts = self._get_date(entity['Timestamp'])
+        self.project_member_id = entity['Your Nightscout Data Commons "project member ID"']
+        self.google_sheet_source = 'nightscout'
+        self.date_of_birth = self._date_from_year(entity["Year of birth"])
+        self.gender = entity['Gender']
+        self.ethnicity = entity['Race/Ethnicity']
+        self.country = entity['Country of residence?']
+        self.first_diagnosed_date = self._get_date(entity['Diagnosis date of diabetes:'])
+        self.first_insulin_pump_date = self._get_date(entity['When did you/your child first go on an insulin pump?'])
+        self.first_glucose_monitor_date = self._get_date(entity['When did you first go on a continuous glucose monitor (CGM)?'])
+        self.first_diy_closed_loop_date = self._get_date(entity['When did you first start using a DIY closed loop?'])
+        self.diy_closed_loop_type = entity['What type of DIY close loop technology do you use? Select all that you actively use:']
+        self.who_uses_the_closed_loop_system = entity['Please describe your relationship to the individual who is donating their data:']
+        self.weight = entity['How much do you weigh?']
+        self.height = entity['How tall are you?']
+        self.insulin_units_per_day = self._numeric(entity['How many units of insulin do you take per day?'])
+        self.basal_insulin_units_per_day = self._numeric(entity['How many units of basal insulin do you take per day, on average?'])
+        self.carb_grams_per_day = self._numeric(entity['On average, how many grams of carbohydrates do you eat in a day?'])
+        self.last_lab_reported_a1c = self._numeric(entity['What was your last lab-reported A1C?'])
+        self.last_lab_reported_a1c_date = self._get_date(entity['When was your last lab-reported A1C?'])
+
+    @staticmethod
+    def _numeric(val):
+
+        try:
+            return float(val)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _get_date(date):
+
+        try:
+            return parse(date).strftime('%Y-%m-%d %H:%M:%S"')
+        except (ValueError, TypeError, AttributeError):
+            return None
+
+    def _date_from_year(self, year):
+
+        if len(str(year)) != 4:
+            try:
+                return self._get_date(year)
+            except TypeError:
+                return None
+        else:
+            return self._get_date(f'01-01-{year}')
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        pass
+
+
+class OpenapsSurvey:
+
+    def __init__(self, entity):
+
+        self.ts = self._get_date(entity['Timestamp'])
         self.project_member_id = entity['Your OpenHumans OpenAPS Data Commons "project member ID"']
-        self.date_of_birth = self._date(entity['When were you born?'])
+        self.google_sheet_source = 'openaps'
+        self.date_of_birth = self._get_date(entity['When were you born?'])
         self.gender = entity['Gender']
         self.ethnicity = entity['Ethnicity origin:']
         self.country = entity['What country do you live in?']
-        self.first_diagnosed_date = self._date(entity['When were you diagnosed with diabetes?'])
-        self.first_insulin_pump_date = self._date(entity['When did you first go on an insulin pump?'])
-        self.first_glucose_monitor_date = self._date(entity['When did you first go on a continuous glucose monitor (CGM)?'])
-        self.first_diy_closed_loop_date = self._date(entity['When did you first start using a DIY closed loop?'])
+        self.first_diagnosed_date = self._get_date(entity['When were you diagnosed with diabetes?'])
+        self.first_insulin_pump_date = self._get_date(entity['When did you first go on an insulin pump?'])
+        self.first_glucose_monitor_date = self._get_date(entity['When did you first go on a continuous glucose monitor (CGM)?'])
+        self.first_diy_closed_loop_date = self._get_date(entity['When did you first start using a DIY closed loop?'])
         self.diy_closed_loop_type = entity['What type of DIY close loop technology do you use? Select all that you actively use:']
         self.who_uses_the_closed_loop_system = entity['Do you yourself have diabetes, or are you filling out this form for a child/loved one who has diabetes?']
         self.weight = entity['How much do you weigh?']
@@ -244,21 +303,22 @@ class FormResponse:
         self.basal_insulin_units_per_day = self._numeric(entity['How many units of basal insulin do you take per day, on average?'])
         self.carb_grams_per_day = self._numeric(entity['On average, how many grams of carbohydrates do you eat in a day?'])
         self.last_lab_reported_a1c = self._numeric(entity['What was your last lab-reported A1C?'])
-        self.last_lab_reported_a1c_date = self._date(entity['When was your last lab-reported A1C?'])
+        self.last_lab_reported_a1c_date = self._get_date(entity['When was your last lab-reported A1C?'])
 
-    def _numeric(self, val):
+    @staticmethod
+    def _numeric(val):
 
         try:
             return float(val)
         except (TypeError, ValueError):
             return None
 
-    def _date(self, val):
-
+    @staticmethod
+    def _get_date(date):
         try:
-            return parse(val).strftime('%Y-%m-%d %H:%M:%S"')
-        except ValueError:
-            return '2050-01-01 00:00:01'
+            return parse(date).strftime('%Y-%m-%d %H:%M:%S"')
+        except (ValueError, TypeError, AttributeError):
+            return None
 
     def __enter__(self):
         return self
