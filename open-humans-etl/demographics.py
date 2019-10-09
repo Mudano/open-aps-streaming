@@ -1,27 +1,34 @@
 
+from models import OpenapsSurvey, NightscoutSurvey
 from utils.upsert_ingester import UpsertIngester
 from gspread.exceptions import APIError
 from utils.google_api import Google
-from models import FormResponse
 import traceback
-import sys
 import os
 
 
 class DemographicsIngest:
 
-    def __init__(self, logger, google_key, demographics_url, db_connection):
+    def __init__(self, logger, google_key, openaps_url, nightscout_url, db_connection):
 
         self.logger = logger
-        self.google = Google(gdrive_key=google_key,spreadsheet_url=demographics_url)
+        self.google = Google(gdrive_key=google_key)
         self.ingester = UpsertIngester(db_connection)
+
+        self.openaps_url = openaps_url
+        self.nightscout_url = nightscout_url
 
     def retrieve_records(self):
 
-        records = self.google.retrieve_worksheet('Form Responses 1')
+        self.google.add_target_spreadsheet(self.openaps_url)
+        openaps = self.google.retrieve_worksheet('Form Responses 1')
+
+        self.google.add_target_spreadsheet(self.nightscout_url)
+        nightscout = self.google.retrieve_worksheet('Form Responses 1')
 
         mapper = {
-            'demographics': {'entity': records, 'object': FormResponse, 'primary_keys': ['project_member_id', 'ts'], 'table': 'member_demographics'}
+            'openaps': {'entity': openaps, 'object': OpenapsSurvey, 'primary_keys': ['project_member_id', 'ts'], 'table': 'member_demographics'},
+            'nightscout': {'entity': nightscout, 'object': NightscoutSurvey, 'primary_keys': ['project_member_id', 'ts'], 'table': 'member_demographics'},
         }
         return mapper
 
@@ -38,7 +45,7 @@ class DemographicsIngest:
 
             except Exception:
                 self.logger.error(traceback.format_exc())
-                sys.exit(1)
+                return
 
             if temp_list:
 
@@ -50,8 +57,8 @@ class DemographicsIngest:
                                         primary_keys=v['primary_keys']
                                         )
                 except Exception:
-                    print(traceback.format_exc())
-                    break
+                    self.logger.error(traceback.format_exc())
+                    return
 
 
 def ingest_demographics(logger_class, connection):
@@ -60,7 +67,8 @@ def ingest_demographics(logger_class, connection):
         demo_ingestor = DemographicsIngest(
             logger=logger_class,
             google_key='/credentials.json',
-            demographics_url=os.environ['OPEN_APS_DEMOGRAPHICS_SHEET_URL'],
+            openaps_url=os.environ['OPEN_APS_OPENAPS_DEMOGRAPHICS_URL'],
+            nightscout_url=os.environ['OPEN_APS_NIGHTSCOUT_DEMOGRAPHICS_URL'],
             db_connection=connection
         )
 

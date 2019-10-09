@@ -12,7 +12,6 @@
     <img src="{{ url_for('static', filename='images/background/' + 'base_v4.jpg') }}" width="100%">
 
     <div class="top-container">
-
         <div class="message-box unselectable">
             <div style="display: table; width: 100%;">
                 <div class="page-title title-img">
@@ -79,8 +78,22 @@
     $('.tabs a').on('click', function () {
 
         $('.dashboard-section').fadeOut('slow');
-        $('iframe').attr('src', $(this).attr('id'));
-        loadIframe();
+
+        if ( $(this).attr('id') !== 'none' ) {
+
+            $('iframe').attr('src', $(this).attr('id'));
+            loadIframe();
+
+        } else {
+
+          Swal.fire({
+              showConfirmButton: true,
+              text: "You do not have the necessary permissions to view this dashboard."
+                }).then(() => {
+                $('.tabs a:first-of-type').click();
+          });
+
+        }
 
     });
 
@@ -93,10 +106,10 @@
           showConfirmButton: false,
           timer: 5000,
           showLoaderOnConfirm: true,
-          preConfirm: true,
-          target: document.getElementById('dash-cvr')
+          preConfirm: true
         });
         Swal.showLoading();
+
         $('.swal2-loading button').css('height', '6em');
         $('.swal2-loading button').css('width', '6em');
 
@@ -117,7 +130,7 @@
     });
 </script>
 <style>
-    .swal2-modal{
+    .swal2-modal {
         position: absolute!important;
         top: 20%;
         width: 20%;

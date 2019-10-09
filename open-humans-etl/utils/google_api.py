@@ -1,30 +1,26 @@
 
 from oauth2client.service_account import ServiceAccountCredentials
+import traceback
 import gspread
 import sys
 
 
 class Google:
-    def __init__(self, gdrive_key, spreadsheet_name=None, spreadsheet_key=None, spreadsheet_url=None):
+
+    def __init__(self, gdrive_key):
+
+        self.gdrive_key = gdrive_key
+        self.authorize_key(self.gdrive_key)
+
+    def authorize_key(self, key):
+
+        if hasattr(self, 'gc'):
+            del self.gc
 
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(gdrive_key, scope)
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(key, scope)
 
         self.gc = gspread.authorize(credentials)
-
-        if spreadsheet_name:
-            self.sheet = self.gc.open(spreadsheet_name)
-
-        elif spreadsheet_key:
-            self.sheet = self.gc.open_by_key(spreadsheet_key)
-
-        elif spreadsheet_url:
-            self.sheet = self.gc.open_by_url(spreadsheet_url)
-
-        elif not spreadsheet_name and not spreadsheet_key and not spreadsheet_url:
-
-            print('You have not provided a spreadsheet selection parameter.')
-            sys.exit(666)
 
     def select_worksheet(self, worksheet_name=None, worksheet_number=None, all_worksheets=False):
 
@@ -46,9 +42,22 @@ class Google:
 
     def retrieve_worksheet(self, worksheet_name=None, worksheet_number=None):
 
-        worksheet = self.select_worksheet(worksheet_name, worksheet_number).get_all_records()
+        retry_count = 0
+        while retry_count <=5:
+            try:
+                worksheet = self.select_worksheet(worksheet_name, worksheet_number).get_all_records()
+                return worksheet
 
-        return worksheet
+            except gspread.exceptions.APIError as e:
+
+                if 'Request had invalid authentication credentials' in str(e):
+
+                    self.authorize_key(self.gdrive_key)
+
+                else:
+                    raise gspread.exceptions.APIError(traceback.format_exc())
+
+        raise gspread.exceptions.APIError(f'Retries maxed for obtaining spreadsheet with name "{self.sheet.title}" and worksheet "{worksheet_name if worksheet_name else worksheet_number}".')
 
     def create_worksheet(self, title, row_num, col_num):
 
@@ -70,7 +79,6 @@ class Google:
 
     def get_row_or_column(self, index, row=False, column=False, worksheet_name=None, worksheet_number=None):
 
-        values = None
         sheet = self.select_worksheet(worksheet_name, worksheet_number)
 
         if row:
@@ -88,3 +96,14 @@ class Google:
     def share_spreadsheet(self, email):
 
         self.sheet.share(email, perm_type='user', role='writer')
+
+    def add_target_spreadsheet(self, spreadsheet_url):
+
+        self.spreadsheet_url = spreadsheet_url
+        self.sheet = self.gc.open_by_url(spreadsheet_url)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass

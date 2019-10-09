@@ -94,7 +94,7 @@ def populate_files(entity, start_date, end_date, filetype, zip_folder):
                                                      .filter(v['class'].raw_json != None).all()]
 
             if current_user.allowed_projects != 2:
-                records = [x for x in records if x['source_entity'] == current_user.allowed_projects]
+                records = [x for x in records if x['source_entity'] in [current_user.allowed_projects, 2]]
 
             df = json_normalize(records)
 

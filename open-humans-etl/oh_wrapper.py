@@ -193,7 +193,7 @@ class OHWrapper:
         sharing_file = f'{self.FILES_DIRECTORY}/{user_id}/{user_id}_open_aps_data_sharing_consent.txt'
 
         if not os.path.isfile(sharing_file):
-            return 0
+            return 3
         else:
             file = open(sharing_file, 'r').read()
             if 'openaps' in file:
