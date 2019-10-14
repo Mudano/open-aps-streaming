@@ -74,7 +74,7 @@ def create_demographics_table(pg_connection):
         t1.first_glucose_monitor_date, t1.first_diy_closed_loop_date, t1.diy_closed_loop_type,
         t1.who_uses_the_closed_loop_system, t1.weight, t1.height, t1.insulin_units_per_day,
         t1.basal_insulin_units_per_day, t1.carb_grams_per_day, t1.last_lab_reported_a1c,
-        t1.last_lab_reported_a1c_date, t1.inserted_ts, t3.height_feet as cleaned_height_ft,
+        t1.last_lab_reported_a1c_date, t1.inserted_ts, t1.google_sheets_source, t3.height_feet as cleaned_height_ft,
         t3.height_inches as  cleaned_height_in, t3.height_cm as cleaned_height_cm,
         t3.weight_cleaned as cleaned_weight, t3.weight_units as cleaned_weight_units,
         t3.weight_kg as cleaned_weight_kg, t3.age_years, t3.age_bracket, t3.years_since_diagnosed,
