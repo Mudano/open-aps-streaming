@@ -163,6 +163,7 @@ CREATE TABLE openaps.member_demographics (
   seq_id bigserial NOT NULL,
   ts timestamp NULL,
   project_member_id int4 NULL,
+  google_sheets_source varchar NULL,
   date_of_birth date NULL,
   gender varchar NULL,
   ethnicity varchar NULL,
