@@ -228,7 +228,7 @@ class NightscoutSurvey:
 
         self.ts = self._get_date(entity['Timestamp'])
         self.project_member_id = entity['Your Nightscout Data Commons "project member ID"']
-        self.google_sheet_source = 'nightscout'
+        self.google_sheets_source = 'nightscout'
         self.date_of_birth = self._date_from_year(entity["Year of birth"])
         self.gender = entity['Gender']
         self.ethnicity = entity['Race/Ethnicity']
@@ -286,7 +286,7 @@ class OpenapsSurvey:
 
         self.ts = self._get_date(entity['Timestamp'])
         self.project_member_id = entity['Your OpenHumans OpenAPS Data Commons "project member ID"']
-        self.google_sheet_source = 'openaps'
+        self.google_sheets_source = 'openaps'
         self.date_of_birth = self._get_date(entity['When were you born?'])
         self.gender = entity['Gender']
         self.ethnicity = entity['Ethnicity origin:']
