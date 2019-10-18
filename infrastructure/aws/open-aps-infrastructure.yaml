@@ -66,7 +66,7 @@ Resources:
           Value: open-aps-nightscout-data-server
         -
           Key: Owner
-          Value: openaps.app@gmail.com
+          Value: openaps.portal@gmail.com
       UserData:
         Fn::Base64:
           !Sub |
