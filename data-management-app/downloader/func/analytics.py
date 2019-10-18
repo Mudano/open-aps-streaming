@@ -45,6 +45,11 @@ def get_dashboard_mapper():
         This function returns the ID's of the dashboards that a user is allowed to see,
         based on the allowed_projects field in the user table. Dashboards are duplicated,
         and filtered by the Open Humans project that their data is sourced from.
+
+        allowed_projects (0) = openaps;
+        allowed_projects (1) = nightscout;
+        allowed_projects (2) = both;
+
     """
 
     if current_user.allowed_projects == 0:
@@ -52,7 +57,7 @@ def get_dashboard_mapper():
         return {
             'entries': {'number': 9},
             'treatments': {'number': 12},
-            'demographics': {'number': 'NA'}
+            'demographics': {'number': 13}
         }
 
     elif current_user.allowed_projects == 1:
@@ -60,7 +65,7 @@ def get_dashboard_mapper():
         return {
             'entries': {'number': 10},
             'treatments': {'number': 11},
-            'demographics': {'number': 'NA'}
+            'demographics': {'number': 14}
         }
 
     elif current_user.allowed_projects == 2:
