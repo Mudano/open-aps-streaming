@@ -46,8 +46,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON openaps.researcher_applications TO ext_o
 \set default_password_hash `echo "$DOWNLOADER_ADMIN_PASSWORD_HASH"`
 
 INSERT INTO openaps.app_users
-(email, hashed_pw, verified, verification_code, admin, created_ts, last_signin, login_count, num_downloads, total_download_size_mb, deactivated)
+(email, hashed_pw, verified, verification_code, admin, allowed_projects, created_ts, last_signin, login_count, num_downloads, total_download_size_mb, deactivated)
 VALUES
-('openaps.app@gmail.com', :'default_password_hash', TRUE, 'M3EM32O', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, FALSE);
-
-
+('openaps.portal@gmail.com', :'default_password_hash', TRUE, 'M3EM32O', TRUE, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, FALSE);
