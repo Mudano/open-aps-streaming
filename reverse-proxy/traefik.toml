@@ -17,7 +17,7 @@ defaultEntryPoints = ["http", "https"]
 entrypoint="dashboard"
 
 [acme]
-email = "openaps.app@gmail.com"
+email = "openaps.portal@gmail.com"
 storage = "acme.json"
 entryPoint = "https"
 onHostRule = true
