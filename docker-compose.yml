@@ -39,6 +39,7 @@ services:
       OPEN_HUMANS_CLIENT_ID: ${OPEN_HUMANS_CLIENT_ID}
       OPEN_HUMANS_PROJECT_ADDRESS: ${OPEN_HUMANS_PROJECT_ADDRESS}
       OPEN_HUMANS_CLIENT_SECRET: ${OPEN_HUMANS_CLIENT_SECRET}
+      DJANGO_SECRET_KEY: ${REGISTER_APP_DJANGO_SECRET_KEY}
     command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
   open-aps-nightscout-ingester:
     restart: always
