@@ -89,7 +89,8 @@ CREATE TABLE openaps.entries (
   source_entity INTEGER,
   raw_json JSONB,
   "date" timestamp,
-  UNIQUE (id, "date")
+  date_string varchar,
+  UNIQUE (id, date_string)
 );
 GRANT SELECT ON TABLE openaps.entries TO viewer;
 GRANT SELECT ON TABLE openaps.entries TO ext_openaps_app;
