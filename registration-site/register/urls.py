@@ -16,6 +16,7 @@ Including another URLconf
 from django.urls import include, path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from .views import home, logout_view, transfer, deauth_view
+from django.views.static import serve 
 
 urlpatterns = [
     path(r'', home, name='home'),
@@ -23,6 +24,8 @@ urlpatterns = [
     path(r'transfer', transfer, name='transfer'),
     path('openhumans/', include('openhumans.urls')),
     path('deauth', deauth_view, name='deauth'),
+    url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
+    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}), 
 ]
 
 urlpatterns += staticfiles_urlpatterns()
