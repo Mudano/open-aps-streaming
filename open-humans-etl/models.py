@@ -36,7 +36,7 @@ class Entry:
         self.system_time = entity['system_time'] if 'system_time' in entity else entity.get('sysTime')
 
         self.date = datetime.fromtimestamp(entity['date']/1000).strftime('%Y-%m-%d %H:%M:%S')
-        self.date_string = entity['dateString']
+        self.date_string = entity.get('dateString') if 'dateString' in entity and entity.get('dateString') else self.date
 
     def __enter__(self):
         return self
