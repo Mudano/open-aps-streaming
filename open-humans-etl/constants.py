@@ -2,6 +2,7 @@
 from models import Treatment, Entry, Profile, DeviceStatus, DeviceStatusMetric
 
 FILES_DIRECTORY = '/data'
+BULK_FILES_DIRECTORY = '/bulk_data'
 ENTITY_MAPPER = {
     'treatments': {'object': Treatment, 'table': 'treatments', 'primary_keys': ['id', 'created_at']},
     'entries': {'object': Entry, 'table': 'entries', 'primary_keys': ['id', 'date_string']},
