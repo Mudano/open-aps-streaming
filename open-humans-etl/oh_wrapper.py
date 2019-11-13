@@ -162,25 +162,36 @@ class OHWrapper:
 
         return file_list
 
-    def rowify_json_files(self):
+    def rowify_json_files(self, delete_unrowifiable=True, max_file_size=2056):
 
         """
         Used to convert a json array into individual records separated by '\n'
+        :param delete_unrowifiable: If true, deletes files that throw an error when attempting to parse rows
+        :param max_file_size: Maximum file size (in MB) that will be rowified, files over this amount will be deleted
         """
 
         json_files = self.get_files_by_extension(self.FILES_DIRECTORY, '.json')
 
         for filepath in json_files:
 
-            with open(filepath) as infile:
+            fileinfo = os.stat(filepath)
 
-                json_list = json.load(infile)
+            if fileinfo.st_size >> 20 <= max_file_size:
 
-            with open(filepath.replace('.json', '_rowified.json'), 'w') as outfile:
+                with open(filepath) as infile:
 
-                for line in json_list:
+                    try:
+                        json_list = json.load(infile)
+                    except json.JSONDecodeError:
+                        self.logger.error(f'Error while rowifying file with name {filepath}: {traceback.format_exc()}')
+                        if delete_unrowifiable: os.remove(filepath)
+                        continue
 
-                    outfile.write("%s\n" % json.dumps(line))
+                with open(filepath.replace('.json', '_rowified.json'), 'w') as outfile:
+
+                    for line in json_list:
+
+                        outfile.write("%s\n" % json.dumps(line))
 
             os.remove(filepath)
 

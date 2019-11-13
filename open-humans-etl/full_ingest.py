@@ -1,15 +1,13 @@
 
 from constants import BULK_FILES_DIRECTORY, ENTITY_MAPPER
-from etl.database import postgres_connection_string
 from utils.database import Database, Psycopg2Error
 from utils.upsert_ingester import UpsertIngester
 from json.decoder import JSONDecodeError
 from oh_wrapper import OHWrapper
 from utils.logger import Logger
 
-
-
 import traceback
+import psycopg2
 import shutil
 import json
 import sys
@@ -18,7 +16,7 @@ import os
 
 class OpenHumansETL:
 
-    def __init__(self, logger, db_connection, master_token):
+    def __init__(self, logger, db_connection, master_token, current_source):
 
         """
         Class to initialise downloading of files from OH, convert files into lists of dictionaries, and upload to db
@@ -30,10 +28,9 @@ class OpenHumansETL:
 
         try:
             self.db = Database(db_connection)
-
             self.ingester = UpsertIngester(db_connection)
-
             self.oh = OHWrapper(logger=logger, files_directory=BULK_FILES_DIRECTORY, master_token=master_token)
+            self.current_source = current_source
 
         except Psycopg2Error:
             logger.error(f'Error occurred while initialising classes. Breaking script.: {traceback.format_exc()}')
@@ -53,13 +50,11 @@ class OpenHumansETL:
         for user_id in user_folders:
 
             try:
-
                 user = self.db.get_user(user_id)
                 user_files = self.oh.get_files_by_extension(f'{directory}/{user_id}', '.json')
 
-                user_sharing = self.oh.get_user_sharing_flag(user_id)
-                if user_sharing == 3:
-                    continue
+
+                user_sharing = self.current_source
 
                 for filename in user_files:
 
@@ -163,30 +158,39 @@ if __name__ == '__main__':
 
     logger = Logger()
 
-    try:
-        etl_class = OpenHumansETL(logger=logger,
-                                  db_connection=postgres_connection_string,
-                                  master_token='')
+    mapper = {
+        'ns': {'key': 1, 'master_token': ''},
+        'openaps': {'key': 0, 'master_token': ''}
+    }
 
-    except Exception:
-        logger.error(f'Error occurred while initialising ETL class for bulk load: {traceback.format_exc()}')
-        sys.exit(1)
+    for k, v in mapper.items():
 
-    try:
-        etl_class.oh.get_all_records()
-        etl_class.oh.extract_directory_files()
+        try:
+            etl_class = OpenHumansETL(logger=logger,
+                                      db_connection=psycopg2.connect(''),
+                                      master_token=v['master_token'],
+                                      current_source=v['key'])
 
-    except Exception:
-        logger.error(f'Error while downloading and extracting files from OH: {traceback.format_exc()}')
-        sys.exit(1)
+        except Exception:
+            logger.error(f'Error occurred while initialising ETL class for bulk load: {traceback.format_exc()}')
+            sys.exit(1)
 
-    try:
-        etl_class.upload_to_db()
+        try:
+            etl_class.oh.get_all_records()
+            etl_class.oh.extract_directory_files()
+            etl_class.oh.rowify_json_files()
 
-    except Exception:
-        logger.error(f'Error occurred while working uploading files to database: {traceback.format_exc()}')
-        sys.exit(1)
+        except Exception:
+            logger.error(f'Error while downloading and extracting files from OH: {traceback.format_exc()}')
+            sys.exit(1)
 
-    finally:
-        shutil.rmtree(BULK_FILES_DIRECTORY)
-        os.mkdir(BULK_FILES_DIRECTORY)
+        try:
+            etl_class.upload_to_db()
+
+        except Exception:
+            logger.error(f'Error occurred while working uploading files to database: {traceback.format_exc()}')
+            sys.exit(1)
+
+        finally:
+            shutil.rmtree(BULK_FILES_DIRECTORY)
+            os.mkdir(BULK_FILES_DIRECTORY)
