@@ -106,3 +106,4 @@ venv.bak/
 .idea/
 credentials.json
 open-humans-etl/helpers.py
+open-humans-etl/full_ingest.py
