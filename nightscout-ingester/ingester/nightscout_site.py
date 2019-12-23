@@ -75,10 +75,10 @@ class NightscoutSite:
                 new_processed_data = \
                     process_ns_data(new_data_json, nightscout_data_type.sensitive_keys, sharing_consent_value)
             else:
-                print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}')
+                print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}: Non 200 response from Nightscout Site')
                 new_processed_data = []
-        except:
-            print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}')
+        except Exception as e:
+            print(f'An error was encountered downloading new {nightscout_data_type.name} data from ${self.url}: ${e}')
             new_processed_data = []
         return new_processed_data
 
