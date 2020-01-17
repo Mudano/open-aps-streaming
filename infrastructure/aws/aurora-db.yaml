@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  DbName:
+    Type : 'AWS::SSM::Parameter::Value<String>'
+    Default: aurora-db-name
+  DbMasterUsername:
+    Type : 'AWS::SSM::Parameter::Value<String>'
+    Default: aurora-db-master-user
+  DbMasterPassword:
+    Type : 'AWS::SSM::Parameter::Value<String>'
+    Default: aurora-db-master-password
+
+
+Resources:
+  AuroraDB:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      MasterUsername: 
+        Ref: DbMasterUsername
+      MasterUserPassword:
+        Ref: DbMasterPassword
+      DatabaseName:
+        Ref: DbName
+      Engine: aurora-postgresql
+      EngineMode: serverless
+      ScalingConfiguration:
+        AutoPause: true
+        MaxCapacity: 16
+        MinCapacity: 2
+        SecondsUntilAutoPause: 300
+
