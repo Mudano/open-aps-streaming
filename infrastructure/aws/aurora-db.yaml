@@ -13,6 +13,16 @@ Parameters:
 
 
 Resources:
+  AuroraDbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security group for the OpenAPS Aurora DB. Created inside the default VPC"
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: 5432
+        IpProtocol: tcp
+        ToPort: 5432
+
   AuroraDB:
     Type: AWS::RDS::DBCluster
     Properties:
@@ -29,4 +39,5 @@ Resources:
         MaxCapacity: 16
         MinCapacity: 2
         SecondsUntilAutoPause: 300
-
+      VpcSecurityGroupIds: 
+      - Fn::GetAtt: [ AuroraDbSecurityGroup, GroupId ]
