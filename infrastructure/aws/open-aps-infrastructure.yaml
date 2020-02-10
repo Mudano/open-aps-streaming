@@ -92,6 +92,38 @@ Resources:
       AllocationId: !Ref ElasticIpAllocationId
       InstanceId: !Ref OpenApsServer
 
+  OpenApsEc2Role:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      Description: 'IAM role allowing ec2 instances to read individual parameters from the param store'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: AllowParamRead
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'ssm:GetParameter'
+                Resource: '*'
+
+  MyInstanceProfile: 
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      InstanceProfileName: 'OpenApsEc2InstanceProfile'
+      Path: "/"
+      Roles: 
+        - 
+          !Ref OpenApsEc2Role
+
 Outputs:
   OpenApsElasticIp:
     Description: The elastic IP address assigned to the openaps server.
