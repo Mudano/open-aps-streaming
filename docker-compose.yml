@@ -1,35 +1,9 @@
 version: "3.5"
 services:
-  open-aps-db:
-    restart: always
-    environment:
-      POSTGRES_USER: ${OPEN_APS_POSTGRES_ADMIN_USER}
-      POSTGRES_PASSWORD: ${OPEN_APS_POSTGRES_ADMIN_PASSWORD}
-      POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
-      POSTGRES_REGISTER_USER: ${OPEN_APS_POSTGRES_REGISTER_USER}
-      POSTGRES_REGISTER_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
-      POSTGRES_NIGHTSCOUT_USER: ${OPEN_APS_POSTGRES_NIGHTSCOUT_USER}
-      POSTGRES_NIGHTSCOUT_PASSWORD: ${OPEN_APS_NIGHTSCOUT_PASSWORD}
-      POSTGRES_METABASE_PASSWORD: ${OPEN_APS_POSTGRES_METABASE_PASSWORD}
-      POSTGRES_INGESTOR_PASSWORD: ${OPEN_APS_POSTGRES_INGESTOR_PASSWORD}
-      POSTGRES_ADMIN_VIEWER_PASSWORD: ${OPEN_APS_POSTGRES_ADMIN_VIEWER_PASSWORD}
-      POSTGRES_VIEWER_PASSWORD: ${OPEN_APS_POSTGRES_VIEWER_PASSWORD}
-      POSTGRES_EXT_OPENAPS_APP_PASSWORD: ${OPEN_APS_POSTGRES_EXT_OPENAPS_APP_PASSWORD}
-      DOWNLOADER_ADMIN_PASSWORD_HASH: ${OPEN_APS_DOWNLOADER_ADMIN_PASSWORD_HASH}
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${OPEN_APS_POSTGRES_ADMIN_USER} -d ${OPEN_APS_POSTGRES_DB}",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    command: -p ${OPEN_APS_POSTGRES_PORT}
   open-aps-registration-site:
     restart: always
     environment:
-      POSTGRES_HOST: 'open-aps-db'
+      POSTGRES_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
       POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
       POSTGRES_USER: ${OPEN_APS_POSTGRES_REGISTER_USER}
       POSTGRES_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
@@ -44,7 +18,7 @@ services:
   open-aps-nightscout-ingester:
     restart: always
     environment:
-      POSTGRES_HOST: 'open-aps-db'
+      POSTGRES_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
       POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
       POSTGRES_USER: ${OPEN_APS_POSTGRES_NIGHTSCOUT_USER}
       POSTGRES_PASSWORD: ${OPEN_APS_NIGHTSCOUT_PASSWORD}
@@ -57,7 +31,7 @@ services:
   open-aps-downloader:
     restart: always
     environment:
-      POSTGRES_HOST: 'open-aps-db'
+      POSTGRES_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
       POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
       POSTGRES_USER: 'ext_openaps_app'
       POSTGRES_PASSWORD: ${OPEN_APS_POSTGRES_EXT_OPENAPS_APP_PASSWORD}
@@ -79,11 +53,11 @@ services:
       MB_DB_PORT: ${OPEN_APS_POSTGRES_PORT}
       MB_DB_USER: 'openapsuser'
       MB_DB_PASS: ${OPEN_APS_POSTGRES_METABASE_PASSWORD}
-      MB_DB_HOST: 'open-aps-db'
+      MB_DB_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
   open-aps-etl:
     restart: always
     environment:
-      POSTGRES_HOST: 'open-aps-db'
+      POSTGRES_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
       POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
       POSTGRES_USER: 'ingestor'
       DOWNLOADER_SLACK_KEY: ${OPEN_APS_DOWNLOADER_SLACK_KEY}
