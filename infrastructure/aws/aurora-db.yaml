@@ -35,9 +35,8 @@ Resources:
       Engine: aurora-postgresql
       EngineMode: serverless
       ScalingConfiguration:
-        AutoPause: true
+        AutoPause: false
         MaxCapacity: 16
-        MinCapacity: 2
-        SecondsUntilAutoPause: 300
+        MinCapacity: 4
       VpcSecurityGroupIds: 
       - Fn::GetAtt: [ AuroraDbSecurityGroup, GroupId ]
