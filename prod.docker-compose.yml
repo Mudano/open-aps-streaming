@@ -1,13 +1,5 @@
 version: "3.5"
 services:
-  open-aps-db:
-    image: open-aps-db:latest
-    ports:
-      - 5432:5432
-    volumes:
-      - open-aps-postgres-data:/var/lib/postgresql/data
-    networks:
-      - open_aps
   open-aps-registration-site:
     image: open-aps-registration-site:latest
     networks:
