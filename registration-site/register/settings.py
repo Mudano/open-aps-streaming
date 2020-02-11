@@ -69,7 +69,7 @@ WSGI_APPLICATION = 'register.wsgi.application'
 # get postgres configuration from the environment
 POSTGRES_HOST = os.environ['POSTGRES_HOST']
 POSTGRES_PORT = os.environ['POSTGRES_PORT']
-POSTGRES_DB_NAME = ssm.get_parameter(Name = 'aurora-db-name')['Parameter']['Value']
+POSTGRES_DB_NAME = ssm.get_parameter(Name = 'aurora-db-name')['Parameter']['Value'] # os.environ['POSTGRES_DB']
 POSTGRES_USER = os.environ['POSTGRES_USER']
 POSTGRES_PASS = os.environ['POSTGRES_PASSWORD']
 
@@ -81,7 +81,7 @@ APPLICATION_PORT = os.getenv('APP_PORT')
 
 OPENHUMANS_OH_BASE_URL = 'https://www.openhumans.org'
 OPENHUMANS_PROJECT_ADDRESS = os.getenv('OPEN_HUMANS_PROJECT_ADDRESS')
-OPENHUMANS_CLIENT_ID = ssm.get_parameter(Name = 'open-humans-client-id')['Parameter']['Value'] # os.getenv('OPEN_HUMANS_CLIENT_ID')
+OPENHUMANS_CLIENT_ID = os.getenv('OPEN_HUMANS_CLIENT_ID')
 OPENHUMANS_CLIENT_SECRET = os.getenv('OPEN_HUMANS_CLIENT_SECRET')
 
 LOGIN_REDIRECT_URL = '/'
