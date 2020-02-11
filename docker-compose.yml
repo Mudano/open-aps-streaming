@@ -2,7 +2,7 @@ version: "3.5"
 services:
   open-aps-registration-site:
     restart: always
-    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
+    command: ./entrypoint.sh
   open-aps-nightscout-ingester:
     restart: always
     environment:
@@ -15,7 +15,7 @@ services:
       OPEN_HUMANS_PROJECT_ADDRESS: ${OPEN_HUMANS_PROJECT_ADDRESS}
       OPEN_HUMANS_CLIENT_SECRET: ${OPEN_HUMANS_CLIENT_SECRET}
       INGEST_INTERVAL_HOURS: ${OPEN_APS_INGEST_INTERVAL_HOURS}
-    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./wait-for-it.sh open-aps-registration-site:${OPEN_APS_REGISTRATION_PORT} -- ./entrypoint.sh
+    command: ./entrypoint.sh
   open-aps-downloader:
     restart: always
     environment:
@@ -32,7 +32,7 @@ services:
       DOWNLOADER_SLACK_KEY: ${OPEN_APS_DOWNLOADER_SLACK_KEY}
       DOWNLOADER_ADMIN_EMAIL: ${OPEN_APS_DOWNLOADER_ADMIN_EMAIL}
       DOWNLOADER_PUBLIC_URL: ${OPEN_APS_DOWNLOADER_PUBLIC_URL}
-    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
+    command: ./entrypoint.sh
   metabase:
     restart: always
     environment: 
@@ -56,4 +56,4 @@ services:
       OPEN_APS_NIGHTSCOUT_DEMOGRAPHICS_URL: ${OPEN_APS_NIGHTSCOUT_DEMOGRAPHICS_URL}
     volumes:
       - $PWD/credentials.json:/credentials.json
-    command: ./wait-for-it.sh open-aps-db:${OPEN_APS_POSTGRES_PORT} -- ./entrypoint.sh
+    command: ./entrypoint.sh
