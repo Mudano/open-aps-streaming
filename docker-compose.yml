@@ -6,7 +6,7 @@ services:
   open-aps-nightscout-ingester:
     restart: always
     environment:
-      POSTGRES_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
+      POSTGRES_HOST: ${OPEN_APS_POSTGRES_HOST}
       POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
       POSTGRES_USER: ${OPEN_APS_POSTGRES_NIGHTSCOUT_USER}
       POSTGRES_PASSWORD: ${OPEN_APS_NIGHTSCOUT_PASSWORD}
@@ -19,7 +19,7 @@ services:
   open-aps-downloader:
     restart: always
     environment:
-      POSTGRES_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
+      POSTGRES_HOST: ${OPEN_APS_POSTGRES_HOST}
       POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
       POSTGRES_USER: 'ext_openaps_app'
       POSTGRES_PASSWORD: ${OPEN_APS_POSTGRES_EXT_OPENAPS_APP_PASSWORD}
@@ -41,11 +41,11 @@ services:
       MB_DB_PORT: ${OPEN_APS_POSTGRES_PORT}
       MB_DB_USER: 'openapsuser'
       MB_DB_PASS: ${OPEN_APS_POSTGRES_METABASE_PASSWORD}
-      MB_DB_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
+      MB_DB_HOST: ${OPEN_APS_POSTGRES_HOST}
   open-aps-etl:
     restart: always
     environment:
-      POSTGRES_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
+      POSTGRES_HOST: ${OPEN_APS_POSTGRES_HOST}
       POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
       POSTGRES_USER: 'ingestor'
       DOWNLOADER_SLACK_KEY: ${OPEN_APS_DOWNLOADER_SLACK_KEY}
