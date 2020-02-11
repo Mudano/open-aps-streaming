@@ -5,6 +5,16 @@ services:
     command: ./entrypoint.sh
   open-aps-nightscout-ingester:
     restart: always
+    environment:
+      POSTGRES_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
+      POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
+      POSTGRES_USER: ${OPEN_APS_POSTGRES_NIGHTSCOUT_USER}
+      POSTGRES_PASSWORD: ${OPEN_APS_NIGHTSCOUT_PASSWORD}
+      POSTGRES_DB: ${OPEN_APS_POSTGRES_DB}
+      OPEN_HUMANS_CLIENT_ID: ${OPEN_HUMANS_CLIENT_ID}
+      OPEN_HUMANS_PROJECT_ADDRESS: ${OPEN_HUMANS_PROJECT_ADDRESS}
+      OPEN_HUMANS_CLIENT_SECRET: ${OPEN_HUMANS_CLIENT_SECRET}
+      INGEST_INTERVAL_HOURS: ${OPEN_APS_INGEST_INTERVAL_HOURS}
     command: ./entrypoint.sh
   open-aps-downloader:
     restart: always
