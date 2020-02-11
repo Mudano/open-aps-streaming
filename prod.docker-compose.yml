@@ -26,6 +26,7 @@ services:
       - traefik.enable=true
   reverse-proxy:
     image: traefik:1.7.2-alpine
+    restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - $PWD/reverse-proxy/traefik.toml:/traefik.toml
