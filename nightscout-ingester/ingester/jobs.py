@@ -6,9 +6,18 @@ import os
 from .utility_functions import build_ns_file_metadata, delete_oh_file, \
     upload_local_file_to_oh, get_current_unix_timestamp_ms, get_basename, get_previous_upload_timestamp, \
     build_new_oh_filename, update_file_with_string, delete_local_file
+import boto3
 
-CLIENT_ID = os.getenv('OPEN_HUMANS_CLIENT_ID')
-CLIENT_SECRET = os.getenv('OPEN_HUMANS_CLIENT_SECRET')
+# set up ssm client for config
+ssm = boto3.client('ssm', region_name='eu-west-1')
+
+
+def get_ssm_value(param_name):
+    return ssm.get_parameter(Name = param_name)['Parameter']['Value']
+
+
+CLIENT_ID = get_ssm_value('open-humans-client-id')
+CLIENT_SECRET = get_ssm_value('open-humans-client-secret')
 
 
 def nightscout_ingest_job():
