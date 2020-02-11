@@ -2,10 +2,6 @@
 Django settings for register project.
 """
 import os
-import boto3
-
-# set up ssm client for config
-ssm = boto3.client('ssm', region_name='eu-west-1')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -69,7 +65,7 @@ WSGI_APPLICATION = 'register.wsgi.application'
 # get postgres configuration from the environment
 POSTGRES_HOST = os.environ['POSTGRES_HOST']
 POSTGRES_PORT = os.environ['POSTGRES_PORT']
-POSTGRES_DB_NAME = ssm.get_parameter(Name = 'aurora-db-name')['Parameter']['Value'] # os.environ['POSTGRES_DB']
+POSTGRES_DB_NAME = os.environ['POSTGRES_DB']
 POSTGRES_USER = os.environ['POSTGRES_USER']
 POSTGRES_PASS = os.environ['POSTGRES_PASSWORD']
 
