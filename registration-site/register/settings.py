@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_ssm_value('openaps-register-django-key')
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -69,23 +69,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'register.wsgi.application'
 
 
-# get postgres configuration from AWS SSM
-POSTGRES_HOST = get_ssm_value('openaps-postgres-host')
-POSTGRES_PORT = get_ssm_value('openaps-postgres-port')
+# get postgres configuration from the environment
+POSTGRES_HOST = os.environ['POSTGRES_HOST']
+POSTGRES_PORT = os.environ['POSTGRES_PORT']
 POSTGRES_DB_NAME = get_ssm_value('aurora-db-name')
-POSTGRES_USER = get_ssm_value('postgres-register-user')
-POSTGRES_PASS = get_ssm_value('postgres-register-password')
+POSTGRES_USER = os.environ['POSTGRES_USER']
+POSTGRES_PASS = os.environ['POSTGRES_PASSWORD']
 
 postgres_connection_string =\
     f'postgresql://{POSTGRES_USER}:{POSTGRES_PASS}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB_NAME}'
 
-OPENHUMANS_APP_BASE_URL = get_ssm_value('openaps-register-url')
-APPLICATION_PORT = get_ssm_value('openaps-register-port')
+OPENHUMANS_APP_BASE_URL = os.getenv('APP_BASE_URL')
+APPLICATION_PORT = os.getenv('APP_PORT')
 
 OPENHUMANS_OH_BASE_URL = 'https://www.openhumans.org'
-OPENHUMANS_PROJECT_ADDRESS = get_ssm_value('open-humans-project-address')
+OPENHUMANS_PROJECT_ADDRESS = os.getenv('OPEN_HUMANS_PROJECT_ADDRESS')
 OPENHUMANS_CLIENT_ID = get_ssm_value('open-humans-client-id')
-OPENHUMANS_CLIENT_SECRET = get_ssm_value('open-humans-client-secret')
+OPENHUMANS_CLIENT_SECRET = os.getenv('OPEN_HUMANS_CLIENT_SECRET')
 
 LOGIN_REDIRECT_URL = '/'
 
