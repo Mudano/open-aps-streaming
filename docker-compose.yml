@@ -4,7 +4,7 @@ services:
     restart: always
     command: ./entrypoint.sh
     environment:
-      POSTGRES_HOST: 'open-aps-aurora-db-auroradb-qkxwjngdap1l.cluster-c9tzjjvpib4n.eu-west-1.rds.amazonaws.com'
+      POSTGRES_HOST: ${OPEN_APS_POSTGRES_HOST}
       POSTGRES_PORT: ${OPEN_APS_POSTGRES_PORT}
       POSTGRES_USER: ${OPEN_APS_POSTGRES_REGISTER_USER}
       POSTGRES_PASSWORD: ${OPEN_APS_REGISTER_PASSWORD}
