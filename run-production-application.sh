@@ -6,7 +6,7 @@ get_from_ssm () {
   echo $TEMP
 }
 
-
+# pull down application config from ssm and set on the local environment
 export OPEN_APS_POSTGRES_HOST=$(get_from_ssm openaps-postgres-host)
 export OPEN_APS_POSTGRES_PORT=$(get_from_ssm openaps-postgres-port)
 export OPEN_APS_POSTGRES_DB=$(get_from_ssm aurora-db-name)
