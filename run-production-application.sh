@@ -41,6 +41,11 @@ export OPEN_APS_NIGHTSCOUT_DEMOGRAPHICS_URL=$(get_from_ssm openaps-nightscout-de
 echo "loading gsheet integration credentials"
 aws s3 cp s3://open-aps-gsheet-integration-bucket/credentials.json credentials.json
 
+# creating acme.json file if it doesn't already exist
+touch reverse-proxy/acme.json
+chmod 600 reverse-proxy/acme.json 
+
+# start application
 echo "starting application"
 docker-compose -f docker-compose.yml -f prod.docker-compose.yml up --build \
   --force-recreate -d
