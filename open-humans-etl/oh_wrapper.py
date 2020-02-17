@@ -162,7 +162,7 @@ class OHWrapper:
 
         return file_list
 
-    def rowify_json_files(self, delete_unrowifiable=True, max_file_size=2056):
+    def rowify_json_files(self, delete_unrowifiable=True, max_file_size=1024):
 
         """
         Used to convert a json array into individual records separated by '\n'
@@ -215,3 +215,4 @@ class OHWrapper:
                 return 2
             elif 'none' in file:
                 return 3
+

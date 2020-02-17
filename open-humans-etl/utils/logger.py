@@ -67,3 +67,4 @@ class Logger(object):
 
 # initialise the logger outside of the job definition
 logger = Logger()
+
