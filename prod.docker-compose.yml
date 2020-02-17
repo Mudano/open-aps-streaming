@@ -56,9 +56,6 @@ services:
       - open_aps
 
 
-volumes:
-  open-aps-postgres-data:
-
 networks:
   open_aps:
     driver: bridge
