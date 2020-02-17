@@ -43,10 +43,6 @@ Resources:
         FromPort: 443
         IpProtocol: tcp
         ToPort: 443
-      - CidrIp: 0.0.0.0/0
-        FromPort: 5432
-        IpProtocol: tcp
-        ToPort: 5432
 
   OpenApsServer:
     Type: AWS::EC2::Instance
