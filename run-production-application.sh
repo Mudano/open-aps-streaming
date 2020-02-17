@@ -7,6 +7,7 @@ get_from_ssm () {
 }
 
 # pull down application config from ssm and set on the local environment
+echo "Importing all application parameters"
 export OPEN_APS_POSTGRES_HOST=$(get_from_ssm openaps-postgres-host)
 export OPEN_APS_POSTGRES_PORT=$(get_from_ssm openaps-postgres-port)
 export OPEN_APS_POSTGRES_DB=$(get_from_ssm aurora-db-name)
@@ -36,7 +37,11 @@ export OPEN_APS_ETL_INTERVAL_HOURS=$(get_from_ssm openaps-etl-interval)
 export OPEN_APS_OPENAPS_DEMOGRAPHICS_URL=$(get_from_ssm openaps-openaps-demographics-url)
 export OPEN_APS_NIGHTSCOUT_DEMOGRAPHICS_URL=$(get_from_ssm openaps-nightscout-demographics-url)
 
+# copy credentials down to local machine
+echo "loading gsheet integration credentials"
+aws s3 cp s3://open-aps-gsheet-integration-bucket/credentials.json credentials.json
 
+echo "starting application"
 docker-compose -f docker-compose.yml -f prod.docker-compose.yml up --build \
   --force-recreate -d
 
