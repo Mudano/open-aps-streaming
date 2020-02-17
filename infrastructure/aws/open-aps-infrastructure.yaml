@@ -87,6 +87,7 @@ Resources:
             git clone https://github.com/mudano-data-solutions/open-aps-streaming.git
             cd open-aps-streaming/
             ./image-builds.sh
+            ./run-production-application.sh 
   AssociateExistingIp:
     Type: AWS::EC2::EIPAssociation
     Properties:
