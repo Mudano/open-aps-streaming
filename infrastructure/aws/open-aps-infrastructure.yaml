@@ -114,6 +114,9 @@ Resources:
               - Effect: Allow
                 Action: 'ssm:GetParameter'
                 Resource: '*'
+              - Effect: Allow
+                Action: 's3:GetObject'
+                Resource: '*'
 
   MyInstanceProfile: 
     Type: "AWS::IAM::InstanceProfile"
