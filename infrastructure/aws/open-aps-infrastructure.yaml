@@ -55,6 +55,7 @@ Resources:
       KeyName: !Ref SecurityKeyName
       InstanceType: !Ref InstanceType
       SecurityGroupIds: [!Ref OpenApsSecurityGroup]
+      IamInstanceProfile : !Ref MyInstanceProfile
       BlockDeviceMappings:
         - 
           DeviceName: "/dev/sda1"
