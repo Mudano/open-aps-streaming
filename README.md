@@ -1,4 +1,4 @@
-# open-aps-Streaming
+# open-aps-streaming
 A set of tools that provide streaming updates of data from NightScout accounts onto OpenHumans, and a data access platform to manage the stored data. It is hosted using AWS.
 
 #### AWS Deployment
@@ -22,6 +22,12 @@ The full solution structure is shown below, components highlighted in colour are
 
 These services were built independently, hence why they are ran as separate containers. 
 
+- **The registration site**: This is a single page website that allows users to register their OpenHumans account with the site and to submit their Nightscout URL to OpenHumans. Defined in `registration-site/`.
+- **The Nightscout Ingester**: This is a scheduled process that uses the OH data stored in the database, and the Nightscourt URL stored in the corresponding users OH account, to carry out a regular ingest of Nightscout data into OpenHumans. Defined in `nightscout-ingester`.
+- **The ETL job**: This is a scheduled process that ingests user data on a regular basis from their OH account and into the application database. Defined in `open-humans-etl`.
+- **The Downloader application**: This is a small application designed to enable analysis and simple downloads of large amounts of OpenAPS data. Defined in `data-management-app`.
+- **Metabase**: This is an open source data visualisation tool that generates charts using the data stored in the database to be displayed in the downloader application. Config defined in the database (see below).
+
 All containers can be ran so long as they have a live connection to a database initialised with the scripts stored in `open-aps-db/init-scripts` . The only exception to this rule is the metabase server, which stores it's configuration in the database. This configuration can be backed up by taking a dump of the relevant schema (`public`) in the database, but this dump contains sensitive credentials (database access usernames and passwords) so can not be stored on this repository.
 
 #### Application update and deployment
@@ -36,3 +42,8 @@ git pull origin master
 ./run-production-application.sh
 ```
 
+#### DNS and SSL
+
+The routing from the `openaps.org` top level domain to the elastic IP attached to the EC2 instance is managed by the owner of the domain. SSL (HTTPS) access is provided by the reverse-proxy that sits in front of the web components (the registration site and the downloader application). The reverse-proxy used is [Traefik](https://containo.us/traefik/) which allows for easy reverse-proxying of Docker containers ran using Docker-compose. The SSL provision is managed by Traefik using lets-encrypt as the certificate authority.
+
+The Traefik configuration is defined in `reverse-proxy/traefik.toml`, and the container level interaction with Traefik is defined using Docker labels defined in `prod.docker-compose.yml`.
