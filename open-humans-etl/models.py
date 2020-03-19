@@ -52,7 +52,9 @@ class Treatment:
         self.user_id = entity['user_id']
         self.id = entity['_id'] if '_id' in entity else entity['id'] if 'id' in entity else entity['uuid']
         self.event_type = entity.get('eventType')
+
         self.timestamp = self._parse_date(entity.get('timestamp')) if entity.get('timestamp') != 0 else entity.get('created_at')
+        self.timestamp = self.timestamp if self.timestamp else entity.get('created_at')
 
         self.insulin = entity.get('insulin')
         self.carbs = entity.get('carbs')
@@ -91,12 +93,15 @@ class Treatment:
     @staticmethod
     def _parse_date(date):
 
-        if not date:
-            return date
-        elif isinstance(date, int):
-            return str(datetime.fromtimestamp(float(date) / 1000))
-        else:
-            return str(parse(date))
+        try:
+            if not date:
+                return date
+            elif isinstance(date, int):
+                return str(datetime.fromtimestamp(float(date) / 1000))
+            else:
+                return str(parse(date))
+        except OverflowError:
+            return None
 
     def __enter__(self):
         return self
