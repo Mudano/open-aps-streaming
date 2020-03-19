@@ -55,6 +55,10 @@ class OHWrapper:
 
                 self.download_files_by_links(filelist, user_directory)
 
+            except KeyError:
+                self.logger.error(f"Keyerror while downloading records for ID {user_record['oh_id']}: {traceback.format_exc()}")
+                continue
+
             except Exception:
                 self.logger.error(f"Error while downloading records for ID {user_record['oh_id']}: {traceback.format_exc()}")
                 continue
